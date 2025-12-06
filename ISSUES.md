@@ -32,12 +32,18 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
   - AI_LAYER_URL (Standard: http://localhost:8001/analyze)
   - AI_LAYER_TIMEOUT (Standard: 5 Sekunden)
 
-#### #003: HMI zeigt keine Fehlermeldung bei API-Verbindungsfehler
+#### ~~#003: HMI zeigt keine Fehlermeldung bei API-Verbindungsfehler~~ ✅ BEHOBEN
 **Beschreibung:** Wenn das HMI keine Verbindung zum Control Layer herstellen kann, bleibt die Benutzeroberfläche leer ohne Fehlermeldung.
-- **Betroffene Komponenten:** C# HMI Layer (MainForm.cs)
+- **Betroffene Komponenten:** C# HMI Layer (MainForm.cs, ControlLayerClient.cs)
 - **Auswirkung:** Schlechte Benutzererfahrung, unklare Fehlerursache
 - **Priorität:** Mittel
-- **Vorgeschlagene Lösung:** Verbindungsstatus-Indikator und aussagekräftige Fehlerdialoge hinzufügen
+- **Status:** ✅ Behoben in Commit e20cd31
+- **Lösung:** Verbindungsstatus-Anzeige und Fehlerbehandlung implementiert
+  - Verbindungsstatus in System-Status-Label mit Farbcodierung
+  - Unterscheidung zwischen Verbindungs-, Timeout- und allgemeinen Fehlern
+  - Fehlerdialog beim Startup mit Troubleshooting-Hinweisen
+  - "No data available" Anzeige wenn Daten nicht abgerufen werden können
+  - Automatische Verbindungsprüfung vor Datenabfragen
 
 ### Logging & Monitoring
 

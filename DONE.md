@@ -14,6 +14,24 @@ Jeder Eintrag sollte folgende Informationen enthalten:
 
 ## 2024-12-06
 
+### HMI Fehlerbehandlung und Benutzer-Feedback verbessert
+- **Datum:** 2024-12-06
+- **Typ:** Enhancement
+- **Beschreibung:** Fehlerbehandlung im C# HMI Layer verbessert, Verbindungsstatus-Anzeige hinzugefügt
+- **Commit:** e20cd31
+- **Autor:** GitHub Copilot Agent
+- **Details:**
+  - **Issue #003 behoben:** HMI zeigt jetzt aussagekräftige Fehlermeldungen
+    - Verbindungsstatus-Indikator im System-Status-Label
+    - Farbcodierung: Grün (verbunden), Rot (Fehler), Orange (Warnung)
+    - Unterscheidung zwischen HttpRequestException, TaskCanceledException und allgemeinen Fehlern
+    - Detaillierter Fehlerdialog beim Startup mit Troubleshooting-Tipps
+    - "No data available" Anzeige wenn API-Calls fehlschlagen
+    - Automatische Verbindungsprüfung vor Datenabfragen
+  - ControlLayerClient.cs: Exceptions für Connection/Timeout-Fehler durchreichen
+  - MainForm.cs: Erweiterte Fehlerbehandlung in UpdateDataAsync und RefreshDevicesAsync
+  - System.Net.Http using hinzugefügt für HttpRequestException
+
 ### Magic Numbers extrahiert, API Timeouts konfigurierbar, MQTT Reconnection implementiert
 - **Datum:** 2024-12-06
 - **Typ:** Enhancement

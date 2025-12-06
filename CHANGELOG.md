@@ -28,6 +28,8 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - **mqtt_handler.py**: Erweitert um automatische Reconnection mit exponentieller Backoff
 - **config.py**: Neue Konfigurationsoptionen für AI Layer (URL, Timeout)
 - **CONFIGURATION.md**: Dokumentation neuer Umgebungsvariablen hinzugefügt
+- **MainForm.cs**: Verbesserte Fehlerbehandlung mit Verbindungsstatus-Anzeige
+- **ControlLayerClient.cs**: Exceptions für Connection/Timeout-Fehler werden durchgereicht
 
 ### Entfernt
 - Ungenutzte Imports: Thread, numpy, Optional, stats, Dict
@@ -39,6 +41,7 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - Code-Qualitätsprobleme (pyflakes-clean)
 - **Issue #001**: MQTT-Verbindungsabbruch ohne automatische Wiederverbindung
 - **Issue #002**: API-Timeouts nicht konfigurierbar
+- **Issue #003**: HMI zeigt keine Fehlermeldung bei API-Verbindungsfehler
 - **Issue #004**: Inkonsistente Log-Level über Komponenten hinweg
 - **Issue #009**: Magic Numbers im Code schwer verständlich und anzupassen
 
