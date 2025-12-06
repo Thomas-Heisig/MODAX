@@ -117,15 +117,34 @@ Ausführliche Anweisungen finden Sie unter [docs/SETUP.md](docs/SETUP.md)
 
 ## Dokumentation
 
+📚 **[Vollständiger Dokumentations-Index](docs/INDEX.md)** - Umfassender Überblick über alle Dokumentation
+
 ### Hauptdokumentation
+
+#### Kern-System
 - [📋 Architektur-Übersicht](docs/ARCHITECTURE.md) - Detailliertes Systemdesign
 - [🔧 Setup-Anleitung](docs/SETUP.md) - Vollständige Installationsanleitung
 - [📡 API-Dokumentation](docs/API.md) - REST API Referenz
 - [⚙️ Konfiguration](docs/CONFIGURATION.md) - Konfigurationsoptionen
+
+#### Sicherheit & Netzwerk
 - [🔒 Sicherheit](docs/SECURITY.md) - Sicherheitskonzept und Implementierung
+- [🌐 Netzwerkarchitektur](docs/NETWORK_ARCHITECTURE.md) - OT/IT-Trennung, Purdue-Modell, Firewalls
+- [🔐 Fehlerbehandlung](docs/ERROR_HANDLING.md) - Fehlerbehandlungs-Patterns
+- [📋 Logging-Standards](docs/LOGGING_STANDARDS.md) - Logging-Best-Practices
+
+#### Daten & Persistenz
 - [💾 Datenpersistenz](docs/DATA_PERSISTENCE.md) - Datenbank-Strategie und TimescaleDB
+- [💿 Backup & Recovery](docs/BACKUP_RECOVERY.md) - Backup-Strategien und Disaster Recovery
+
+#### Deployment & Operations
 - [🐳 Containerisierung](docs/CONTAINERIZATION.md) - Docker und Deployment
+- [🔄 CI/CD-Pipeline](docs/CI_CD.md) - Continuous Integration/Deployment
+- [⚡ High Availability](docs/HIGH_AVAILABILITY.md) - Hochverfügbarkeit und Failover
 - [📊 Monitoring](docs/MONITORING.md) - Observability Stack (Prometheus, Loki, Grafana)
+
+#### Integration
+- [🔌 OPC UA Integration](docs/OPC_UA_INTEGRATION.md) - OPC UA Server/Client, SCADA-Integration
 
 ### Ebenen-spezifische Dokumentation
 - [🔌 Feldebene](esp32-field-layer/README.md) - ESP32 Dokumentation

@@ -12,6 +12,12 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] Datenpersistenz-Strategie dokumentieren (docs/DATA_PERSISTENCE.md)
 - [x] Containerisierung dokumentieren (docs/CONTAINERIZATION.md)
 - [x] Monitoring-Stack dokumentieren (docs/MONITORING.md)
+- [x] CI/CD-Pipeline dokumentieren (docs/CI_CD.md)
+- [x] High Availability dokumentieren (docs/HIGH_AVAILABILITY.md)
+- [x] Netzwerkarchitektur & OT/IT-Trennung dokumentieren (docs/NETWORK_ARCHITECTURE.md)
+- [x] Backup & Recovery Prozeduren dokumentieren (docs/BACKUP_RECOVERY.md)
+- [x] OPC UA Integration dokumentieren (docs/OPC_UA_INTEGRATION.md)
+- [x] Dokumentations-Index erstellen (docs/INDEX.md)
 
 ### Tests
 - [ ] Unit-Tests für Python Control Layer hinzufügen
@@ -80,10 +86,19 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 
 ### Deployment
 - [x] Containerisierung dokumentieren (docs/CONTAINERIZATION.md)
+- [x] CI/CD-Pipeline dokumentieren (docs/CI_CD.md)
+- [x] High Availability dokumentieren (docs/HIGH_AVAILABILITY.md)
+- [x] Backup & Recovery dokumentieren (docs/BACKUP_RECOVERY.md)
 - [ ] Docker-Container für alle Ebenen erstellen (siehe docs/CONTAINERIZATION.md)
 - [ ] Docker-Compose-Datei für schnellen Start (siehe docs/CONTAINERIZATION.md)
 - [ ] Kubernetes-Manifeste für Produktionsbereitstellung
-- [ ] CI/CD-Pipeline mit GitHub Actions (siehe docs/CONTAINERIZATION.md)
+- [ ] CI/CD-Pipeline mit GitHub Actions implementieren (siehe docs/CI_CD.md)
+
+### Integration
+- [x] OPC UA Integration dokumentieren (docs/OPC_UA_INTEGRATION.md)
+- [ ] OPC UA Server implementieren (siehe docs/OPC_UA_INTEGRATION.md)
+- [ ] Externe System-Integrationen dokumentieren (ERP/MES/SCADA)
+- [ ] MQTT Sparkplug B implementieren
 
 ### Dokumentation
 - [ ] Video-Tutorials für Setup erstellen
