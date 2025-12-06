@@ -8,6 +8,10 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] API-Dokumentation für alle REST-Endpunkte erstellen (docs/API.md)
 - [x] Fehlerbehandlungs-Leitfaden dokumentieren (docs/ERROR_HANDLING.md)
 - [x] Konfigurationsoptionen vollständig dokumentieren (docs/CONFIGURATION.md)
+- [x] Sicherheitskonzept dokumentieren (docs/SECURITY.md)
+- [x] Datenpersistenz-Strategie dokumentieren (docs/DATA_PERSISTENCE.md)
+- [x] Containerisierung dokumentieren (docs/CONTAINERIZATION.md)
+- [x] Monitoring-Stack dokumentieren (docs/MONITORING.md)
 
 ### Tests
 - [ ] Unit-Tests für Python Control Layer hinzufügen
@@ -16,16 +20,19 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [ ] End-to-End-Tests für komplette Datenflusskette
 
 ### Sicherheit
-- [ ] MQTT-Authentifizierung implementieren
-- [ ] TLS/SSL für Produktionsumgebung einrichten
-- [ ] API-Authentifizierung hinzufügen
+- [x] Sicherheitskonzept dokumentieren (docs/SECURITY.md)
+- [ ] MQTT-Authentifizierung implementieren (siehe docs/SECURITY.md)
+- [ ] TLS/SSL für Produktionsumgebung einrichten (siehe docs/SECURITY.md)
+- [ ] API-Authentifizierung hinzufügen (siehe docs/SECURITY.md)
+- [ ] Secrets Management einrichten (siehe docs/SECURITY.md)
 - [ ] Sicherheitsaudit durchführen
 
 ## Priorität 2: Hoch
 
 ### Funktionserweiterungen
 - [ ] WebSocket-Unterstützung für Echtzeit-Updates im HMI
-- [ ] Zeitreihen-Datenbank-Integration (z.B. InfluxDB)
+- [x] Zeitreihen-Datenbank-Integration dokumentieren (docs/DATA_PERSISTENCE.md)
+- [ ] TimescaleDB implementieren (siehe docs/DATA_PERSISTENCE.md)
 - [ ] Erweiterte Visualisierungen mit Diagrammen im HMI
 - [ ] Daten-Export-Funktion (CSV, JSON)
 
@@ -65,16 +72,18 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 ## Priorität 4: Niedrig
 
 ### Monitoring
-- [ ] Prometheus-Metriken exportieren
-- [ ] Grafana-Dashboards erstellen
-- [ ] Log-Aggregation mit ELK-Stack einrichten
-- [ ] Alerting-System für kritische Fehler
+- [x] Monitoring-Stack dokumentieren (docs/MONITORING.md)
+- [ ] Prometheus-Metriken exportieren (siehe docs/MONITORING.md)
+- [ ] Grafana-Dashboards erstellen (siehe docs/MONITORING.md)
+- [ ] Log-Aggregation mit Loki einrichten (siehe docs/MONITORING.md)
+- [ ] Alerting-System für kritische Fehler (siehe docs/MONITORING.md)
 
 ### Deployment
-- [ ] Docker-Container für alle Ebenen erstellen
-- [ ] Docker-Compose-Datei für schnellen Start
+- [x] Containerisierung dokumentieren (docs/CONTAINERIZATION.md)
+- [ ] Docker-Container für alle Ebenen erstellen (siehe docs/CONTAINERIZATION.md)
+- [ ] Docker-Compose-Datei für schnellen Start (siehe docs/CONTAINERIZATION.md)
 - [ ] Kubernetes-Manifeste für Produktionsbereitstellung
-- [ ] CI/CD-Pipeline mit GitHub Actions
+- [ ] CI/CD-Pipeline mit GitHub Actions (siehe docs/CONTAINERIZATION.md)
 
 ### Dokumentation
 - [ ] Video-Tutorials für Setup erstellen

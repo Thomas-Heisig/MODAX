@@ -14,6 +14,36 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - Erweiterte Docstrings für main.py Module
 - **docs/ERROR_HANDLING.md**: Umfassender Fehlerbehandlungs-Leitfaden
 - **docs/LOGGING_STANDARDS.md**: Logging-Standards und Konventionen
+- **docs/SECURITY.md**: Vollständiges Sicherheitskonzept
+  - Transport-Sicherheit (TLS/SSL für MQTT und HTTPS)
+  - Authentifizierung & Autorisierung (MQTT, API, RBAC)
+  - Audit-Logging für Sicherheitsereignisse
+  - Secrets Management (HashiCorp Vault)
+  - Netzwerk-Segmentierung (OT/IT-Trennung)
+  - Vulnerability Management und Incident Response
+  - Compliance (IEC 62443, NIST SP 800-82)
+- **docs/DATA_PERSISTENCE.md**: Datenpersistenz-Strategie
+  - TimescaleDB als empfohlene Zeit-Reihen-Datenbank
+  - Vollständiges Datenbankschema mit Hypertables
+  - Continuous Aggregates für Performance
+  - Datei-Retention-Policies (7 Tage bis 10 Jahre)
+  - Python-Integration mit Connection Pooling
+  - Backup & Recovery mit PITR
+- **docs/CONTAINERIZATION.md**: Containerisierungs-Guide
+  - Dockerfiles für alle Komponenten (MQTT, DB, Control, AI)
+  - docker-compose.yml für Entwicklung und Produktion
+  - Build und Deployment-Skripte
+  - Zero-Downtime Updates
+  - CI/CD Integration (GitHub Actions)
+  - Security Best Practices für Container
+- **docs/MONITORING.md**: Monitoring-Stack-Dokumentation
+  - Prometheus für Metrics Collection
+  - Loki für Log Aggregation
+  - Grafana für Visualisierung und Dashboards
+  - AlertManager für Alerting
+  - OpenTelemetry für Distributed Tracing
+  - Vollständige Konfigurationsbeispiele
+  - Custom Metrics für MODAX-Komponenten
 - **MQTT Reconnection**: Automatische Wiederverbindung mit exponentieller Backoff-Strategie
 - **Konfigurierbare API Timeouts**: AI_LAYER_URL und AI_LAYER_TIMEOUT Umgebungsvariablen
 
@@ -43,7 +73,13 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - **Issue #002**: API-Timeouts nicht konfigurierbar
 - **Issue #003**: HMI zeigt keine Fehlermeldung bei API-Verbindungsfehler
 - **Issue #004**: Inkonsistente Log-Level über Komponenten hinweg
+- **Issue #006**: Fehlende API-Dokumentation - docs/API.md erstellt
+- **Issue #007**: Konfigurationsoptionen nicht dokumentiert - docs/CONFIGURATION.md erstellt
 - **Issue #009**: Magic Numbers im Code schwer verständlich und anzupassen
+- **Issue #018**: Fehlende Sicherheitsdokumentation - docs/SECURITY.md erstellt
+- **Issue #019**: Fehlende Datenpersistenz-Dokumentation - docs/DATA_PERSISTENCE.md erstellt
+- **Issue #020**: Fehlende Containerisierungs-Dokumentation - docs/CONTAINERIZATION.md erstellt
+- **Issue #021**: Fehlende Monitoring-Dokumentation - docs/MONITORING.md erstellt
 
 ### Sicherheit
 - protobuf auf >=4.25.8 erhöht (CVE-Fix für DoS-Schwachstellen)
