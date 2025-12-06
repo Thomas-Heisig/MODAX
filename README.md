@@ -122,6 +122,10 @@ Ausführliche Anweisungen finden Sie unter [docs/SETUP.md](docs/SETUP.md)
 - [🔧 Setup-Anleitung](docs/SETUP.md) - Vollständige Installationsanleitung
 - [📡 API-Dokumentation](docs/API.md) - REST API Referenz
 - [⚙️ Konfiguration](docs/CONFIGURATION.md) - Konfigurationsoptionen
+- [🔒 Sicherheit](docs/SECURITY.md) - Sicherheitskonzept und Implementierung
+- [💾 Datenpersistenz](docs/DATA_PERSISTENCE.md) - Datenbank-Strategie und TimescaleDB
+- [🐳 Containerisierung](docs/CONTAINERIZATION.md) - Docker und Deployment
+- [📊 Monitoring](docs/MONITORING.md) - Observability Stack (Prometheus, Loki, Grafana)
 
 ### Ebenen-spezifische Dokumentation
 - [🔌 Feldebene](esp32-field-layer/README.md) - ESP32 Dokumentation

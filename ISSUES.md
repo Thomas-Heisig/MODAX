@@ -67,19 +67,53 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
 
 ### Dokumentation
 
-#### #006: Fehlende API-Dokumentation
+#### ~~#006: Fehlende API-Dokumentation~~ ✅ BEHOBEN
 **Beschreibung:** REST-API-Endpunkte sind nicht vollständig dokumentiert (z.B. fehlen Request/Response-Schemas).
 - **Betroffene Komponenten:** Python Control Layer, Python AI Layer
 - **Auswirkung:** Schwierig für neue Entwickler, APIs zu nutzen
 - **Priorität:** Mittel
-- **Vorgeschlagene Lösung:** OpenAPI/Swagger-Dokumentation mit FastAPI generieren
+- **Status:** ✅ Behoben - docs/API.md erstellt
+- **Lösung:** Vollständige API-Dokumentation mit allen Endpunkten, Request/Response-Schemas und Beispielen
 
-#### #007: Konfigurationsoptionen nicht vollständig dokumentiert
+#### ~~#007: Konfigurationsoptionen nicht vollständig dokumentiert~~ ✅ BEHOBEN
 **Beschreibung:** Einige Umgebungsvariablen und Konfigurationsoptionen sind nicht in den README-Dateien erklärt.
 - **Betroffene Komponenten:** Alle Ebenen
 - **Auswirkung:** Schwierige Konfiguration für Deployment
 - **Priorität:** Mittel
-- **Vorgeschlagene Lösung:** Vollständige Konfigurationsreferenz in SETUP.md erstellen
+- **Status:** ✅ Behoben - docs/CONFIGURATION.md erstellt
+- **Lösung:** Vollständige Konfigurationsreferenz mit allen Umgebungsvariablen und Standardwerten
+
+#### #018: Fehlende Sicherheitsdokumentation
+**Beschreibung:** Sicherheitskonzept (TLS, Authentifizierung, Audit-Logging) nicht dokumentiert.
+- **Betroffene Komponenten:** Alle Ebenen
+- **Auswirkung:** Unsichere Produktionsbereitstellung
+- **Priorität:** Kritisch
+- **Status:** ✅ Behoben - docs/SECURITY.md erstellt
+- **Lösung:** Umfassendes Sicherheitskonzept mit Implementierungsrichtlinien
+
+#### #019: Fehlende Datenpersistenz-Dokumentation
+**Beschreibung:** Strategie für historische Datenspeicherung nicht dokumentiert.
+- **Betroffene Komponenten:** Control Layer, AI Layer
+- **Auswirkung:** Keine Langzeitanalyse möglich
+- **Priorität:** Hoch
+- **Status:** ✅ Behoben - docs/DATA_PERSISTENCE.md erstellt
+- **Lösung:** Vollständige Datenpersistenz-Strategie mit TimescaleDB
+
+#### #020: Fehlende Containerisierungs-Dokumentation
+**Beschreibung:** Docker und Container-Deployment nicht dokumentiert.
+- **Betroffene Komponenten:** Alle Ebenen
+- **Auswirkung:** Schwierige Produktionsbereitstellung
+- **Priorität:** Hoch
+- **Status:** ✅ Behoben - docs/CONTAINERIZATION.md erstellt
+- **Lösung:** Umfassende Containerisierungs-Anleitung mit Dockerfiles und docker-compose
+
+#### #021: Fehlende Monitoring-Dokumentation
+**Beschreibung:** Monitoring und Observability Stack nicht dokumentiert.
+- **Betroffene Komponenten:** Alle Ebenen
+- **Auswirkung:** Keine System-Überwachung in Produktion
+- **Priorität:** Hoch
+- **Status:** ✅ Behoben - docs/MONITORING.md erstellt
+- **Lösung:** Vollständige Monitoring-Stack-Dokumentation mit Prometheus, Loki, Grafana
 
 ## Kleinere Probleme
 
