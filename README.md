@@ -117,12 +117,23 @@ Ausführliche Anweisungen finden Sie unter [docs/SETUP.md](docs/SETUP.md)
 
 ## Dokumentation
 
+### Hauptdokumentation
 - [📋 Architektur-Übersicht](docs/ARCHITECTURE.md) - Detailliertes Systemdesign
 - [🔧 Setup-Anleitung](docs/SETUP.md) - Vollständige Installationsanleitung
+- [📡 API-Dokumentation](docs/API.md) - REST API Referenz
+- [⚙️ Konfiguration](docs/CONFIGURATION.md) - Konfigurationsoptionen
+
+### Ebenen-spezifische Dokumentation
 - [🔌 Feldebene](esp32-field-layer/README.md) - ESP32 Dokumentation
 - [⚙️ Steuerungsebene](python-control-layer/README.md) - Python Control Layer
 - [🤖 KI-Ebene](python-ai-layer/README.md) - AI Layer Details
 - [💻 HMI-Ebene](csharp-hmi-layer/README.md) - C# HMI Dokumentation
+
+### Projekt-Management
+- [📝 TODO](TODO.md) - Offene Aufgaben und Roadmap
+- [🐛 ISSUES](ISSUES.md) - Bekannte Probleme und Verbesserungsvorschläge
+- [✅ DONE](DONE.md) - Erledigte Aufgaben
+- [📜 CHANGELOG](CHANGELOG.md) - Änderungsprotokoll
 
 ## Projektstruktur
 
