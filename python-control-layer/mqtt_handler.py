@@ -35,7 +35,9 @@ class MQTTHandler:
         self.client.on_message = self._on_message
         self.client.on_disconnect = self._on_disconnect
         
-        # Enable automatic reconnection
+        # Enable automatic reconnection using paho-mqtt's built-in mechanism
+        # This sets the client's internal reconnection parameters and works
+        # in conjunction with our manual exponential backoff tracking below
         self.client.reconnect_delay_set(
             min_delay=MQTT_RECONNECT_DELAY_MIN,
             max_delay=MQTT_RECONNECT_DELAY_MAX

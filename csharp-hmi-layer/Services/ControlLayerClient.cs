@@ -16,6 +16,11 @@ namespace MODAX.HMI.Services
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
 
+        /// <summary>
+        /// Gets the base URL of the Control Layer API
+        /// </summary>
+        public string BaseUrl => _baseUrl;
+
         public ControlLayerClient(string baseUrl = "http://localhost:8000")
         {
             _baseUrl = baseUrl;

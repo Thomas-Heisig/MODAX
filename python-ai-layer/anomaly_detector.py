@@ -186,6 +186,22 @@ class StatisticalAnomalyDetector:
                 confidence=0.90
             )
     
+    def _update_baseline_stat(self, old_mean: float, old_std: float, new_value: float) -> Tuple[float, float]:
+        """
+        Update baseline statistics using exponential moving average
+        
+        Args:
+            old_mean: Previous mean value
+            old_std: Previous standard deviation
+            new_value: New measurement value
+            
+        Returns:
+            Tuple of (new_mean, new_std)
+        """
+        new_mean = BASELINE_UPDATE_ALPHA * old_mean + (1 - BASELINE_UPDATE_ALPHA) * new_value
+        new_std = BASELINE_UPDATE_ALPHA * old_std + (1 - BASELINE_UPDATE_ALPHA) * abs(new_value - new_mean)
+        return (new_mean, new_std)
+    
     def update_baseline(self, device_id: str, sensor_data: dict):
         """Update baseline statistics with new data"""
         if device_id not in self.baseline_stats:
@@ -194,16 +210,11 @@ class StatisticalAnomalyDetector:
         # Update current baselines
         for i, current in enumerate(sensor_data.get('current_mean', [])):
             key = f'current_{i}'
-            # Simple exponential moving average
             if key in self.baseline_stats[device_id]:
                 old_mean, old_std = self.baseline_stats[device_id][key]
-                new_mean = BASELINE_UPDATE_ALPHA * old_mean + (1 - BASELINE_UPDATE_ALPHA) * current
-                new_std = BASELINE_UPDATE_ALPHA * old_std + (1 - BASELINE_UPDATE_ALPHA) * abs(current - new_mean)
+                self.baseline_stats[device_id][key] = self._update_baseline_stat(old_mean, old_std, current)
             else:
-                new_mean = current
-                new_std = INITIAL_CURRENT_STD
-            
-            self.baseline_stats[device_id][key] = (new_mean, new_std)
+                self.baseline_stats[device_id][key] = (current, INITIAL_CURRENT_STD)
         
         # Update vibration baseline
         vib_magnitude = sensor_data.get('vibration_mean', {}).get('magnitude', 0)
@@ -211,23 +222,15 @@ class StatisticalAnomalyDetector:
             key = 'vibration_magnitude'
             if key in self.baseline_stats[device_id]:
                 old_mean, old_std = self.baseline_stats[device_id][key]
-                new_mean = BASELINE_UPDATE_ALPHA * old_mean + (1 - BASELINE_UPDATE_ALPHA) * vib_magnitude
-                new_std = BASELINE_UPDATE_ALPHA * old_std + (1 - BASELINE_UPDATE_ALPHA) * abs(vib_magnitude - new_mean)
+                self.baseline_stats[device_id][key] = self._update_baseline_stat(old_mean, old_std, vib_magnitude)
             else:
-                new_mean = vib_magnitude
-                new_std = INITIAL_VIBRATION_STD
-            
-            self.baseline_stats[device_id][key] = (new_mean, new_std)
+                self.baseline_stats[device_id][key] = (vib_magnitude, INITIAL_VIBRATION_STD)
         
         # Update temperature baselines
         for i, temp in enumerate(sensor_data.get('temperature_mean', [])):
             key = f'temp_{i}'
             if key in self.baseline_stats[device_id]:
                 old_mean, old_std = self.baseline_stats[device_id][key]
-                new_mean = BASELINE_UPDATE_ALPHA * old_mean + (1 - BASELINE_UPDATE_ALPHA) * temp
-                new_std = BASELINE_UPDATE_ALPHA * old_std + (1 - BASELINE_UPDATE_ALPHA) * abs(temp - new_mean)
+                self.baseline_stats[device_id][key] = self._update_baseline_stat(old_mean, old_std, temp)
             else:
-                new_mean = temp
-                new_std = INITIAL_TEMPERATURE_STD
-            
-            self.baseline_stats[device_id][key] = (new_mean, new_std)
+                self.baseline_stats[device_id][key] = (temp, INITIAL_TEMPERATURE_STD)

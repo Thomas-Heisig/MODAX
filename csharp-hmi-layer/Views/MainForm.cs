@@ -354,7 +354,7 @@ namespace MODAX.HMI.Views
                     _systemStatusLabel.ForeColor = Color.Red;
                 }
                 MessageBox.Show(
-                    $"Failed to connect to Control Layer at {_controlClient.GetType().GetProperty("_baseUrl")?.GetValue(_controlClient)}.\n\n" +
+                    $"Failed to connect to Control Layer at {_controlClient.BaseUrl}.\n\n" +
                     $"Error: {ex.Message}\n\n" +
                     "Please ensure:\n" +
                     "1. The Control Layer is running\n" +
