@@ -3,6 +3,27 @@ import numpy as np
 from typing import Dict, List
 from dataclasses import dataclass
 
+# Wear prediction threshold constants
+CURRENT_NORMAL_THRESHOLD = 5.0  # Amperes - normal operating current
+CURRENT_HIGH_LOAD_EXPONENT = 1.5  # Exponent for high load wear factor
+CURRENT_SPIKE_THRESHOLD = 8.0  # Amperes - current spike threshold
+CURRENT_SPIKE_BASE_FACTOR = 1.1  # Base wear factor for current spikes
+CURRENT_SPIKE_INCREMENT = 0.05  # Incremental wear factor per amp above threshold
+VIBRATION_NORMAL_THRESHOLD = 3.0  # m/s² - normal vibration level
+VIBRATION_WEAR_FACTOR = 0.15  # Wear factor multiplier per m/s² above threshold
+VIBRATION_STD_THRESHOLD = 1.0  # m/s² - vibration variability threshold
+VIBRATION_STD_WEAR_FACTOR = 1.15  # Wear factor for high vibration variability
+TEMPERATURE_NORMAL_THRESHOLD = 50.0  # °C - normal operating temperature
+TEMPERATURE_WEAR_FACTOR = 0.02  # Wear factor per °C above threshold
+TEMPERATURE_CYCLING_THRESHOLD = 15.0  # °C - temperature cycling range
+TEMPERATURE_CYCLING_FACTOR = 1.1  # Wear factor for temperature cycling
+WEAR_HIGH_THRESHOLD = 0.7  # High wear level (70%)
+WEAR_MODERATE_THRESHOLD = 0.5  # Moderate wear level (50%)
+WEAR_MEDIUM_THRESHOLD = 0.4  # Medium wear level (40%)
+CONFIDENCE_BASE = 0.75  # Base confidence level
+CONFIDENCE_WEAR_PENALTY = 0.2  # Confidence penalty factor based on wear level
+NOMINAL_LIFETIME_HOURS = 10000  # Baseline component lifetime in hours
+
 @dataclass
 class WearPrediction:
     """Wear prediction result"""
@@ -22,7 +43,7 @@ class SimpleWearPredictor:
         self.wear_rates: Dict[str, float] = {}
         
         # Typical component lifetimes (hours)
-        self.nominal_lifetime = 10000  # 10,000 hours baseline
+        self.nominal_lifetime = NOMINAL_LIFETIME_HOURS
         
     def predict_wear(self, sensor_data: dict, device_id: str) -> WearPrediction:
         """
@@ -45,14 +66,14 @@ class SimpleWearPredictor:
             current_max = max(sensor_data.get('current_max', [0]))
             
             # High current increases wear exponentially
-            if avg_current > 5.0:
-                load_factor = (avg_current / 5.0) ** 1.5
+            if avg_current > CURRENT_NORMAL_THRESHOLD:
+                load_factor = (avg_current / CURRENT_NORMAL_THRESHOLD) ** CURRENT_HIGH_LOAD_EXPONENT
                 wear_factor *= load_factor
                 contributing_factors.append(f"High load operation ({avg_current:.1f}A)")
             
             # Current spikes cause additional wear
-            if current_max > 8.0:
-                spike_factor = 1.1 + (current_max - 8.0) * 0.05
+            if current_max > CURRENT_SPIKE_THRESHOLD:
+                spike_factor = CURRENT_SPIKE_BASE_FACTOR + (current_max - CURRENT_SPIKE_THRESHOLD) * CURRENT_SPIKE_INCREMENT
                 wear_factor *= spike_factor
                 contributing_factors.append(f"Current spikes ({current_max:.1f}A)")
         
@@ -60,8 +81,8 @@ class SimpleWearPredictor:
         vibration = sensor_data.get('vibration_mean', {})
         vib_magnitude = vibration.get('magnitude', 0)
         
-        if vib_magnitude > 3.0:
-            vib_factor = 1.0 + (vib_magnitude - 3.0) * 0.15
+        if vib_magnitude > VIBRATION_NORMAL_THRESHOLD:
+            vib_factor = 1.0 + (vib_magnitude - VIBRATION_NORMAL_THRESHOLD) * VIBRATION_WEAR_FACTOR
             wear_factor *= vib_factor
             contributing_factors.append(f"Elevated vibration ({vib_magnitude:.2f} m/s²)")
         
@@ -69,8 +90,8 @@ class SimpleWearPredictor:
         vib_std = sensor_data.get('vibration_std', {})
         if vib_std:
             std_magnitude = vib_std.get('magnitude', 0)
-            if std_magnitude > 1.0:
-                wear_factor *= 1.15
+            if std_magnitude > VIBRATION_STD_THRESHOLD:
+                wear_factor *= VIBRATION_STD_WEAR_FACTOR
                 contributing_factors.append("Vibration variability (possible misalignment)")
         
         # Factor 3: Temperature (thermal stress)
@@ -81,8 +102,8 @@ class SimpleWearPredictor:
             max_temp = max(temperature_max)
             
             # Elevated temperature accelerates wear
-            if max_temp > 50.0:
-                temp_factor = 1.0 + (max_temp - 50.0) * 0.02
+            if max_temp > TEMPERATURE_NORMAL_THRESHOLD:
+                temp_factor = 1.0 + (max_temp - TEMPERATURE_NORMAL_THRESHOLD) * TEMPERATURE_WEAR_FACTOR
                 wear_factor *= temp_factor
                 contributing_factors.append(f"Elevated temperature ({max_temp:.1f}°C)")
             
@@ -90,8 +111,8 @@ class SimpleWearPredictor:
             if temperature_mean:
                 avg_temp = np.mean(temperature_mean)
                 temp_range = max_temp - avg_temp
-                if temp_range > 15.0:
-                    wear_factor *= 1.1
+                if temp_range > TEMPERATURE_CYCLING_THRESHOLD:
+                    wear_factor *= TEMPERATURE_CYCLING_FACTOR
                     contributing_factors.append("Temperature cycling")
         
         # Factor 4: Operating time accumulation
@@ -115,13 +136,13 @@ class SimpleWearPredictor:
         estimated_remaining_hours = int(remaining_nominal_hours / wear_factor)
         
         # Add wear level to factors
-        if wear_level > 0.7:
+        if wear_level > WEAR_HIGH_THRESHOLD:
             contributing_factors.append(f"High accumulated wear ({wear_level:.1%})")
-        elif wear_level > 0.5:
+        elif wear_level > WEAR_MODERATE_THRESHOLD:
             contributing_factors.append(f"Moderate accumulated wear ({wear_level:.1%})")
         
         # Confidence decreases with wear level (more uncertainty at high wear)
-        confidence = 0.75 - (wear_level * 0.2)
+        confidence = CONFIDENCE_BASE - (wear_level * CONFIDENCE_WEAR_PENALTY)
         
         if not contributing_factors:
             contributing_factors.append("Normal operating conditions")

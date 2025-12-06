@@ -2,6 +2,20 @@
 from typing import Dict, List, Tuple
 from dataclasses import dataclass
 
+# Threshold constants for anomaly detection
+CURRENT_ABSOLUTE_MAX_THRESHOLD = 12.0  # Amperes - absolute maximum safe current
+CURRENT_IMBALANCE_THRESHOLD = 2.0  # Amperes - maximum acceptable current difference between motors
+VIBRATION_MODERATE_THRESHOLD = 5.0  # m/s² - moderate concern level
+VIBRATION_HIGH_THRESHOLD = 10.0  # m/s² - high concern level
+VIBRATION_IMBALANCE_FACTOR = 2.0  # Factor for detecting axis imbalance
+TEMPERATURE_HIGH_THRESHOLD = 70.0  # °C - high temperature alert
+TEMPERATURE_ELEVATED_THRESHOLD = 60.0  # °C - elevated temperature warning
+TEMPERATURE_RAPID_INCREASE_THRESHOLD = 10.0  # °C - rapid temperature increase
+BASELINE_UPDATE_ALPHA = 0.9  # Exponential moving average factor
+INITIAL_CURRENT_STD = 0.5  # Initial standard deviation estimate for current
+INITIAL_VIBRATION_STD = 0.5  # Initial standard deviation estimate for vibration
+INITIAL_TEMPERATURE_STD = 2.0  # Initial standard deviation estimate for temperature
+
 @dataclass
 class AnomalyResult:
     """Result of anomaly detection"""
@@ -48,14 +62,14 @@ class StatisticalAnomalyDetector:
                         anomalies.append(f"Motor {i+1} current anomaly: {mean:.2f}A (expected {baseline_mean:.2f}±{baseline_std:.2f})")
             
             # Simple threshold checks (domain knowledge)
-            if max_val > 12.0:  # Absolute maximum threshold
+            if max_val > CURRENT_ABSOLUTE_MAX_THRESHOLD:
                 max_score = max(max_score, 0.9)
                 anomalies.append(f"Motor {i+1} current spike: {max_val:.2f}A")
             
             # Detect current imbalance between motors
             if i > 0 and len(current_mean) > 1:
                 diff = abs(current_mean[i] - current_mean[0])
-                if diff > 2.0:  # More than 2A difference
+                if diff > CURRENT_IMBALANCE_THRESHOLD:
                     max_score = max(max_score, 0.6)
                     anomalies.append(f"Current imbalance detected: {diff:.2f}A difference")
         
@@ -86,11 +100,11 @@ class StatisticalAnomalyDetector:
         max_magnitude = vibration_max.get('magnitude', 0)
         
         # Threshold checks (typical values for industrial machinery)
-        if magnitude > 5.0:  # m/s² - moderate concern
+        if magnitude > VIBRATION_MODERATE_THRESHOLD:
             max_score = max(max_score, 0.6)
             anomalies.append(f"Elevated vibration: {magnitude:.2f} m/s²")
         
-        if max_magnitude > 10.0:  # m/s² - high concern
+        if max_magnitude > VIBRATION_HIGH_THRESHOLD:
             max_score = max(max_score, 0.9)
             anomalies.append(f"High vibration spike: {max_magnitude:.2f} m/s²")
         
@@ -100,7 +114,7 @@ class StatisticalAnomalyDetector:
         z = abs(vibration_mean.get('z', 0))
         
         axes = [x, y, z]
-        if max(axes) > 2 * min(axes):  # One axis significantly higher
+        if max(axes) > VIBRATION_IMBALANCE_FACTOR * min(axes):
             max_score = max(max_score, 0.5)
             dominant_axis = ['X', 'Y', 'Z'][axes.index(max(axes))]
             anomalies.append(f"Vibration imbalance on {dominant_axis} axis")
@@ -141,10 +155,10 @@ class StatisticalAnomalyDetector:
         
         for i, (mean, max_val) in enumerate(zip(temperature_mean, temperature_max)):
             # Absolute thresholds
-            if max_val > 70.0:
+            if max_val > TEMPERATURE_HIGH_THRESHOLD:
                 max_score = max(max_score, 0.8)
                 anomalies.append(f"Sensor {i+1} high temperature: {max_val:.1f}°C")
-            elif max_val > 60.0:
+            elif max_val > TEMPERATURE_ELEVATED_THRESHOLD:
                 max_score = max(max_score, 0.5)
                 anomalies.append(f"Sensor {i+1} elevated temperature: {max_val:.1f}°C")
             
@@ -153,7 +167,7 @@ class StatisticalAnomalyDetector:
                 baseline_mean, baseline_std = self.baseline_stats[device_id][f'temp_{i}']
                 
                 temp_increase = mean - baseline_mean
-                if temp_increase > 10.0:  # More than 10°C increase
+                if temp_increase > TEMPERATURE_RAPID_INCREASE_THRESHOLD:
                     max_score = max(max_score, 0.7)
                     anomalies.append(f"Sensor {i+1} rapid temperature increase: +{temp_increase:.1f}°C")
         
@@ -183,11 +197,11 @@ class StatisticalAnomalyDetector:
             # Simple exponential moving average
             if key in self.baseline_stats[device_id]:
                 old_mean, old_std = self.baseline_stats[device_id][key]
-                new_mean = 0.9 * old_mean + 0.1 * current
-                new_std = 0.9 * old_std + 0.1 * abs(current - new_mean)
+                new_mean = BASELINE_UPDATE_ALPHA * old_mean + (1 - BASELINE_UPDATE_ALPHA) * current
+                new_std = BASELINE_UPDATE_ALPHA * old_std + (1 - BASELINE_UPDATE_ALPHA) * abs(current - new_mean)
             else:
                 new_mean = current
-                new_std = 0.5  # Initial estimate
+                new_std = INITIAL_CURRENT_STD
             
             self.baseline_stats[device_id][key] = (new_mean, new_std)
         
@@ -197,11 +211,11 @@ class StatisticalAnomalyDetector:
             key = 'vibration_magnitude'
             if key in self.baseline_stats[device_id]:
                 old_mean, old_std = self.baseline_stats[device_id][key]
-                new_mean = 0.9 * old_mean + 0.1 * vib_magnitude
-                new_std = 0.9 * old_std + 0.1 * abs(vib_magnitude - new_mean)
+                new_mean = BASELINE_UPDATE_ALPHA * old_mean + (1 - BASELINE_UPDATE_ALPHA) * vib_magnitude
+                new_std = BASELINE_UPDATE_ALPHA * old_std + (1 - BASELINE_UPDATE_ALPHA) * abs(vib_magnitude - new_mean)
             else:
                 new_mean = vib_magnitude
-                new_std = 0.5
+                new_std = INITIAL_VIBRATION_STD
             
             self.baseline_stats[device_id][key] = (new_mean, new_std)
         
@@ -210,10 +224,10 @@ class StatisticalAnomalyDetector:
             key = f'temp_{i}'
             if key in self.baseline_stats[device_id]:
                 old_mean, old_std = self.baseline_stats[device_id][key]
-                new_mean = 0.9 * old_mean + 0.1 * temp
-                new_std = 0.9 * old_std + 0.1 * abs(temp - new_mean)
+                new_mean = BASELINE_UPDATE_ALPHA * old_mean + (1 - BASELINE_UPDATE_ALPHA) * temp
+                new_std = BASELINE_UPDATE_ALPHA * old_std + (1 - BASELINE_UPDATE_ALPHA) * abs(temp - new_mean)
             else:
                 new_mean = temp
-                new_std = 2.0
+                new_std = INITIAL_TEMPERATURE_STD
             
             self.baseline_stats[device_id][key] = (new_mean, new_std)

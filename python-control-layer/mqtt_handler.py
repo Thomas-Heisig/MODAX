@@ -1,12 +1,18 @@
 """MQTT Handler - Manages communication with field layer and AI layer"""
 import json
 import logging
+import time
 from typing import Callable, Optional
 import paho.mqtt.client as mqtt
 from config import MQTTConfig
 from data_aggregator import SensorReading, SafetyStatus
 
 logger = logging.getLogger(__name__)
+
+# MQTT reconnection constants
+MQTT_RECONNECT_DELAY_MIN = 1  # Minimum reconnection delay in seconds
+MQTT_RECONNECT_DELAY_MAX = 60  # Maximum reconnection delay in seconds
+MQTT_RECONNECT_BACKOFF_MULTIPLIER = 2  # Exponential backoff multiplier
 
 class MQTTHandler:
     """Handles MQTT communication for the control layer"""
@@ -20,10 +26,20 @@ class MQTTHandler:
         self.on_safety_status: Optional[Callable[[SafetyStatus], None]] = None
         self.on_ai_analysis: Optional[Callable[[dict], None]] = None
         
+        # Reconnection state
+        self._reconnect_delay = MQTT_RECONNECT_DELAY_MIN
+        self._is_connected = False
+        
         # Setup client
         self.client.on_connect = self._on_connect
         self.client.on_message = self._on_message
         self.client.on_disconnect = self._on_disconnect
+        
+        # Enable automatic reconnection
+        self.client.reconnect_delay_set(
+            min_delay=MQTT_RECONNECT_DELAY_MIN,
+            max_delay=MQTT_RECONNECT_DELAY_MAX
+        )
         
         if config.username and config.password:
             self.client.username_pw_set(config.username, config.password)
@@ -65,6 +81,8 @@ class MQTTHandler:
         """Callback when connected to broker"""
         if rc == 0:
             logger.info("Connected to MQTT broker")
+            self._is_connected = True
+            self._reconnect_delay = MQTT_RECONNECT_DELAY_MIN  # Reset delay on successful connection
             
             # Subscribe to topics
             client.subscribe(self.config.topic_sensor_data)
@@ -75,11 +93,21 @@ class MQTTHandler:
                        f"{self.config.topic_safety}, {self.config.topic_ai_analysis}")
         else:
             logger.error(f"Failed to connect to MQTT broker, return code: {rc}")
+            self._is_connected = False
     
     def _on_disconnect(self, client, userdata, rc):
         """Callback when disconnected from broker"""
+        self._is_connected = False
+        
         if rc != 0:
             logger.warning(f"Unexpected disconnect from MQTT broker, return code: {rc}")
+            logger.info(f"Automatic reconnection will be attempted with exponential backoff (delay: {self._reconnect_delay}s)")
+            
+            # Update reconnect delay with exponential backoff
+            self._reconnect_delay = min(
+                self._reconnect_delay * MQTT_RECONNECT_BACKOFF_MULTIPLIER,
+                MQTT_RECONNECT_DELAY_MAX
+            )
         else:
             logger.info("Disconnected from MQTT broker")
     

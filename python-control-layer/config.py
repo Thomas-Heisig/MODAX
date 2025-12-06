@@ -29,6 +29,8 @@ class ControlConfig:
     
     # AI Layer integration
     ai_layer_enabled: bool = os.getenv("AI_ENABLED", "true").lower() == "true"
+    ai_layer_url: str = os.getenv("AI_LAYER_URL", "http://localhost:8001/analyze")
+    ai_layer_timeout: int = int(os.getenv("AI_LAYER_TIMEOUT", "5"))  # seconds
     ai_analysis_interval_seconds: int = 60
 
 @dataclass
