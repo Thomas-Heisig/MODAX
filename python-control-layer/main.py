@@ -1,16 +1,31 @@
-"""Main entry point for Control Layer"""
+"""
+Main entry point for MODAX Control Layer.
+
+This module initializes and starts the Control Layer, which coordinates
+data flow between the field layer (ESP32), AI layer, and HMI layer.
+It provides a REST API for monitoring and control.
+
+Features:
+- MQTT communication with field devices
+- Data aggregation for AI analysis
+- REST API for HMI integration
+- Safety monitoring and command validation
+"""
 import logging
 import signal
 import sys
 import uvicorn
-from threading import Thread
 from config import config
 from control_layer import ControlLayer
 import control_api
 
+# Configure logging at application entry point
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
 )
 logger = logging.getLogger(__name__)
 

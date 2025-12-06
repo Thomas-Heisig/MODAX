@@ -1,6 +1,6 @@
 """Configuration for Control Layer"""
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 @dataclass
@@ -34,8 +34,8 @@ class ControlConfig:
 @dataclass
 class Config:
     """Master configuration"""
-    mqtt: MQTTConfig = MQTTConfig()
-    control: ControlConfig = ControlConfig()
+    mqtt: MQTTConfig = field(default_factory=MQTTConfig)
+    control: ControlConfig = field(default_factory=ControlConfig)
 
 # Global config instance
 config = Config()

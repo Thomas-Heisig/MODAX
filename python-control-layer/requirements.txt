@@ -1,7 +1,7 @@
 paho-mqtt>=1.6.1
-protobuf>=4.21.0
+protobuf>=4.25.8  # Security: CVE fixes for DoS vulnerabilities
 numpy>=1.24.0
 python-dotenv>=1.0.0
-fastapi>=0.104.0
+fastapi>=0.109.1  # Security: Fix for ReDoS vulnerability
 uvicorn>=0.24.0
 pydantic>=2.4.0

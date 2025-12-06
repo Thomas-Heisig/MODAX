@@ -1,5 +1,5 @@
 """Optimization Recommendations - Provides actionable recommendations"""
-from typing import List, Dict
+from typing import List
 
 class OptimizationRecommender:
     """

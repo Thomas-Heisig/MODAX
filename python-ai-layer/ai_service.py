@@ -8,10 +8,6 @@ from anomaly_detector import StatisticalAnomalyDetector
 from wear_predictor import SimpleWearPredictor
 from optimizer import OptimizationRecommender
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="MODAX AI Layer", version="1.0.0")
