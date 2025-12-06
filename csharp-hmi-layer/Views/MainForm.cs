@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Net.Http;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using MODAX.HMI.Services;
@@ -315,18 +316,54 @@ namespace MODAX.HMI.Views
 
         private async Task RefreshDevicesAsync()
         {
-            var devices = await _controlClient.GetDevicesAsync();
-            if (devices != null && _deviceComboBox != null)
+            try
             {
-                _deviceComboBox.Items.Clear();
-                foreach (var device in devices)
+                var devices = await _controlClient.GetDevicesAsync();
+                if (devices != null && _deviceComboBox != null)
                 {
-                    _deviceComboBox.Items.Add(device);
+                    _deviceComboBox.Items.Clear();
+                    foreach (var device in devices)
+                    {
+                        _deviceComboBox.Items.Add(device);
+                    }
+                    if (_deviceComboBox.Items.Count > 0)
+                    {
+                        _deviceComboBox.SelectedIndex = 0;
+                    }
+                    else if (_systemStatusLabel != null)
+                    {
+                        _systemStatusLabel.Text = "Status: Connected but no devices found";
+                        _systemStatusLabel.ForeColor = Color.Orange;
+                    }
                 }
-                if (_deviceComboBox.Items.Count > 0)
+                else
                 {
-                    _deviceComboBox.SelectedIndex = 0;
+                    // Connection failed
+                    if (_systemStatusLabel != null)
+                    {
+                        _systemStatusLabel.Text = "Status: ⚠️ Cannot retrieve device list";
+                        _systemStatusLabel.ForeColor = Color.Red;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                if (_systemStatusLabel != null)
+                {
+                    _systemStatusLabel.Text = $"Status: ⚠️ Error loading devices: {ex.Message}";
+                    _systemStatusLabel.ForeColor = Color.Red;
+                }
+                MessageBox.Show(
+                    $"Failed to connect to Control Layer at {_controlClient.BaseUrl}.\n\n" +
+                    $"Error: {ex.Message}\n\n" +
+                    "Please ensure:\n" +
+                    "1. The Control Layer is running\n" +
+                    "2. The API is accessible at the configured URL\n" +
+                    "3. Network connectivity is available",
+                    "Connection Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
             }
         }
 
@@ -334,13 +371,28 @@ namespace MODAX.HMI.Views
         {
             try
             {
+                // Check connection first
+                var isConnected = await _controlClient.IsConnectedAsync();
+                
+                if (!isConnected)
+                {
+                    // Display connection error to user
+                    if (_systemStatusLabel != null)
+                    {
+                        _systemStatusLabel.Text = "Status: ⚠️ Cannot connect to Control Layer";
+                        _systemStatusLabel.ForeColor = Color.Red;
+                    }
+                    return;
+                }
+                
                 // Update system status
                 var systemStatus = await _controlClient.GetSystemStatusAsync();
                 if (systemStatus != null && _systemStatusLabel != null)
                 {
-                    _systemStatusLabel.Text = $"Status: {systemStatus.GetStatusText()} | " +
+                    _systemStatusLabel.Text = $"Status: ✓ Connected | " +
                                              $"Devices: {systemStatus.DevicesOnline.Count} | " +
                                              $"AI: {(systemStatus.AiEnabled ? "Enabled" : "Disabled")}";
+                    _systemStatusLabel.ForeColor = Color.DarkGreen;
                 }
 
                 // Update device-specific data
@@ -350,8 +402,34 @@ namespace MODAX.HMI.Views
                     await UpdateAIAnalysisAsync(_selectedDeviceId);
                 }
             }
+            catch (HttpRequestException ex)
+            {
+                // Network/connection errors - display to user
+                if (_systemStatusLabel != null)
+                {
+                    _systemStatusLabel.Text = $"Status: ⚠️ Connection Error: {ex.Message}";
+                    _systemStatusLabel.ForeColor = Color.Red;
+                }
+                Console.WriteLine($"Connection error: {ex.Message}");
+            }
+            catch (TaskCanceledException ex)
+            {
+                // Timeout errors - display to user
+                if (_systemStatusLabel != null)
+                {
+                    _systemStatusLabel.Text = "Status: ⚠️ Request Timeout - Control Layer not responding";
+                    _systemStatusLabel.ForeColor = Color.OrangeRed;
+                }
+                Console.WriteLine($"Timeout error: {ex.Message}");
+            }
             catch (Exception ex)
             {
+                // General errors - display to user
+                if (_systemStatusLabel != null)
+                {
+                    _systemStatusLabel.Text = $"Status: ⚠️ Error: {ex.Message}";
+                    _systemStatusLabel.ForeColor = Color.Red;
+                }
                 Console.WriteLine($"Update error: {ex.Message}");
             }
         }
@@ -359,7 +437,14 @@ namespace MODAX.HMI.Views
         private async Task UpdateSensorDataAsync(string deviceId)
         {
             var data = await _controlClient.GetDeviceDataAsync(deviceId);
-            if (data == null) return;
+            if (data == null) 
+            {
+                // Clear displays when no data available
+                if (_currentLabel != null) _currentLabel.Text = "Motor Currents: No data available";
+                if (_vibrationLabel != null) _vibrationLabel.Text = "Vibration: No data available";
+                if (_temperatureLabel != null) _temperatureLabel.Text = "Temperature: No data available";
+                return;
+            }
 
             // Update sensor displays
             if (_currentLabel != null)
@@ -397,7 +482,19 @@ namespace MODAX.HMI.Views
         private async Task UpdateAIAnalysisAsync(string deviceId)
         {
             var analysis = await _controlClient.GetAIAnalysisAsync(deviceId);
-            if (analysis == null) return;
+            if (analysis == null) 
+            {
+                // Clear AI displays when no data available
+                if (_anomalyLabel != null) 
+                {
+                    _anomalyLabel.Text = "Anomaly Detection: Not available";
+                    _anomalyLabel.ForeColor = Color.Gray;
+                }
+                if (_wearLevelLabel != null) _wearLevelLabel.Text = "Wear Level: Not available";
+                if (_wearProgressBar != null) _wearProgressBar.Value = 0;
+                if (_recommendationsTextBox != null) _recommendationsTextBox.Text = "AI recommendations not available";
+                return;
+            }
 
             if (_anomalyLabel != null)
             {

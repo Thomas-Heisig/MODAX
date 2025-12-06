@@ -12,11 +12,24 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - Umfassende API-Dokumentation (docs/API.md)
 - Vollständige Konfigurationsreferenz (docs/CONFIGURATION.md)
 - Erweiterte Docstrings für main.py Module
+- **docs/ERROR_HANDLING.md**: Umfassender Fehlerbehandlungs-Leitfaden
+- **docs/LOGGING_STANDARDS.md**: Logging-Standards und Konventionen
+- **MQTT Reconnection**: Automatische Wiederverbindung mit exponentieller Backoff-Strategie
+- **Konfigurierbare API Timeouts**: AI_LAYER_URL und AI_LAYER_TIMEOUT Umgebungsvariablen
 
 ### Geändert
 - README.md aktualisiert mit Links zur neuen Dokumentation
 - Logging-Konfiguration nur noch in main.py (entfernt aus anderen Modulen)
 - Dependency-Versionen erhöht für Sicherheitsfixes
+- **anomaly_detector.py**: 12 Magic Numbers zu benannten Konstanten extrahiert
+- **wear_predictor.py**: 17 Magic Numbers zu benannten Konstanten extrahiert
+- **optimizer.py**: 18 Magic Numbers zu benannten Konstanten extrahiert
+- **ai_interface.py**: Verwendet jetzt konfigurierbare AI Layer URL und Timeout
+- **mqtt_handler.py**: Erweitert um automatische Reconnection mit exponentieller Backoff
+- **config.py**: Neue Konfigurationsoptionen für AI Layer (URL, Timeout)
+- **CONFIGURATION.md**: Dokumentation neuer Umgebungsvariablen hinzugefügt
+- **MainForm.cs**: Verbesserte Fehlerbehandlung mit Verbindungsstatus-Anzeige
+- **ControlLayerClient.cs**: Exceptions für Connection/Timeout-Fehler werden durchgereicht
 
 ### Entfernt
 - Ungenutzte Imports: Thread, numpy, Optional, stats, Dict
@@ -26,6 +39,11 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 ### Behoben
 - Dataclass-Konfigurationsfehler in config.py (field mit default_factory)
 - Code-Qualitätsprobleme (pyflakes-clean)
+- **Issue #001**: MQTT-Verbindungsabbruch ohne automatische Wiederverbindung
+- **Issue #002**: API-Timeouts nicht konfigurierbar
+- **Issue #003**: HMI zeigt keine Fehlermeldung bei API-Verbindungsfehler
+- **Issue #004**: Inkonsistente Log-Level über Komponenten hinweg
+- **Issue #009**: Magic Numbers im Code schwer verständlich und anzupassen
 
 ### Sicherheit
 - protobuf auf >=4.25.8 erhöht (CVE-Fix für DoS-Schwachstellen)

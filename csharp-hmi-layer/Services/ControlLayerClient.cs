@@ -16,6 +16,11 @@ namespace MODAX.HMI.Services
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
 
+        /// <summary>
+        /// Gets the base URL of the Control Layer API
+        /// </summary>
+        public string BaseUrl => _baseUrl;
+
         public ControlLayerClient(string baseUrl = "http://localhost:8000")
         {
             _baseUrl = baseUrl;
@@ -37,6 +42,16 @@ namespace MODAX.HMI.Services
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadFromJsonAsync<SystemStatus>();
             }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Connection error getting system status: {ex.Message}");
+                throw; // Re-throw to allow UI to handle connection errors
+            }
+            catch (TaskCanceledException ex)
+            {
+                Console.WriteLine($"Timeout getting system status: {ex.Message}");
+                throw; // Re-throw to allow UI to handle timeout errors
+            }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error getting system status: {ex.Message}");
@@ -54,6 +69,16 @@ namespace MODAX.HMI.Services
                 var response = await _httpClient.GetAsync("/devices");
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadFromJsonAsync<List<string>>();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Connection error getting devices: {ex.Message}");
+                throw; // Re-throw to allow UI to handle connection errors
+            }
+            catch (TaskCanceledException ex)
+            {
+                Console.WriteLine($"Timeout getting devices: {ex.Message}");
+                throw; // Re-throw to allow UI to handle timeout errors
             }
             catch (Exception ex)
             {

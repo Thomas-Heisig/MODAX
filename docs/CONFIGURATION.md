@@ -39,6 +39,8 @@ The Control Layer supports configuration via environment variables or `.env` fil
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
 | `AI_ENABLED` | boolean | `true` | Enable AI layer integration |
+| `AI_LAYER_URL` | string | `http://localhost:8001/analyze` | AI layer analysis endpoint URL |
+| `AI_LAYER_TIMEOUT` | integer | `5` | Timeout for AI layer requests (seconds) |
 
 ### Configuration File (config.py)
 
@@ -74,6 +76,8 @@ API_PORT=8000
 
 # AI Layer Integration
 AI_ENABLED=true
+AI_LAYER_URL=http://localhost:8001/analyze
+AI_LAYER_TIMEOUT=5
 ```
 
 ---

@@ -10,35 +10,53 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
 
 ### Fehlerbehandlung & Robustheit
 
-#### #001: Fehlende Fehlerbehandlung bei MQTT-Verbindungsabbruch
+#### ~~#001: Fehlende Fehlerbehandlung bei MQTT-Verbindungsabbruch~~ ✅ BEHOBEN
 **Beschreibung:** Wenn die MQTT-Verbindung während des Betriebs abbricht, wird nicht automatisch eine Wiederverbindung hergestellt.
 - **Betroffene Komponenten:** Python Control Layer (mqtt_handler.py)
 - **Auswirkung:** Datenverlust bei Netzwerkproblemen
 - **Priorität:** Hoch
-- **Vorgeschlagene Lösung:** Automatische Reconnect-Logik mit exponentieller Backoff-Strategie implementieren
+- **Status:** ✅ Behoben in Commit 5dafac9
+- **Lösung:** Automatische Reconnect-Logik mit exponentieller Backoff-Strategie implementiert
+  - MQTT_RECONNECT_DELAY_MIN = 1s
+  - MQTT_RECONNECT_DELAY_MAX = 60s
+  - MQTT_RECONNECT_BACKOFF_MULTIPLIER = 2
+  - Automatische Wiederverbindung bei Verbindungsabbruch
 
-#### #002: API-Timeouts nicht konfigurierbar
+#### ~~#002: API-Timeouts nicht konfigurierbar~~ ✅ BEHOBEN
 **Beschreibung:** Timeouts für AI-Layer-Anfragen sind fest codiert und können nicht über Konfiguration angepasst werden.
-- **Betroffene Komponenten:** Python Control Layer (ai_interface.py)
+- **Betroffene Komponenten:** Python Control Layer (ai_interface.py, config.py)
 - **Auswirkung:** Keine Flexibilität für verschiedene Netzwerkbedingungen
 - **Priorität:** Mittel
-- **Vorgeschlagene Lösung:** Timeout-Werte in config.py konfigurierbar machen
+- **Status:** ✅ Behoben in Commit 5dafac9
+- **Lösung:** Timeout-Werte über Umgebungsvariablen konfigurierbar
+  - AI_LAYER_URL (Standard: http://localhost:8001/analyze)
+  - AI_LAYER_TIMEOUT (Standard: 5 Sekunden)
 
-#### #003: HMI zeigt keine Fehlermeldung bei API-Verbindungsfehler
+#### ~~#003: HMI zeigt keine Fehlermeldung bei API-Verbindungsfehler~~ ✅ BEHOBEN
 **Beschreibung:** Wenn das HMI keine Verbindung zum Control Layer herstellen kann, bleibt die Benutzeroberfläche leer ohne Fehlermeldung.
-- **Betroffene Komponenten:** C# HMI Layer (MainForm.cs)
+- **Betroffene Komponenten:** C# HMI Layer (MainForm.cs, ControlLayerClient.cs)
 - **Auswirkung:** Schlechte Benutzererfahrung, unklare Fehlerursache
 - **Priorität:** Mittel
-- **Vorgeschlagene Lösung:** Verbindungsstatus-Indikator und aussagekräftige Fehlerdialoge hinzufügen
+- **Status:** ✅ Behoben in Commit e20cd31
+- **Lösung:** Verbindungsstatus-Anzeige und Fehlerbehandlung implementiert
+  - Verbindungsstatus in System-Status-Label mit Farbcodierung
+  - Unterscheidung zwischen Verbindungs-, Timeout- und allgemeinen Fehlern
+  - Fehlerdialog beim Startup mit Troubleshooting-Hinweisen
+  - "No data available" Anzeige wenn Daten nicht abgerufen werden können
+  - Automatische Verbindungsprüfung vor Datenabfragen
 
 ### Logging & Monitoring
 
-#### #004: Inkonsistente Log-Level über Komponenten hinweg
+#### ~~#004: Inkonsistente Log-Level über Komponenten hinweg~~ ✅ BEHOBEN
 **Beschreibung:** Verschiedene Ebenen verwenden unterschiedliche Log-Level für ähnliche Events (z.B. DEBUG vs. INFO für Sensor-Daten).
 - **Betroffene Komponenten:** Alle Python-Ebenen
 - **Auswirkung:** Schwierige Fehlersuche, zu viele oder zu wenige Logs
 - **Priorität:** Mittel
-- **Vorgeschlagene Lösung:** Logging-Standard definieren und konsistent anwenden
+- **Status:** ✅ Behoben in Commit 5dafac9
+- **Lösung:** Logging-Standard dokumentiert und angewendet
+  - docs/LOGGING_STANDARDS.md erstellt mit vollständigen Richtlinien
+  - Konsistentes Format über alle Python-Module
+  - Klare Definition wann welches Log-Level zu verwenden ist
 
 #### #005: Fehlende strukturierte Logs
 **Beschreibung:** Logs sind als einfache Strings formatiert, nicht als strukturierte JSON-Objekte.
@@ -74,12 +92,17 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
 - **Priorität:** Niedrig
 - **Vorgeschlagene Lösung:** Schrittweise Type Hints hinzufügen, mypy für Type-Checking nutzen
 
-#### #009: Magic Numbers in Code
+#### ~~#009: Magic Numbers in Code~~ ✅ BEHOBEN
 **Beschreibung:** Einige Threshold-Werte sind direkt im Code als Zahlen geschrieben (z.B. Temperatur-Limits, Strom-Schwellenwerte).
-- **Betroffene Komponenten:** ESP32 Field Layer, Python AI Layer (anomaly_detector.py)
+- **Betroffene Komponenten:** Python AI Layer (anomaly_detector.py, wear_predictor.py, optimizer.py)
 - **Auswirkung:** Schwer zu verstehen und anzupassen
 - **Priorität:** Niedrig
-- **Vorgeschlagene Lösung:** Als benannte Konstanten extrahieren mit erklärenden Kommentaren
+- **Status:** ✅ Behoben in Commit 5dafac9
+- **Lösung:** Alle magic numbers als benannte Konstanten extrahiert
+  - anomaly_detector.py: 12 Konstanten für Schwellenwerte
+  - wear_predictor.py: 17 Konstanten für Verschleiß-Berechnungen
+  - optimizer.py: 18 Konstanten für Optimierungs-Empfehlungen
+  - Alle Konstanten mit beschreibenden Namen und Kommentaren
 
 #### #010: Fehlende Eingabevalidierung in einigen API-Endpunkten
 **Beschreibung:** Nicht alle API-Endpunkte validieren Eingabeparameter vollständig.

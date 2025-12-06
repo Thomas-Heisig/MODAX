@@ -3,11 +3,9 @@ import logging
 import requests
 from typing import Optional
 from data_aggregator import AggregatedData
+from config import config
 
 logger = logging.getLogger(__name__)
-
-# AI Layer endpoint (could be local or separate service)
-AI_LAYER_URL = "http://localhost:8001/analyze"
 
 def request_ai_analysis(aggregated_data: AggregatedData) -> Optional[dict]:
     """
@@ -36,8 +34,12 @@ def request_ai_analysis(aggregated_data: AggregatedData) -> Optional[dict]:
             "sample_count": aggregated_data.sample_count
         }
         
-        # Send request to AI layer
-        response = requests.post(AI_LAYER_URL, json=payload, timeout=5)
+        # Send request to AI layer with configurable timeout
+        response = requests.post(
+            config.control.ai_layer_url,
+            json=payload,
+            timeout=config.control.ai_layer_timeout
+        )
         
         if response.status_code == 200:
             return response.json()

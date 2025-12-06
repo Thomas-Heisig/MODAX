@@ -5,9 +5,9 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 ## Priorität 1: Kritisch
 
 ### Dokumentation
-- [ ] API-Dokumentation für alle REST-Endpunkte erstellen
-- [ ] Fehlerbehandlungs-Leitfaden dokumentieren
-- [ ] Konfigurationsoptionen vollständig dokumentieren
+- [x] API-Dokumentation für alle REST-Endpunkte erstellen (docs/API.md)
+- [x] Fehlerbehandlungs-Leitfaden dokumentieren (docs/ERROR_HANDLING.md)
+- [x] Konfigurationsoptionen vollständig dokumentieren (docs/CONFIGURATION.md)
 
 ### Tests
 - [ ] Unit-Tests für Python Control Layer hinzufügen
@@ -30,15 +30,17 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [ ] Daten-Export-Funktion (CSV, JSON)
 
 ### Code-Qualität
-- [ ] Logging-Format über alle Ebenen standardisieren
+- [x] Logging-Format über alle Ebenen standardisieren (docs/LOGGING_STANDARDS.md)
+- [x] Magic Numbers zu benannten Konstanten extrahieren (anomaly_detector.py, wear_predictor.py, optimizer.py)
 - [ ] Fehlerbehandlung in allen API-Endpunkten vereinheitlichen
 - [ ] Code-Linting mit flake8/pylint für Python-Code
 - [ ] Code-Coverage-Berichte generieren
 
 ### Konfiguration
+- [x] Standardwerte für alle Konfigurationsoptionen dokumentieren (docs/CONFIGURATION.md)
+- [x] API Timeouts konfigurierbar machen (AI_LAYER_TIMEOUT)
 - [ ] Umgebungsvariablen-Schema validieren
 - [ ] Konfigurationsdatei-Loader mit Validierung erstellen
-- [ ] Standardwerte für alle Konfigurationsoptionen dokumentieren
 
 ## Priorität 3: Mittel
 
