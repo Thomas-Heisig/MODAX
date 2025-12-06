@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package modax;
+
+// Sensor data message from ESP32 field layer
+message SensorData {
+  int64 timestamp = 1;           // Unix timestamp in milliseconds
+  string device_id = 2;          // Unique device identifier
+  
+  // Current measurements (in Amperes)
+  repeated float motor_currents = 3;
+  
+  // Vibration measurements
+  VibrationData vibration = 4;
+  
+  // Temperature sensors (in Celsius)
+  repeated float temperatures = 5;
+  
+  // Safety-critical data (AI-free zone)
+  SafetyData safety = 6;
+}
+
+message VibrationData {
+  float x_axis = 1;              // X-axis acceleration (m/s²)
+  float y_axis = 2;              // Y-axis acceleration (m/s²)
+  float z_axis = 3;              // Z-axis acceleration (m/s²)
+  float magnitude = 4;           // Overall vibration magnitude
+}
+
+message SafetyData {
+  bool emergency_stop = 1;       // Emergency stop status
+  bool door_closed = 2;          // Safety door status
+  bool overload_detected = 3;    // Motor overload detection
+  bool temperature_ok = 4;       // Temperature within safe range
+}
+
+// AI analysis results
+message AIAnalysis {
+  int64 timestamp = 1;
+  string device_id = 2;
+  
+  // Anomaly detection
+  bool anomaly_detected = 3;
+  float anomaly_score = 4;       // 0.0 to 1.0
+  string anomaly_description = 5;
+  
+  // Wear prediction
+  float predicted_wear_level = 6;  // 0.0 to 1.0
+  int32 estimated_remaining_hours = 7;
+  
+  // Optimization recommendations
+  repeated string recommendations = 8;
+  
+  // Model confidence
+  float confidence = 9;          // 0.0 to 1.0
+}
+
+// Control commands from HMI to control layer
+message ControlCommand {
+  int64 timestamp = 1;
+  string command_type = 2;       // start, stop, pause, reset, etc.
+  map<string, string> parameters = 3;
+}
