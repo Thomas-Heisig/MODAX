@@ -1,8 +1,6 @@
 """Statistical Anomaly Detection - Simple statistical models for anomaly detection"""
-import numpy as np
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple
 from dataclasses import dataclass
-from scipy import stats
 
 @dataclass
 class AnomalyResult:

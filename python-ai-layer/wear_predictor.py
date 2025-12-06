@@ -99,8 +99,7 @@ class SimpleWearPredictor:
             self.wear_rates[device_id] = 0.0
         
         # Accumulate wear (in production, this would be persistent)
-        # For demo, use a simplified model
-        sample_count = sensor_data.get('sample_count', 0)
+        # For demo, use a simplified model based on time window
         time_window = sensor_data.get('time_window_end', 0) - sensor_data.get('time_window_start', 0)
         
         # Accumulate wear based on operating time and conditions
