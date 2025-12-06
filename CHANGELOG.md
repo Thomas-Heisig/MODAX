@@ -9,16 +9,27 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Hinzugefügt
 - TODO.md, ISSUES.md, DONE.md und CHANGELOG.md für strukturiertes Projekt-Management
-- Dokumentations-Infrastruktur für bessere Nachvollziehbarkeit
+- Umfassende API-Dokumentation (docs/API.md)
+- Vollständige Konfigurationsreferenz (docs/CONFIGURATION.md)
+- Erweiterte Docstrings für main.py Module
 
 ### Geändert
-- (Noch keine Änderungen)
+- README.md aktualisiert mit Links zur neuen Dokumentation
+- Logging-Konfiguration nur noch in main.py (entfernt aus anderen Modulen)
+- Dependency-Versionen erhöht für Sicherheitsfixes
 
 ### Entfernt
-- (Noch keine Entfernungen)
+- Ungenutzte Imports: Thread, numpy, Optional, stats, Dict
+- Ungenutzte Variable `sample_count` in wear_predictor.py
+- Doppelte `logging.basicConfig()` Aufrufe
 
 ### Behoben
-- (Noch keine Fixes)
+- Dataclass-Konfigurationsfehler in config.py (field mit default_factory)
+- Code-Qualitätsprobleme (pyflakes-clean)
+
+### Sicherheit
+- protobuf auf >=4.25.8 erhöht (CVE-Fix für DoS-Schwachstellen)
+- fastapi auf >=0.109.1 erhöht (Fix für ReDoS-Schwachstelle)
 
 ## [0.1.0] - 2024-12-06
 
