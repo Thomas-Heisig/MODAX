@@ -269,7 +269,7 @@ README.md                                    (updated)
 docs/INDEX.md                               (updated)
 docs/CNC_FEATURES.md                        (updated)
 docs/ADVANCED_CNC_INDUSTRY_4_0.md          (NEW - 1,672 lines)
-docs/SESSION_SUMMARY_2024-12-07_INDUSTRY_4_0.md (NEW - this file)
+docs/SESSION_SUMMARY_2025-12-07_INDUSTRY_4_0.md (NEW - this file)
 ```
 
 ## Conclusion
