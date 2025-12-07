@@ -178,7 +178,9 @@ Ausführliche Anweisungen finden Sie unter [docs/SETUP.md](docs/SETUP.md)
 
 #### CNC & Industry 4.0
 - [🏭 CNC Features](docs/CNC_FEATURES.md) - CNC machine functionality (G-code, motion control, tools)
-- [🚀 Advanced CNC Industry 4.0](docs/ADVANCED_CNC_INDUSTRY_4_0.md) - **NEU** Advanced features, communication protocols, intelligent automation, digital twin, AI optimization
+- [📝 Extended G-Code Support](docs/EXTENDED_GCODE_SUPPORT.md) - Extended G-codes, macros, manufacturer-specific codes
+- [🔧 Hobbyist CNC Systems](docs/HOBBYIST_CNC_SYSTEMS.md) - **NEU** Estlcam, UCCNC, Haas-specific functions
+- [🚀 Advanced CNC Industry 4.0](docs/ADVANCED_CNC_INDUSTRY_4_0.md) - Advanced features, communication protocols, intelligent automation, digital twin, AI optimization
 
 #### Sicherheit & Netzwerk
 - [🔒 Sicherheit](docs/SECURITY.md) - Sicherheitskonzept und Implementierung

@@ -248,6 +248,11 @@ class GCodeParser:
         'G92': ('Coordinate system offset', GCodeType.COORD_SYSTEM),
         'G98': ('Return to initial point in canned cycle', GCodeType.CYCLE),
         'G99': ('Return to R point in canned cycle', GCodeType.CYCLE),
+        
+        # Haas-specific codes
+        'G47': ('Engraving', GCodeType.OTHER),
+        'G71': ('Turning roughing cycle (radial)', GCodeType.CYCLE),
+        'G72': ('Turning roughing cycle (facing)', GCodeType.CYCLE),
     }
     
     # M-code command definitions
@@ -316,6 +321,9 @@ class GCodeParser:
         'M63': 'Output off',
         'M64': 'Output on immediate',
         'M65': 'Output off immediate',
+        
+        # Haas-specific codes
+        'M130': 'Media player control',
     }
     
     def __init__(self):
@@ -537,6 +545,11 @@ class GCodeParser:
         if g_code in fanuc_codes:
             return True, "Fanuc (Macro B)"
         
+        # Haas codes
+        haas_codes = ['G47', 'G71', 'G72']
+        if g_code in haas_codes:
+            return True, "Haas"
+        
         # Okuma OSP codes
         okuma_codes = []  # Add specific Okuma codes here
         if g_code in okuma_codes:
@@ -550,6 +563,8 @@ class GCodeParser:
             "Siemens Sinumerik (G05, G107, CYCLE)",
             "Heidenhain TNC (G05.1, CYCL DEF)",
             "Fanuc Macro B (G65/G66, #variables)",
+            "Haas (G47, G71/G72, M130)",
             "Okuma OSP (VC variables, CALL OO)",
-            "Mazak Mazatrol (M200+ series)"
+            "Mazak Mazatrol (M200+ series)",
+            "Estlcam (hobbyist/desktop CNC)"
         ]

@@ -697,12 +697,15 @@ For detailed information on advanced CNC capabilities, see:
 - **FANUC:** G-code reference
 - **Siemens:** SINUMERIK programming guide
 - **Heidenhain:** TNC programming manual
+- **Haas:** G-code Quick Reference and Programming Manuals
 
 ### Related Documentation
 - [ARCHITECTURE.md](ARCHITECTURE.md) - System architecture
 - [API.md](API.md) - Complete API reference
 - [CONFIGURATION.md](CONFIGURATION.md) - Configuration options
 - [SECURITY.md](SECURITY.md) - Security considerations
+- [EXTENDED_GCODE_SUPPORT.md](EXTENDED_GCODE_SUPPORT.md) - Extended G-code and manufacturer-specific codes
+- **[HOBBYIST_CNC_SYSTEMS.md](HOBBYIST_CNC_SYSTEMS.md) - Hobbyist and desktop CNC systems (Estlcam, UCCNC, Haas)**
 
 ## Support
 
