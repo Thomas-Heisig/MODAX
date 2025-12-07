@@ -319,6 +319,10 @@ class CNCCycles:
         
         # Calculate step values
         radial_step = tool_diameter * stepover
+        if radial_step <= 0:
+            logger.error("Invalid radial step: stepover must be positive")
+            return moves
+        
         num_passes = int((pocket_radius - tool_radius) / radial_step) + 1
         num_depths = int(abs(depth) / stepdown) + 1
         

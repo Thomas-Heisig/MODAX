@@ -743,10 +743,11 @@ async def change_tool(
                 "cnc_tool_change",
                 {"tool_number": tool_number}
             )
+            tool = cnc.tools.tools.get(tool_number)
             return {
                 "status": "success",
                 "tool_number": tool_number,
-                "tool_name": cnc.tools.tools[tool_number].name if tool_number in cnc.tools.tools else None
+                "tool_name": tool.name if tool else None
             }
         else:
             return {"status": "error", "message": "Tool change failed"}

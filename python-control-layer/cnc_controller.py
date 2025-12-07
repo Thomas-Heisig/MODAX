@@ -230,13 +230,16 @@ class CNCController:
         logger.info(f"Coolant: {state.value}")
         return True
     
+    # Feed rate limits
+    MAX_FEED_RATE = 15000.0  # mm/min
+    
     def set_feed_rate(self, rate: float):
         """Set feed rate in mm/min"""
         if rate < 0:
             logger.warning(f"Invalid feed rate: {rate}")
             return False
         
-        self.feed_rate = min(rate, 15000.0)  # Limit to max 15000 mm/min
+        self.feed_rate = min(rate, self.MAX_FEED_RATE)
         self.f_value = self.feed_rate
         logger.debug(f"Feed rate set to: {self.feed_rate} mm/min")
         return True

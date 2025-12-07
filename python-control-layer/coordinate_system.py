@@ -278,7 +278,7 @@ class CoordinateSystemManager:
                 if axis in machine_pos:
                     center = self.scaling_center.get(axis, 0.0)
                     factor = self.scaling_factors.get(axis, 1.0)
-                    if factor != 0:
+                    if abs(factor) > 1e-10:
                         machine_pos[axis] = center + (machine_pos[axis] - center) / factor
         
         if self.rotation_active and "X" in machine_pos and "Y" in machine_pos:
