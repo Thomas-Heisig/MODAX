@@ -37,20 +37,21 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 
 ### Sicherheit
 - [x] Sicherheitskonzept dokumentieren (docs/SECURITY.md)
-- [ ] MQTT-Authentifizierung implementieren (siehe docs/SECURITY.md)
-- [ ] TLS/SSL für Produktionsumgebung einrichten (siehe docs/SECURITY.md)
-- [ ] API-Authentifizierung hinzufügen (siehe docs/SECURITY.md)
-- [ ] Secrets Management einrichten (siehe docs/SECURITY.md)
+- [x] MQTT-Authentifizierung implementieren (siehe docs/SECURITY.md)
+- [x] TLS/SSL für Produktionsumgebung einrichten (siehe docs/SECURITY.md)
+- [x] API-Authentifizierung hinzufügen (siehe docs/SECURITY.md)
+- [x] Secrets Management einrichten (siehe docs/SECURITY.md)
+- [x] Security Implementation dokumentieren (docs/SECURITY_IMPLEMENTATION.md)
 - [ ] Sicherheitsaudit durchführen
 
 ## Priorität 2: Hoch
 
 ### Funktionserweiterungen
-- [ ] WebSocket-Unterstützung für Echtzeit-Updates im HMI
+- [x] WebSocket-Unterstützung für Echtzeit-Updates im HMI
 - [x] Zeitreihen-Datenbank-Integration dokumentieren (docs/DATA_PERSISTENCE.md)
-- [ ] TimescaleDB implementieren (siehe docs/DATA_PERSISTENCE.md)
+- [x] TimescaleDB implementieren (siehe docs/DATA_PERSISTENCE.md)
 - [ ] Erweiterte Visualisierungen mit Diagrammen im HMI
-- [ ] Daten-Export-Funktion (CSV, JSON)
+- [x] Daten-Export-Funktion (CSV, JSON)
 
 ### Code-Qualität
 - [x] Logging-Format über alle Ebenen standardisieren (docs/LOGGING_STANDARDS.md)

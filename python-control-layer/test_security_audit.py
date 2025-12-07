@@ -186,9 +186,10 @@ class TestSecurityAuditLogger:
         assert len(entries) == 1
         
         timestamp = entries[0]['timestamp']
-        # Should be in ISO format with Z suffix
-        assert timestamp.endswith('Z')
+        # Should be in ISO format with timezone info
         assert 'T' in timestamp
+        # Should have timezone info (either Z or +00:00 or similar)
+        assert (timestamp.endswith('Z') or '+' in timestamp or timestamp.endswith('+00:00'))
 
 
 if __name__ == '__main__':

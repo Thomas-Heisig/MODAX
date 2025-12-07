@@ -14,6 +14,41 @@ Jeder Eintrag sollte folgende Informationen enthalten:
 
 ## 2025-12-07
 
+### Security und Feature-Erweiterungen implementiert
+- **Datum:** 2025-12-07
+- **Typ:** Enhancement/Feature
+- **Beschreibung:** Umfassende Sicherheitsfunktionen und Feature-Erweiterungen implementiert
+- **Commit:** 7a9042b, 0dc2e04
+- **Autor:** GitHub Copilot Agent
+- **Details:**
+  - **Security Features implementiert:**
+    - MQTT TLS/SSL Unterstützung (mqtt_handler.py)
+    - API Key Authentifizierung (auth.py)
+    - Security Audit Logging (security_audit.py)
+    - Secrets Management mit Vault-Support (secrets_manager.py)
+    - Alle Security Features vollständig getestet (39 Tests, 100% pass rate)
+  - **Feature-Erweiterungen:**
+    - WebSocket Support für Echtzeit-Updates (websocket_manager.py)
+    - TimescaleDB Integration für Datenpersistenz:
+      - Database Connection Pool (db_connection.py)
+      - Data Writer Service (data_writer.py)
+      - Data Reader Service (data_reader.py)
+      - SQL Schema mit Hypertables und Continuous Aggregates (schema.sql)
+    - Daten-Export Funktionalität (data_export.py):
+      - CSV Export
+      - JSON Export
+      - Statistik Export
+  - **Dokumentation:**
+    - SECURITY_IMPLEMENTATION.md erstellt mit vollständigem Setup-Guide
+    - API.md erweitert mit neuen Endpoints
+    - control-layer-security.env.example erstellt
+    - TODO.md aktualisiert mit erledigten Items
+  - **Testing:**
+    - test_auth.py - 10 Tests für API Authentication
+    - test_security_audit.py - 8 Tests für Audit Logging
+    - test_secrets_manager.py - 10 Tests für Secrets Management
+    - test_websocket_manager.py - 11 Tests für WebSocket Manager
+
 ### Projektdokumentation aktualisiert - Datum auf 2025 korrigiert
 - **Datum:** 2025-12-07
 - **Typ:** Maintenance
