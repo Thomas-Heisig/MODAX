@@ -11,7 +11,7 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
 
 **Kernkonzept:** Sichere Automatisierung mit beratender KI - Die KI-Ebene liefert Empfehlungen und Analysen, während die Steuerungsebene alle sicherheitskritischen Entscheidungen trifft. Das System kombiniert Echtzeit-Reaktionsfähigkeit mit intelligenter Langzeit-Analyse.
 
-**Aktuelle Version:** 0.2.0 (mit umfassenden CNC-Funktionen)
+**Aktuelle Version:** 0.3.0 (mit Industry 4.0 Roadmap)
 - 123+ Unit-Tests, 96-97% Code Coverage
 - Vollständige CNC-Maschinen-Funktionalität
 - Produktionsreife Dokumentation
@@ -90,6 +90,14 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
 - **Sicherheitsfunktionen:** Software-Endlagen, Not-Aus, Kollisionsvermeidung
 - Siehe [CNC_FEATURES.md](docs/CNC_FEATURES.md) für Details
 
+### 🚀 Industry 4.0 Roadmap (NEU v0.3.0)
+- **Advanced Communication:** OPC UA (✅), MQTT (✅), EtherCAT, PROFINET, MTConnect
+- **Intelligent Process Control:** Adaptive Feed Control, Vibration Monitoring, Energy Management
+- **Predictive Intelligence:** AI-powered parameter optimization, predictive maintenance
+- **Digital Twin:** Virtual machine simulation and optimization
+- **Next-Gen HMI:** Cloud-native interfaces, AR guidance, voice control
+- Siehe [ADVANCED_CNC_INDUSTRY_4_0.md](docs/ADVANCED_CNC_INDUSTRY_4_0.md) für vollständige Roadmap
+
 ### 🔧 Modular & Skalierbar
 - Mehrere Feldgeräte unterstützt
 - Horizontale Skalierung
@@ -162,6 +170,10 @@ Ausführliche Anweisungen finden Sie unter [docs/SETUP.md](docs/SETUP.md)
 - [📡 API-Dokumentation](docs/API.md) - REST API Referenz
 - [⚙️ Konfiguration](docs/CONFIGURATION.md) - Konfigurationsoptionen
 - [🚀 Quick Wins (TOFU)](docs/TOFU.md) - Produktionsreife Features und Best Practices
+
+#### CNC & Industry 4.0
+- [🏭 CNC Features](docs/CNC_FEATURES.md) - CNC machine functionality (G-code, motion control, tools)
+- [🚀 Advanced CNC Industry 4.0](docs/ADVANCED_CNC_INDUSTRY_4_0.md) - **NEU** Advanced features, communication protocols, intelligent automation, digital twin, AI optimization
 
 #### Sicherheit & Netzwerk
 - [🔒 Sicherheit](docs/SECURITY.md) - Sicherheitskonzept und Implementierung
@@ -276,17 +288,33 @@ Sicherheitsfunktionen bleiben in der Feldebene (ESP32) Hardware. Siehe [docs/SEC
 
 ## Zukünftige Erweiterungen
 
-### Phase 2 (Geplant)
+⭐ **Siehe [ADVANCED_CNC_INDUSTRY_4_0.md](docs/ADVANCED_CNC_INDUSTRY_4_0.md) für vollständige Industry 4.0 Roadmap**
+
+### Phase 2 (Geplant - Monate 1-3)
+- OPC UA Server Deployment (✅ dokumentiert)
 - ONNX-Modell-Deployment
 - Zeitreihen-Datenbank-Integration
 - Erweiterte Visualisierungen
 - WebSocket-Echtzeit-Updates
+- Adaptive Feed Control
+- Vibration-basierte Chatter-Erkennung
 
-### Phase 3 (Zukunft)
+### Phase 3 (Monate 4-6)
 - ML-Modell-Training-Pipeline
+- AI Parameter-Optimierung
+- Digital Twin Basic Functionality
+- Cloud-native Web HMI
 - Flottenweite Analytik
 - Cloud-Integration
 - Mobile App (nur Überwachung)
+
+### Phase 4 (Monate 7-12) - Industry 4.0
+- EtherCAT/PROFINET Support
+- MES/ERP Integration
+- Advanced Digital Twin mit Physics
+- Federated Learning Framework
+- AR Maintenance Guidance
+- Voice Control Interface
 
 ## Testing & Code Quality
 

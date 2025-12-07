@@ -58,6 +58,13 @@ Complete documentation index for the MODAX industrial control system.
   - Coordinate systems and transformations
   - Fixed cycles (drilling, milling, tapping)
   - API endpoints for CNC operations
+- **[ADVANCED_CNC_INDUSTRY_4_0.md](ADVANCED_CNC_INDUSTRY_4_0.md)** ⭐ **NEW** - Industry 4.0 Advanced Features
+  - Advanced Communication Protocols (EtherCAT, PROFINET, OPC UA, MQTT, MTConnect)
+  - Intelligent Process Control (Adaptive Feed, Vibration Monitoring, Energy Management)
+  - Advanced Automation (Predictive Maintenance, Lights-Out Production, Automated Job Setup)
+  - Future Integration (AI Parameter Optimization, Digital Twin, Peer-to-Peer Learning)
+  - Next-Generation HMI (AR Overlays, Cloud-Native Interfaces, Voice/Gesture Control)
+  - Implementation Roadmap and ROI Analysis
 
 ### Security
 - [SECURITY.md](SECURITY.md) - Comprehensive security concept
