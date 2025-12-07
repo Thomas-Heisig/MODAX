@@ -194,13 +194,16 @@ def health_check(request: Request):
 def readiness_check(request: Request):
     """Readiness check endpoint - returns 200 if service is ready to accept requests"""
     if not control_layer:
+        error_response = ErrorResponse(
+            error="ServiceNotReady",
+            message="Control layer not initialized",
+            status_code=503,
+            timestamp=datetime.utcnow().isoformat(),
+            details={"reason": "Control layer not initialized"}
+        )
         return JSONResponse(
             status_code=503,
-            content={
-                "status": "not_ready",
-                "reason": "Control layer not initialized",
-                "timestamp": datetime.utcnow().isoformat()
-            }
+            content=error_response.dict()
         )
     
     # Update system metrics
@@ -208,10 +211,13 @@ def readiness_check(request: Request):
     DEVICES_ONLINE.set(len(devices))
     SYSTEM_SAFE.set(1 if control_layer.aggregator.is_system_safe() else 0)
     
+    # Check MQTT connection status from control layer
+    mqtt_connected = control_layer.mqtt_handler.client.is_connected() if hasattr(control_layer, 'mqtt_handler') else False
+    
     return {
         "status": "ready",
         "service": "modax-control-layer",
-        "mqtt_connected": True,
+        "mqtt_connected": mqtt_connected,
         "devices_online": len(devices),
         "system_safe": control_layer.aggregator.is_system_safe(),
         "timestamp": datetime.utcnow().isoformat()
