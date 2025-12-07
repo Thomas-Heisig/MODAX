@@ -152,6 +152,10 @@ class DataAggregator:
         num_motors = len(recent_data[0].motor_currents)
         num_temps = len(recent_data[0].temperatures)
 
+        # Validate dimensions before allocation to prevent errors
+        if num_samples <= 0 or num_motors <= 0 or num_temps <= 0:
+            return None
+
         # Pre-allocate numpy arrays for better performance
         currents_array = np.zeros((num_samples, num_motors), dtype=np.float32)
         vibrations_array = np.zeros((num_samples, 4), dtype=np.float32)  # x, y, z, magnitude

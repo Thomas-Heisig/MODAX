@@ -682,7 +682,8 @@ namespace MODAX.HMI.Views
                 _loadingPanel.Visible = true;
                 _loadingPanel.BringToFront();
                 _isLoading = true;
-                Application.DoEvents(); // Force UI update
+                // Note: UI updates automatically when control properties change
+                // Using async/await pattern in calling methods ensures proper UI threading
             }
         }
 
