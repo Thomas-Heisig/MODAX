@@ -7,6 +7,74 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-12-07
+
+### Hinzugefügt - Industry 4.0 Advanced Features Documentation
+- **📚 Umfassende Industry 4.0 Dokumentation (`docs/ADVANCED_CNC_INDUSTRY_4_0.md`):**
+  - 1.672 Zeilen detaillierte Dokumentation für moderne CNC-Funktionen
+  - Advanced Communication Protocols:
+    - OPC UA (✅ dokumentiert und bereit)
+    - MQTT (✅ implementiert und operational)
+    - EtherCAT, PROFINET, SERCOS III (Roadmap)
+    - MTConnect (Roadmap)
+    - Hersteller-spezifische Ökosysteme (Siemens, Heidenhain, Okuma, Mazak)
+  
+  - Intelligente Prozesssteuerung:
+    - Adaptive Feed Control mit Code-Beispielen
+    - In-Process Gauging mit Touch-Probe
+    - Vibration Monitoring & Chatter Detection (⭐ hohe Priorität)
+    - Energy Consumption Monitoring
+    - Automated Job Setup (RFID/Barcode)
+    - Predictive Maintenance Analytics (⭐ sehr hohe Priorität)
+    - Lights-Out Production Capabilities
+  
+  - Zukunftsfähige Integration:
+    - AI-Powered Parameter Optimization
+    - Digital Twin Synchronization
+    - Peer-to-Peer Machine Learning (Federated Learning)
+    - Augmented Reality Overlays
+    - Cloud-Native, Customizable HMIs
+    - Voice & Gesture Control
+  
+  - Implementation Roadmap:
+    - Phase 1 (Monate 1-3): Foundation Enhancement
+    - Phase 2 (Monate 4-6): Intelligence & Automation
+    - Phase 3 (Monate 7-12): Advanced Integration
+  
+  - ROI-Analyse für alle Features
+  - Best Practices und Startpunkte
+  - Sicherheitsüberlegungen und Netzwerkarchitektur
+
+- **📝 Session Summary (`docs/SESSION_SUMMARY_2024-12-07_INDUSTRY_4_0.md`):**
+  - Vollständige Dokumentation aller Änderungen
+  - Implementierungsstrategien
+  - Prioritäten und nächste Schritte
+
+### Geändert
+- **README.md:**
+  - Version auf 0.3.0 aktualisiert (Industry 4.0 Roadmap)
+  - Industry 4.0 Roadmap Sektion hinzugefügt
+  - Zukünftige Erweiterungen in 4 Phasen strukturiert
+  - Referenzen zur neuen Advanced-Dokumentation
+
+- **docs/CNC_FEATURES.md:**
+  - Referenz zu ADVANCED_CNC_INDUSTRY_4_0.md hinzugefügt
+  - Industry 4.0 Advanced Features Sektion ergänzt
+  - Klare Wegweiser zur umfassenden Dokumentation
+
+- **docs/INDEX.md:**
+  - ADVANCED_CNC_INDUSTRY_4_0.md in Core System Documentation aufgenommen
+  - Als ⭐ **NEW** markiert
+  - Zusammenfassung der behandelten Themen
+
+### Technische Details
+- Alle Protokollbeschreibungen basieren auf Industriestandards
+- 22 Python-Code-Beispiele mit praktischen Implementierungen
+- Alle internen Links verifiziert und funktionsfähig
+- Seamlose Integration mit bestehender MODAX-Dokumentation
+- OT/IT-Netzwerktrennung dokumentiert
+- Sicherheits-Best-Practices für Industry 4.0
+
 ## [0.2.0] - 2025-12-07
 
 ### Hinzugefügt - Umfassende CNC-Funktionalität
