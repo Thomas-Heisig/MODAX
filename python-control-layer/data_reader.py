@@ -1,6 +1,6 @@
 """Data reader service for TimescaleDB"""
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import List, Dict, Optional
 from db_connection import get_db_pool
 
@@ -9,15 +9,15 @@ logger = logging.getLogger(__name__)
 
 class DataReader:
     """Service for querying historical data from TimescaleDB"""
-    
+
     def __init__(self):
         """Initialize data reader"""
         self.db_pool = get_db_pool()
-    
+
     def is_available(self) -> bool:
         """Check if database is available"""
         return self.db_pool.is_available()
-    
+
     def get_recent_sensor_data(
         self,
         device_id: str,
@@ -25,17 +25,17 @@ class DataReader:
     ) -> List[Dict]:
         """
         Get recent sensor data for a device
-        
+
         Args:
             device_id: Device identifier
             minutes: Number of minutes of history to fetch
-            
+
         Returns:
             List of sensor readings
         """
         if not self.db_pool.config.ENABLED:
             return []
-        
+
         try:
             with self.db_pool.get_cursor() as cursor:
                 cursor.execute("""
@@ -46,7 +46,7 @@ class DataReader:
                       AND time > NOW() - INTERVAL '%s minutes'
                     ORDER BY time DESC
                 """, (device_id, minutes))
-                
+
                 return [
                     {
                         'timestamp': row[0].timestamp(),
@@ -63,7 +63,7 @@ class DataReader:
         except Exception as e:
             logger.error(f"Failed to get recent sensor data: {e}")
             return []
-    
+
     def get_hourly_statistics(
         self,
         device_id: str,
@@ -71,17 +71,17 @@ class DataReader:
     ) -> List[Dict]:
         """
         Get hourly aggregated statistics
-        
+
         Args:
             device_id: Device identifier
             hours: Number of hours of history to fetch
-            
+
         Returns:
             List of hourly statistics
         """
         if not self.db_pool.config.ENABLED:
             return []
-        
+
         try:
             with self.db_pool.get_cursor() as cursor:
                 cursor.execute("""
@@ -98,7 +98,7 @@ class DataReader:
                       AND hour > NOW() - INTERVAL '%s hours'
                     ORDER BY hour DESC
                 """, (device_id, hours))
-                
+
                 return [
                     {
                         'hour': row[0],
@@ -114,7 +114,7 @@ class DataReader:
         except Exception as e:
             logger.error(f"Failed to get hourly statistics: {e}")
             return []
-    
+
     def get_safety_events(
         self,
         device_id: Optional[str] = None,
@@ -123,18 +123,18 @@ class DataReader:
     ) -> List[Dict]:
         """
         Get safety events with optional filters
-        
+
         Args:
             device_id: Optional device identifier
             hours: Number of hours of history to fetch
             event_type: Optional event type filter
-            
+
         Returns:
             List of safety events
         """
         if not self.db_pool.config.ENABLED:
             return []
-        
+
         try:
             query = """
                 SELECT time, device_id, event_type, is_safe, description
@@ -142,17 +142,17 @@ class DataReader:
                 WHERE time > NOW() - INTERVAL %s
             """
             params = [f'{hours} hours']
-            
+
             if device_id:
                 query += " AND device_id = %s"
                 params.append(device_id)
-            
+
             if event_type:
                 query += " AND event_type = %s"
                 params.append(event_type)
-            
+
             query += " ORDER BY time DESC LIMIT 100"
-            
+
             with self.db_pool.get_cursor() as cursor:
                 cursor.execute(query, params)
                 return [
@@ -168,21 +168,21 @@ class DataReader:
         except Exception as e:
             logger.error(f"Failed to get safety events: {e}")
             return []
-    
+
     def get_device_uptime(self, device_id: str, days: int = 7) -> Dict:
         """
         Calculate device uptime statistics
-        
+
         Args:
             device_id: Device identifier
             days: Number of days to calculate uptime for
-            
+
         Returns:
             Dictionary with uptime statistics
         """
         if not self.db_pool.config.ENABLED:
             return {}
-        
+
         try:
             with self.db_pool.get_cursor() as cursor:
                 cursor.execute("""
@@ -195,7 +195,7 @@ class DataReader:
                     WHERE device_id = %s
                       AND time > NOW() - INTERVAL '%s days'
                 """, (device_id, days))
-                
+
                 row = cursor.fetchone()
                 if row:
                     return {
@@ -208,7 +208,7 @@ class DataReader:
         except Exception as e:
             logger.error(f"Failed to get device uptime: {e}")
             return {}
-    
+
     def get_data_for_export(
         self,
         device_id: str,
@@ -218,19 +218,19 @@ class DataReader:
     ) -> List[Dict]:
         """
         Get sensor data for export (CSV/JSON)
-        
+
         Args:
             device_id: Device identifier
             start_time: Start of time range
             end_time: End of time range
             limit: Maximum number of records to fetch
-            
+
         Returns:
             List of sensor readings
         """
         if not self.db_pool.config.ENABLED:
             return []
-        
+
         try:
             with self.db_pool.get_cursor() as cursor:
                 cursor.execute("""
@@ -245,7 +245,7 @@ class DataReader:
                     ORDER BY time ASC
                     LIMIT %s
                 """, (device_id, start_time, end_time, limit))
-                
+
                 return [
                     {
                         'timestamp': row[0].isoformat(),

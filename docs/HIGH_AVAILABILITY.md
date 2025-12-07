@@ -734,5 +734,5 @@ groups:
 - [HAProxy Configuration Manual](http://www.haproxy.org/)
 
 ---
-**Last Updated:** 2024-12-06  
+**Last Updated:** 2025-12-07  
 **Maintained By:** MODAX Infrastructure Team

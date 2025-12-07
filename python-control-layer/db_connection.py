@@ -3,7 +3,6 @@ import os
 import logging
 from contextlib import contextmanager
 from typing import Optional
-import psycopg2
 import psycopg2.pool as pool
 from secrets_manager import get_secrets_manager
 
@@ -12,12 +11,12 @@ logger = logging.getLogger(__name__)
 
 class DatabaseConfig:
     """Database configuration"""
-    
+
     def __init__(self):
         """Initialize database configuration from secrets manager"""
         secrets = get_secrets_manager()
         db_creds = secrets.get_database_credentials()
-        
+
         self.HOST = db_creds.get('host', 'localhost')
         self.PORT = int(db_creds.get('port', '5432'))
         self.DATABASE = db_creds.get('database', 'modax')
@@ -25,27 +24,27 @@ class DatabaseConfig:
         self.PASSWORD = db_creds.get('password', '')
         self.MIN_CONNECTIONS = int(os.getenv("DB_POOL_MIN", "2"))
         self.MAX_CONNECTIONS = int(os.getenv("DB_POOL_MAX", "10"))
-        
+
         # Check if database is enabled
         self.ENABLED = os.getenv("DB_ENABLED", "false").lower() == "true"
 
 
 class DatabaseConnectionPool:
     """Database connection pool manager"""
-    
+
     def __init__(self, config: DatabaseConfig):
         """
         Initialize database connection pool
-        
+
         Args:
             config: Database configuration
         """
         self.config = config
         self.pool: Optional[pool.ThreadedConnectionPool] = None
-        
+
         if config.ENABLED:
             self.initialize_pool()
-    
+
     def initialize_pool(self):
         """Initialize the connection pool"""
         try:
@@ -65,32 +64,32 @@ class DatabaseConnectionPool:
         except Exception as e:
             logger.error(f"Failed to initialize database connection pool: {e}")
             raise
-    
+
     @contextmanager
     def get_connection(self):
         """
         Get a database connection from the pool
-        
+
         Yields:
             Database connection
         """
         if not self.pool:
             raise RuntimeError("Database pool not initialized")
-        
+
         conn = self.pool.getconn()
         try:
             yield conn
         finally:
             self.pool.putconn(conn)
-    
+
     @contextmanager
     def get_cursor(self, commit: bool = False):
         """
         Get a database cursor
-        
+
         Args:
             commit: Whether to commit after execution
-            
+
         Yields:
             Database cursor
         """
@@ -105,18 +104,18 @@ class DatabaseConnectionPool:
                 raise
             finally:
                 cursor.close()
-    
+
     def close(self):
         """Close all connections in the pool"""
         if self.pool:
             self.pool.closeall()
             logger.info("Database connection pool closed")
-    
+
     def is_available(self) -> bool:
         """Check if database is available"""
         if not self.pool:
             return False
-        
+
         try:
             with self.get_cursor() as cursor:
                 cursor.execute("SELECT 1")

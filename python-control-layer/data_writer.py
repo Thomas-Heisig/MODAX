@@ -10,32 +10,32 @@ logger = logging.getLogger(__name__)
 
 class DataWriter:
     """Service for writing data to TimescaleDB"""
-    
+
     def __init__(self):
         """Initialize data writer"""
         self.db_pool = get_db_pool()
-    
+
     def is_available(self) -> bool:
         """Check if database is available"""
         return self.db_pool.is_available()
-    
+
     def write_sensor_data(self, device_id: str, data: Dict) -> bool:
         """
         Write single sensor reading
-        
+
         Args:
             device_id: Device identifier
             data: Sensor data dictionary
-            
+
         Returns:
             True if successful, False otherwise
         """
         if not self.db_pool.config.ENABLED:
             return False
-        
+
         try:
             timestamp = datetime.fromtimestamp(data['timestamp'])
-            
+
             with self.db_pool.get_cursor(commit=True) as cursor:
                 cursor.execute("""
                     INSERT INTO sensor_data (
@@ -57,20 +57,20 @@ class DataWriter:
         except Exception as e:
             logger.error(f"Failed to write sensor data: {e}")
             return False
-    
+
     def write_sensor_data_batch(self, records: List[tuple]) -> bool:
         """
         Write multiple sensor readings efficiently
-        
+
         Args:
             records: List of tuples containing sensor data
-            
+
         Returns:
             True if successful, False otherwise
         """
         if not self.db_pool.config.ENABLED:
             return False
-        
+
         try:
             with self.db_pool.get_cursor(commit=True) as cursor:
                 psycopg2.extras.execute_batch(cursor, """
@@ -84,21 +84,21 @@ class DataWriter:
         except Exception as e:
             logger.error(f"Failed to write batch sensor data: {e}")
             return False
-    
+
     def write_safety_event(self, device_id: str, event: Dict) -> bool:
         """
         Write safety event
-        
+
         Args:
             device_id: Device identifier
             event: Safety event data
-            
+
         Returns:
             True if successful, False otherwise
         """
         if not self.db_pool.config.ENABLED:
             return False
-        
+
         try:
             with self.db_pool.get_cursor(commit=True) as cursor:
                 cursor.execute("""
@@ -122,21 +122,21 @@ class DataWriter:
         except Exception as e:
             logger.error(f"Failed to write safety event: {e}")
             return False
-    
+
     def write_ai_analysis(self, device_id: str, analysis: Dict) -> bool:
         """
         Write AI analysis result
-        
+
         Args:
             device_id: Device identifier
             analysis: AI analysis results
-            
+
         Returns:
             True if successful, False otherwise
         """
         if not self.db_pool.config.ENABLED:
             return False
-        
+
         try:
             with self.db_pool.get_cursor(commit=True) as cursor:
                 cursor.execute("""
@@ -161,7 +161,7 @@ class DataWriter:
         except Exception as e:
             logger.error(f"Failed to write AI analysis: {e}")
             return False
-    
+
     def write_control_command(
         self,
         device_id: str,
@@ -174,7 +174,7 @@ class DataWriter:
     ) -> bool:
         """
         Write control command to audit trail
-        
+
         Args:
             device_id: Device identifier
             command: Command type
@@ -183,13 +183,13 @@ class DataWriter:
             status: Command status (executed, blocked, failed)
             parameters: Command parameters
             reason: Reason for status (if blocked/failed)
-            
+
         Returns:
             True if successful, False otherwise
         """
         if not self.db_pool.config.ENABLED:
             return False
-        
+
         try:
             with self.db_pool.get_cursor(commit=True) as cursor:
                 cursor.execute("""

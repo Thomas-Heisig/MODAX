@@ -10,48 +10,48 @@ logger = logging.getLogger(__name__)
 
 class SecurityAuditLogger:
     """Handles security audit logging for authentication, authorization, and control events"""
-    
+
     # Event type constants
     EVENT_AUTH = "authentication"
     EVENT_AUTHZ = "authorization"
     EVENT_CONTROL = "control_command"
     EVENT_CONFIG = "configuration_change"
-    
+
     # Severity levels
     SEVERITY_INFO = "INFO"
     SEVERITY_WARNING = "WARNING"
     SEVERITY_ERROR = "ERROR"
     SEVERITY_CRITICAL = "CRITICAL"
-    
+
     def __init__(self, audit_log_path: Optional[str] = None):
         """
         Initialize security audit logger
-        
+
         Args:
             audit_log_path: Path to audit log file. If None, uses default location.
         """
         if audit_log_path is None:
             audit_log_path = "/var/log/modax/security_audit.log"
-        
+
         self.audit_log_path = Path(audit_log_path)
-        
+
         # Ensure audit log directory exists
         self.audit_log_path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         # Set up file handler for audit logs
         self.audit_handler = logging.FileHandler(self.audit_log_path)
         self.audit_handler.setLevel(logging.INFO)
-        
+
         # Use JSON format for structured logging
         formatter = logging.Formatter('%(message)s')
         self.audit_handler.setFormatter(formatter)
-        
+
         # Create separate logger for audit events
         self.audit_logger = logging.getLogger("modax.security.audit")
         self.audit_logger.setLevel(logging.INFO)
         self.audit_logger.addHandler(self.audit_handler)
         self.audit_logger.propagate = False
-    
+
     def _log_event(self, event_type: str, severity: str, **kwargs):
         """Log a security audit event"""
         event = {
@@ -60,9 +60,9 @@ class SecurityAuditLogger:
             "severity": severity,
             **kwargs
         }
-        
+
         self.audit_logger.info(json.dumps(event))
-    
+
     def log_authentication_success(
         self,
         user: str,
@@ -82,7 +82,7 @@ class SecurityAuditLogger:
                 "user_agent": user_agent
             }
         )
-    
+
     def log_authentication_failure(
         self,
         attempted_user: str,
@@ -98,7 +98,7 @@ class SecurityAuditLogger:
             source_ip=source_ip,
             reason=reason
         )
-    
+
     def log_authorization_denied(
         self,
         user: str,
@@ -116,7 +116,7 @@ class SecurityAuditLogger:
             requested_action=action,
             reason=reason
         )
-    
+
     def log_control_command(
         self,
         user: str,
@@ -128,7 +128,7 @@ class SecurityAuditLogger:
     ):
         """Log control command execution or blocking"""
         severity = self.SEVERITY_WARNING if status == "blocked" else self.SEVERITY_INFO
-        
+
         self._log_event(
             self.EVENT_CONTROL,
             severity,
@@ -139,7 +139,7 @@ class SecurityAuditLogger:
             parameters=parameters,
             reason=reason
         )
-    
+
     def log_configuration_change(
         self,
         user: str,
@@ -158,7 +158,7 @@ class SecurityAuditLogger:
             new_value=new_value,
             reason=reason
         )
-    
+
     def log_security_event(
         self,
         event_type: str,
@@ -189,7 +189,7 @@ def get_security_audit_logger() -> SecurityAuditLogger:
             audit_path = "./logs/security_audit.log"
         else:
             audit_path = None  # Use default production path
-        
+
         _audit_logger = SecurityAuditLogger(audit_path)
     return _audit_logger
 

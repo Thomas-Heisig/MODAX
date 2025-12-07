@@ -647,7 +647,7 @@ Export sensor data in CSV format.
 Returns CSV file with headers:
 ```csv
 timestamp,device_id,current_a,current_b,current_c,vibration,temperature,rpm,power_kw
-2024-12-07T12:00:00Z,ESP32_FIELD_001,5.2,5.1,5.3,100.5,45.3,1500,7.8
+2025-12-07T12:00:00Z,ESP32_FIELD_001,5.2,5.1,5.3,100.5,45.3,1500,7.8
 ```
 
 **Response (404 Not Found):**
@@ -671,7 +671,7 @@ Export sensor data in JSON format.
 ```json
 [
   {
-    "timestamp": "2024-12-07T12:00:00Z",
+    "timestamp": "2025-12-07T12:00:00Z",
     "device_id": "ESP32_FIELD_001",
     "current_a": 5.2,
     "current_b": 5.1,
@@ -698,7 +698,7 @@ Export hourly statistics in JSON format.
 ```json
 [
   {
-    "hour": "2024-12-07T12:00:00Z",
+    "hour": "2025-12-07T12:00:00Z",
     "avg_current": 5.2,
     "max_current": 6.1,
     "avg_vibration": 102.3,

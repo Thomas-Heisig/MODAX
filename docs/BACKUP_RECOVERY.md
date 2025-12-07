@@ -331,7 +331,7 @@ echo "Database restoration completed"
 #!/bin/bash
 # restore_database_pitr.sh
 
-TARGET_TIME=$1  # Format: 2024-12-06 14:30:00
+TARGET_TIME=$1  # Format: 2025-12-07 14:30:00
 
 if [ -z "$TARGET_TIME" ]; then
     echo "Usage: restore_database_pitr.sh 'YYYY-MM-DD HH:MM:SS'"
@@ -687,5 +687,5 @@ df -h /var/lib/postgresql
 - [Disaster Recovery Best Practices](https://www.nist.gov/itl/smallbusinesscyber/guidance-topic/backup-recovery)
 
 ---
-**Last Updated:** 2024-12-06  
+**Last Updated:** 2025-12-07  
 **Maintained By:** MODAX Operations Team

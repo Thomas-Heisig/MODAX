@@ -1,5 +1,5 @@
 """REST API for Control Layer - Interface for HMI"""
-from fastapi import FastAPI, HTTPException, Depends, Security, WebSocket, WebSocketDisconnect, Response, Request
+from fastapi import FastAPI, HTTPException, Depends, WebSocket, WebSocketDisconnect, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -12,7 +12,7 @@ from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTEN
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-from auth import get_api_key, require_read, require_write, require_control
+from auth import get_api_key, require_control
 from security_audit import get_security_audit_logger
 from websocket_manager import get_websocket_manager
 from data_export import get_data_exporter
@@ -84,7 +84,7 @@ async def metrics_middleware(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
     duration = time.time() - start_time
-    
+
     # Update metrics
     REQUEST_COUNT.labels(
         method=request.method,
@@ -95,7 +95,7 @@ async def metrics_middleware(request: Request, call_next):
         method=request.method,
         endpoint=request.url.path
     ).observe(duration)
-    
+
     return response
 
 
@@ -207,15 +207,15 @@ def readiness_check(request: Request):
             status_code=503,
             content=error_response.dict()
         )
-    
+
     # Update system metrics
     devices = control_layer.aggregator.get_device_ids()
     DEVICES_ONLINE.set(len(devices))
     SYSTEM_SAFE.set(1 if control_layer.aggregator.is_system_safe() else 0)
-    
+
     # Check MQTT connection status from control layer
     mqtt_connected = control_layer.mqtt_handler.client.is_connected() if hasattr(control_layer, 'mqtt_handler') else False
-    
+
     return {
         "status": "ready",
         "service": "modax-control-layer",
@@ -420,7 +420,7 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             # Keep connection alive and handle incoming messages if needed
-            data = await websocket.receive_text()
+            _data = await websocket.receive_text()
             # Echo back for now (can be extended to handle commands)
             await websocket.send_json({"type": "ping", "message": "pong"})
     except WebSocketDisconnect:
@@ -435,7 +435,7 @@ async def websocket_device_endpoint(websocket: WebSocket, device_id: str):
     try:
         while True:
             # Keep connection alive and handle incoming messages if needed
-            data = await websocket.receive_text()
+            _data = await websocket.receive_text()
             await websocket.send_json({"type": "ping", "message": "pong"})
     except WebSocketDisconnect:
         ws_manager.disconnect(websocket)
@@ -453,7 +453,7 @@ async def export_device_data_csv(
 ):
     """
     Export device sensor data as CSV
-    
+
     Args:
         device_id: Device identifier
         hours: Number of hours of data to export (default: 24)
@@ -461,19 +461,19 @@ async def export_device_data_csv(
     try:
         end_time = datetime.now()
         start_time = end_time - timedelta(hours=hours)
-        
+
         csv_content = data_exporter.export_to_csv(
             device_id, start_time, end_time
         )
-        
+
         if not csv_content:
             raise HTTPException(
                 status_code=404,
                 detail=f"No data available for device {device_id}"
             )
-        
+
         filename = f"modax_{device_id}_{start_time.strftime('%Y%m%d_%H%M%S')}.csv"
-        
+
         return Response(
             content=csv_content,
             media_type="text/csv",
@@ -496,7 +496,7 @@ async def export_device_data_json(
 ):
     """
     Export device sensor data as JSON
-    
+
     Args:
         device_id: Device identifier
         hours: Number of hours of data to export (default: 24)
@@ -504,19 +504,19 @@ async def export_device_data_json(
     try:
         end_time = datetime.now()
         start_time = end_time - timedelta(hours=hours)
-        
+
         json_content = data_exporter.export_to_json(
             device_id, start_time, end_time
         )
-        
+
         if json_content == "[]":
             raise HTTPException(
                 status_code=404,
                 detail=f"No data available for device {device_id}"
             )
-        
+
         filename = f"modax_{device_id}_{start_time.strftime('%Y%m%d_%H%M%S')}.json"
-        
+
         return Response(
             content=json_content,
             media_type="application/json",
@@ -539,22 +539,22 @@ async def export_device_statistics(
 ):
     """
     Export device hourly statistics as JSON
-    
+
     Args:
         device_id: Device identifier
         hours: Number of hours of statistics to export (default: 24)
     """
     try:
         json_content = data_exporter.export_statistics_to_json(device_id, hours)
-        
+
         if json_content == "[]":
             raise HTTPException(
                 status_code=404,
                 detail=f"No statistics available for device {device_id}"
             )
-        
+
         filename = f"modax_{device_id}_statistics_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-        
+
         return Response(
             content=json_content,
             media_type="application/json",
@@ -579,7 +579,7 @@ async def get_cnc_status(
 ):
     """
     Get comprehensive CNC machine status
-    
+
     Returns complete status including controller state, position, tools,
     coordinate systems, and active cycles.
     """
@@ -600,7 +600,7 @@ async def load_cnc_program(
 ):
     """
     Load G-code program
-    
+
     Request body:
     {
         "gcode": "G90 G54\\nG00 X10 Y20\\n...",
@@ -610,12 +610,12 @@ async def load_cnc_program(
     try:
         gcode = program.get("gcode", "")
         name = program.get("name", "")
-        
+
         if not gcode:
             raise HTTPException(status_code=400, detail="No G-code provided")
-        
+
         success = cnc.load_program(gcode, name)
-        
+
         if success:
             audit_logger.log_control_action(
                 "cnc_program_load",
@@ -624,7 +624,7 @@ async def load_cnc_program(
             return {"status": "success", "message": "Program loaded successfully"}
         else:
             return {"status": "error", "message": "Failed to load program"}
-            
+
     except Exception as e:
         logger.error(f"Error loading CNC program: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -639,12 +639,12 @@ async def set_cnc_mode(
 ):
     """
     Set CNC operation mode
-    
+
     Modes: auto, manual, mdi, reference, handwheel, single_step, dry_run, simulation
     """
     try:
         from cnc_controller import CNCMode
-        
+
         # Validate mode
         valid_modes = [m.value for m in CNCMode]
         if mode not in valid_modes:
@@ -652,16 +652,16 @@ async def set_cnc_mode(
                 status_code=400,
                 detail=f"Invalid mode. Valid modes: {', '.join(valid_modes)}"
             )
-        
+
         mode_enum = CNCMode(mode)
         success = cnc.controller.set_mode(mode_enum)
-        
+
         if success:
             audit_logger.log_control_action("cnc_mode_change", {"mode": mode})
             return {"status": "success", "mode": mode}
         else:
             return {"status": "error", "message": "Cannot change mode"}
-            
+
     except Exception as e:
         logger.error(f"Error setting CNC mode: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -676,7 +676,7 @@ async def control_spindle(
 ):
     """
     Control spindle
-    
+
     Request body:
     {
         "state": "cw" | "ccw" | "stopped",
@@ -685,25 +685,25 @@ async def control_spindle(
     """
     try:
         from cnc_controller import SpindleState
-        
+
         state_map = {
             "cw": SpindleState.CW,
             "ccw": SpindleState.CCW,
             "stopped": SpindleState.STOPPED
         }
-        
+
         state_str = command.get("state", "").lower()
         if state_str not in state_map:
             raise HTTPException(
                 status_code=400,
                 detail="Invalid state. Use: cw, ccw, or stopped"
             )
-        
+
         state = state_map[state_str]
         speed = command.get("speed")
-        
+
         success = cnc.controller.set_spindle(state, speed)
-        
+
         if success:
             audit_logger.log_control_action(
                 "cnc_spindle_control",
@@ -716,7 +716,7 @@ async def control_spindle(
             }
         else:
             return {"status": "error", "message": "Cannot control spindle"}
-            
+
     except Exception as e:
         logger.error(f"Error controlling spindle: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -731,13 +731,13 @@ async def change_tool(
 ):
     """
     Execute tool change
-    
+
     Args:
         tool_number: Tool number to change to
     """
     try:
         success = cnc.tools.change_tool(tool_number)
-        
+
         if success:
             audit_logger.log_control_action(
                 "cnc_tool_change",
@@ -751,7 +751,7 @@ async def change_tool(
             }
         else:
             return {"status": "error", "message": "Tool change failed"}
-            
+
     except Exception as e:
         logger.error(f"Error changing tool: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -796,13 +796,13 @@ async def set_coordinate_system(
 ):
     """
     Set active work coordinate system
-    
+
     Args:
         system: G54, G55, G56, G57, G58, G59, G59.1, G59.2, or G59.3
     """
     try:
         success = cnc.coords.set_active_coordinate_system(system.upper())
-        
+
         if success:
             audit_logger.log_control_action(
                 "cnc_coord_system_change",
@@ -811,7 +811,7 @@ async def set_coordinate_system(
             return {"status": "success", "system": system}
         else:
             return {"status": "error", "message": "Invalid coordinate system"}
-            
+
     except Exception as e:
         logger.error(f"Error setting coordinate system: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -826,13 +826,13 @@ async def set_feed_override(
 ):
     """
     Set feed override percentage
-    
+
     Request body: {"percentage": 100}  (0-150)
     """
     try:
         percentage = override.get("percentage", 100)
         success = cnc.controller.set_feed_override(percentage)
-        
+
         if success:
             return {
                 "status": "success",
@@ -840,7 +840,7 @@ async def set_feed_override(
             }
         else:
             return {"status": "error", "message": "Invalid override value"}
-            
+
     except Exception as e:
         logger.error(f"Error setting feed override: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -855,13 +855,13 @@ async def set_spindle_override(
 ):
     """
     Set spindle override percentage
-    
+
     Request body: {"percentage": 100}  (50-150)
     """
     try:
         percentage = override.get("percentage", 100)
         success = cnc.controller.set_spindle_override(percentage)
-        
+
         if success:
             return {
                 "status": "success",
@@ -869,7 +869,7 @@ async def set_spindle_override(
             }
         else:
             return {"status": "error", "message": "Invalid override value"}
-            
+
     except Exception as e:
         logger.error(f"Error setting spindle override: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -884,25 +884,25 @@ async def emergency_stop(
 ):
     """
     Activate or deactivate emergency stop
-    
+
     Request body: {"active": true/false}
     """
     try:
         active = command.get("active", True)
         cnc.controller.set_emergency_stop(active)
-        
+
         audit_logger.log_security_event(
             "cnc_emergency_stop",
             {"active": active},
             "critical" if active else "info"
         )
-        
+
         return {
             "status": "success",
             "emergency_stop": active,
             "machine_state": cnc.controller.state.value
         }
-            
+
     except Exception as e:
         logger.error(f"Error setting emergency stop: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -917,18 +917,18 @@ async def parse_gcode(
 ):
     """
     Parse G-code without executing
-    
+
     Query parameter: gcode=G00 X10 Y20
     """
     try:
         from gcode_parser import GCodeParser
-        
+
         parser = GCodeParser()
         command = parser.parse_line(gcode, 1)
-        
+
         if command:
             valid, errors = parser.validate_command(command)
-            
+
             return {
                 "valid": valid,
                 "g_codes": command.g_codes,
@@ -938,7 +938,7 @@ async def parse_gcode(
             }
         else:
             return {"valid": False, "errors": ["Empty or invalid command"]}
-            
+
     except Exception as e:
         logger.error(f"Error parsing G-code: {e}")
         raise HTTPException(status_code=500, detail=str(e))

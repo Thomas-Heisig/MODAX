@@ -653,7 +653,7 @@ archive_command = 'aws s3 cp %p s3://modax-backups/wal/%f'
 ```bash
 #!/bin/bash
 # restore_pitr.sh
-RESTORE_TIME="2024-12-06 20:00:00"
+RESTORE_TIME="2025-12-07 20:00:00"
 BACKUP_FILE="/var/backups/modax/modax_full_20241206.dump"
 
 # Stop PostgreSQL

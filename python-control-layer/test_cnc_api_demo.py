@@ -11,23 +11,23 @@ def demo_cnc_functionality():
     print_separator()
     print("MODAX CNC Functionality Demo")
     print_separator()
-    
+
     # Initialize CNC
     print("\n1. Initializing CNC Integration...")
     cnc = get_cnc_integration()
     print("   ✅ CNC Integration initialized")
     print(f"   - Demo tools loaded: {len(cnc.tools.tools)}")
-    
+
     # Get initial status
     status = cnc.get_comprehensive_status()
     print(f"   - Machine state: {status['controller']['state']}")
     print(f"   - Mode: {status['controller']['mode']}")
-    
+
     # Set mode to AUTO
     print("\n2. Setting CNC mode to AUTO...")
     cnc.controller.set_mode(CNCMode.AUTO)
     print("   ✅ Mode set to AUTO")
-    
+
     # Load G-code program
     print("\n3. Loading G-code program...")
     gcode_program = """
@@ -47,7 +47,7 @@ G00 Z50.0        (Retract)
 M05              (Spindle off)
 M30              (Program end)
 """
-    
+
     success = cnc.load_program(gcode_program, "Demo Drilling Program")
     if success:
         print(f"   ✅ Program loaded: {len(cnc.current_program)} commands")
@@ -55,35 +55,35 @@ M30              (Program end)
     else:
         print("   ❌ Failed to load program")
         return False
-    
+
     # Show parsed commands
     print("\n4. Parsed G-code commands (first 5):")
     for i, cmd in enumerate(cnc.current_program[:5], 1):
         print(f"   Line {i}: {cmd.raw_line}")
         if cmd.g_codes:
-            g_descriptions = [f"{g} ({cnc.parser.get_g_code_description(g)})" 
+            g_descriptions = [f"{g} ({cnc.parser.get_g_code_description(g)})"
                             for g in cmd.g_codes]
             print(f"      G-codes: {', '.join(g_descriptions)}")
         if cmd.m_codes:
-            m_descriptions = [f"{m} ({cnc.parser.get_m_code_description(m)})" 
+            m_descriptions = [f"{m} ({cnc.parser.get_m_code_description(m)})"
                             for m in cmd.m_codes]
             print(f"      M-codes: {', '.join(m_descriptions)}")
         if cmd.parameters:
             params = ', '.join([f"{k}={v}" for k, v in cmd.parameters.items()])
             print(f"      Parameters: {params}")
-    
+
     # Spindle control
     print("\n5. Testing spindle control...")
     cnc.controller.set_spindle(SpindleState.CW, 1500)
     print(f"   ✅ Spindle: {cnc.controller.spindle_state.value} at {cnc.controller.spindle_speed} RPM")
-    
+
     # Feed rate control
     print("\n6. Testing feed rate control...")
     cnc.controller.set_feed_rate(500.0)
     print(f"   ✅ Feed rate: {cnc.controller.feed_rate} mm/min")
     cnc.controller.set_feed_override(120)
     print(f"   ✅ Feed override: {cnc.controller.feed_override}%")
-    
+
     # Tool change
     print("\n7. Testing tool change...")
     tool_num = 2
@@ -94,14 +94,14 @@ M30              (Program end)
         print(f"      - Type: {tool.type}")
         print(f"      - Diameter: {tool.diameter} mm")
         print(f"      - Length: {tool.length} mm")
-    
+
     # Coordinate system
     print("\n8. Testing coordinate system...")
     cnc.coords.set_work_offsets("G54", {"X": 100.0, "Y": 50.0, "Z": 25.0})
     cnc.coords.set_active_coordinate_system("G54")
     print(f"   ✅ Work coordinate system: G54")
     print(f"      - Offsets: X=100, Y=50, Z=25")
-    
+
     # Get comprehensive status
     print("\n9. Comprehensive status:")
     status = cnc.get_comprehensive_status()
@@ -118,16 +118,16 @@ M30              (Program end)
     print(f"   Program:")
     print(f"      - Loaded: {status['program']['loaded']}")
     print(f"      - Total commands: {status['program']['total_commands']}")
-    
+
     # Stop spindle
     print("\n10. Stopping spindle...")
     cnc.controller.set_spindle(SpindleState.STOPPED)
     print(f"   ✅ Spindle stopped")
-    
+
     print_separator()
     print("✅ ALL TESTS PASSED - CNC functionality working correctly!")
     print_separator()
-    
+
     return True
 
 

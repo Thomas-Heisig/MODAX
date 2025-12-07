@@ -1,10 +1,9 @@
 """Authentication and authorization for API endpoints"""
 import logging
 import os
-from typing import Dict, Optional, List
+from typing import Dict, Optional
 from fastapi import HTTPException, Security, status
 from fastapi.security import APIKeyHeader
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -15,12 +14,12 @@ api_key_header_scheme = APIKeyHeader(name=API_KEY_HEADER, auto_error=False)
 
 class APIKeyManager:
     """Manages API keys and permissions"""
-    
+
     def __init__(self):
         """Initialize API key manager with keys from environment"""
         self.api_keys: Dict[str, Dict] = {}
         self._load_api_keys()
-    
+
     def _load_api_keys(self):
         """Load API keys from environment variables"""
         # HMI client key
@@ -31,7 +30,7 @@ class APIKeyManager:
                 "permissions": ["read", "write", "control"],
                 "rate_limit": 100
             }
-        
+
         # Monitoring read-only key
         monitoring_key = os.getenv("MONITORING_API_KEY")
         if monitoring_key:
@@ -40,7 +39,7 @@ class APIKeyManager:
                 "permissions": ["read"],
                 "rate_limit": 1000
             }
-        
+
         # Admin key with full access
         admin_key = os.getenv("ADMIN_API_KEY")
         if admin_key:
@@ -49,15 +48,15 @@ class APIKeyManager:
                 "permissions": ["read", "write", "control", "admin"],
                 "rate_limit": 1000
             }
-        
+
         logger.info(f"Loaded {len(self.api_keys)} API keys")
-    
+
     def validate_key(self, api_key: str) -> Optional[Dict]:
         """Validate an API key and return its info"""
         if api_key in self.api_keys:
             return self.api_keys[api_key]
         return None
-    
+
     def has_permission(self, api_key: str, permission: str) -> bool:
         """Check if an API key has a specific permission"""
         key_info = self.validate_key(api_key)
@@ -78,7 +77,7 @@ async def get_api_key(api_key: str = Security(api_key_header_scheme)) -> str:
             detail="API key is missing",
             headers={"WWW-Authenticate": "ApiKey"},
         )
-    
+
     key_info = api_key_manager.validate_key(api_key)
     if not key_info:
         logger.warning(f"Invalid API key attempted: {api_key[:8]}...")
@@ -87,7 +86,7 @@ async def get_api_key(api_key: str = Security(api_key_header_scheme)) -> str:
             detail="Invalid API key",
             headers={"WWW-Authenticate": "ApiKey"},
         )
-    
+
     logger.debug(f"API key validated: {key_info['name']}")
     return api_key
 

@@ -46,7 +46,7 @@ class MQTTHandler:
 
         if config.username and config.password:
             self.client.username_pw_set(config.username, config.password)
-        
+
         # Configure TLS/SSL if enabled
         if config.use_tls:
             self._configure_tls()
@@ -56,10 +56,10 @@ class MQTTHandler:
         try:
             # Set TLS version (minimum TLS 1.2 for security)
             tls_version = ssl.PROTOCOL_TLSv1_2
-            
+
             # Configure TLS options
             cert_required = ssl.CERT_REQUIRED if not self.config.tls_insecure else ssl.CERT_NONE
-            
+
             self.client.tls_set(
                 ca_certs=self.config.ca_certs,
                 certfile=self.config.certfile,
@@ -67,12 +67,12 @@ class MQTTHandler:
                 cert_reqs=cert_required,
                 tls_version=tls_version
             )
-            
+
             # Optionally disable hostname verification (for development only)
             if self.config.tls_insecure:
                 self.client.tls_insecure_set(True)
                 logger.warning("TLS certificate verification is disabled - use only for development!")
-            
+
             logger.info("TLS/SSL configured for MQTT connection")
         except Exception as e:
             logger.error(f"Failed to configure TLS: {e}")

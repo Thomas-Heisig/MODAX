@@ -217,7 +217,7 @@ API_KEYS = {
 #### Authentication Events
 ```python
 {
-    "timestamp": "2024-12-06T21:19:21.971Z",
+    "timestamp": "2025-12-07T21:19:21.971Z",
     "event_type": "authentication",
     "severity": "INFO",
     "source_ip": "192.168.1.100",
@@ -233,7 +233,7 @@ API_KEYS = {
 #### Authorization Events
 ```python
 {
-    "timestamp": "2024-12-06T21:19:21.971Z",
+    "timestamp": "2025-12-07T21:19:21.971Z",
     "event_type": "authorization",
     "severity": "WARNING",
     "user": "operator1",
@@ -246,7 +246,7 @@ API_KEYS = {
 #### Control Command Events
 ```python
 {
-    "timestamp": "2024-12-06T21:19:21.971Z",
+    "timestamp": "2025-12-07T21:19:21.971Z",
     "event_type": "control_command",
     "severity": "WARNING",
     "user": "operator1",
@@ -260,7 +260,7 @@ API_KEYS = {
 #### Configuration Change Events
 ```python
 {
-    "timestamp": "2024-12-06T21:19:21.971Z",
+    "timestamp": "2025-12-07T21:19:21.971Z",
     "event_type": "configuration_change",
     "severity": "INFO",
     "user": "admin1",
