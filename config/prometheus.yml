@@ -1,0 +1,17 @@
+# Prometheus configuration for MODAX
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Control Layer metrics
+  - job_name: 'modax-control-layer'
+    static_configs:
+      - targets: ['control-layer:8000']
+    metrics_path: '/metrics'
+
+  # AI Layer metrics
+  - job_name: 'modax-ai-layer'
+    static_configs:
+      - targets: ['ai-layer:8001']
+    metrics_path: '/metrics'
