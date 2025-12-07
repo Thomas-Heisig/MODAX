@@ -7,6 +7,76 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2025-12-07
+
+### Hinzugefügt - Extended G-Code Support & Interpreter
+
+- **🔧 Erweiterte G-Code-Unterstützung (150+ Codes):**
+  - **Advanced Interpolation:** G05 (NURBS), G05.1 (Look-Ahead), G07.1/G107 (Zylindrisch), G12.1/G13.1 (Polar)
+  - **Threading:** G33 (konstante Steigung), G76 (Threading-Zyklus), G84.2/G84.3 (Rechts-/Links-Tappen)
+  - **Workspace:** G22/G23 (Arbeitsbereichsbegrenzung), G25/G26 (Spindel-Schwankungserkennung)
+  - **Probing:** G31 (Skip/Probe), G36 (Auto-Offset), G37 (Auto-Länge), G38.2-G38.5 (erweitert)
+  - **Advanced Cycles:** G73 (High-Speed-Peck), G74 (Links-Tappen), G34/G35 (Lochkreis)
+  - **Coordinate Systems:** G54.1 Pxx (erweiterte WCS P1-P300), G98/G99 (Rückkehr-Modi)
+
+- **🔧 Erweiterte M-Code-Unterstützung:**
+  - **Spindle:** M19 (Orientierung), M21/M22 (Getriebe-Schaltung), M29 (Starr-Tappen)
+  - **Coolant:** M50/M51 (Hochdruck), M88 (Through-Spindle), M89 (Through-Tool)
+  - **Feed Override:** M36/M37 (Bereichsbegrenzung)
+  - **User Macros:** M100-M199 (frei konfigurierbar)
+  - **Pallet Control:** M200-M203 (Mazak Palettensteuerung)
+
+- **🤖 Makro-Unterstützung:**
+  - Fanuc Macro B: G65 (Makro-Aufruf), G66/G67 (Modal)
+  - O-Codes: Programm-/Makro-Nummern (O1000-O9999)
+  - Variablen: #1-#999 (Common Variables)
+  - Parameter-Übergabe an Makros
+
+- **🔀 Kontrollfluss & Interpreter:**
+  - **GOTO:** Unbedingter Sprung zu Labels oder N-Nummern
+  - **GOSUB/RETURN:** Unterprogramm-Aufrufe mit Call-Stack
+  - **Labels:** Mit oder ohne Doppelpunkt (:START, LOOP, N100)
+  - **Verschachtelte Aufrufe:** Mehrere GOSUB-Ebenen unterstützt
+  - **Infinite Loop Protection:** Max. Ausführungszähler
+
+- **🏭 Herstellerspezifische Unterstützung:**
+  - **Siemens Sinumerik:** G05, G107, CYCLE-Befehle
+  - **Heidenhain TNC:** G05.1, CYCL DEF (vorbereitet)
+  - **Fanuc Macro B:** G54.1, G65/G66/G67, #-Variablen
+  - **Okuma OSP:** VC-Variable (vorbereitet), CALL OOxx (vorbereitet)
+  - **Mazak Mazatrol:** M200+ Serie (Palettensteuerung)
+
+- **📝 Kommentar-Unterstützung:**
+  - Beide Stile: Parentheses `(comment)` und Semicolon `; comment`
+  - Kommentare werden geparst und gespeichert
+
+- **📊 F und S Code Handling:**
+  - `has_spindle_speed()`, `get_spindle_speed()` - S-Parameter
+  - `has_feed_rate()`, `get_feed_rate()` - F-Parameter
+  - Vollständige Integration in Parser
+
+- **✅ Umfangreiche Tests:**
+  - `test_gcode_extended.py`: 18 Tests für erweiterte Codes
+  - `test_gcode_interpreter.py`: 17 Tests für Interpreter
+  - 100% Code-Abdeckung für neue Features
+
+- **📚 Dokumentation:**
+  - `docs/EXTENDED_GCODE_SUPPORT.md`: Vollständige Referenz (13KB)
+  - API-Dokumentation für Parser und Interpreter
+  - Beispiele für alle Features
+  - Sicherheitshinweise für Produktionseinsatz
+
+### Geändert
+- **gcode_parser.py:** Erweitert um 60+ neue G-Codes, 20+ M-Codes
+- **README.md:** Aktualisiert mit neuen Features (v0.4.0)
+- **docs/INDEX.md:** Neue Dokumentation verlinkt
+
+### Neue Dateien
+- `python-control-layer/gcode_interpreter.py` (273 Zeilen)
+- `python-control-layer/test_gcode_extended.py` (312 Zeilen)
+- `python-control-layer/test_gcode_interpreter.py` (315 Zeilen)
+- `docs/EXTENDED_GCODE_SUPPORT.md` (13KB)
+
 ## [0.3.0] - 2025-12-07
 
 ### Hinzugefügt - Industry 4.0 Advanced Features Documentation
