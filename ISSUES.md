@@ -2,9 +2,34 @@
 
 Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Probleme werden nach `DONE.md` verschoben.
 
+**Letzte Aktualisierung:** 2024-12-07  
+**Anzahl offener Issues:** 10 (2 kritisch, 3 wichtig, 5 kleinere Probleme)
+
 ## Kritische Probleme
 
-*Derzeit keine kritischen Probleme bekannt.*
+### Sicherheit
+
+#### #022: Fehlende Authentifizierung für MQTT-Broker
+**Beschreibung:** Der MQTT-Broker läuft ohne Authentifizierung, jeder kann Nachrichten publizieren/subscriben.
+- **Betroffene Komponenten:** MQTT Broker, alle Ebenen
+- **Auswirkung:** Unbefugter Zugriff auf Sensor-Daten und Steuerungsbefehle möglich
+- **Priorität:** Kritisch
+- **Vorgeschlagene Lösung:** 
+  - MQTT-Broker mit Benutzername/Passwort konfigurieren
+  - TLS/SSL für verschlüsselte Kommunikation aktivieren
+  - ACL-Regeln für Topic-basierte Zugriffskontrolle
+  - Siehe docs/SECURITY.md für Implementierungsdetails
+
+#### #023: API-Endpunkte ohne Authentifizierung
+**Beschreibung:** Control Layer und AI Layer APIs sind ohne Authentifizierung zugänglich.
+- **Betroffene Komponenten:** control_api.py, ai_service.py
+- **Auswirkung:** Unbefugter Zugriff auf System-Daten und Steuerung
+- **Priorität:** Kritisch
+- **Vorgeschlagene Lösung:**
+  - API-Keys oder JWT-Token für Authentifizierung
+  - FastAPI Security Dependencies verwenden
+  - Rate-Limiting implementieren
+  - Siehe docs/SECURITY.md für Implementierungsdetails
 
 ## Wichtige Probleme
 
@@ -193,6 +218,27 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
 **Beschreibung:** Einige Benutzer bevorzugen eine dunkle Benutzeroberfläche.
 - **Priorität:** Sehr Niedrig
 - **Vorgeschlagene Lösung:** Theme-System mit Light/Dark-Mode-Unterstützung
+
+### #024: TimescaleDB Integration
+**Beschreibung:** Historische Daten werden derzeit nicht persistent gespeichert.
+- **Betroffene Komponenten:** Control Layer
+- **Auswirkung:** Keine Langzeit-Trendanalyse möglich
+- **Priorität:** Mittel
+- **Vorgeschlagene Lösung:** TimescaleDB implementieren wie in docs/DATA_PERSISTENCE.md beschrieben
+
+### #025: Prometheus Metrics Export
+**Beschreibung:** System-Metriken werden nicht für Prometheus exportiert.
+- **Betroffene Komponenten:** Control Layer, AI Layer
+- **Auswirkung:** Eingeschränktes Monitoring
+- **Priorität:** Mittel
+- **Vorgeschlagene Lösung:** prometheus-client einbinden und Metriken-Endpunkte hinzufügen
+
+### #026: WebSocket-Support für Echtzeit-Updates
+**Beschreibung:** HMI verwendet Polling statt Push-Updates.
+- **Betroffene Komponenten:** Control Layer, HMI Layer
+- **Auswirkung:** Höhere Latenz und mehr Netzwerklast
+- **Priorität:** Mittel
+- **Vorgeschlagene Lösung:** FastAPI WebSocket für Echtzeit-Push implementieren
 
 ## Hinweise
 

@@ -9,31 +9,48 @@
 
 MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lernen für prädiktive Wartung und Optimierung integriert, während alle sicherheitskritischen Funktionen KI-frei bleiben.
 
+**Kernkonzept:** Sichere Automatisierung mit beratender KI - Die KI-Ebene liefert Empfehlungen und Analysen, während die Steuerungsebene alle sicherheitskritischen Entscheidungen trifft. Das System kombiniert Echtzeit-Reaktionsfähigkeit mit intelligenter Langzeit-Analyse.
+
+**Aktuelle Version:** 0.1.0 (Initial Release mit vollem Feature-Set)
+- 98 Unit-Tests, 96-97% Code Coverage
+- Produktionsreife Dokumentation
+- Docker-ready Architektur
+- MQTT-basierte IoT-Kommunikation
+
 ## System Architecture
 
 ### Die 4 Ebenen
 
 1. **Feldebene (ESP32)** - Echtzeit-Sensordatenerfassung
-   - Motorströme, Vibrationen, Temperaturen
-   - Sicherheitsüberwachung (KI-frei)
-   - MQTT-Datenübertragung
+   - Motorströme (ACS712), Vibrationen (MPU6050), Temperaturen
+   - Sicherheitsüberwachung (KI-frei, Hardware-basiert)
+   - MQTT-Datenübertragung (10Hz Sensordaten, 20Hz Safety)
+   - Hardware-Interlocks für Not-Aus und Überlastschutz
+   - **Entry Point:** `esp32-field-layer/src/main.cpp`
 
 2. **Steuerungsebene (Python)** - Zentrale Koordination
-   - Datenaggregation von mehreren Geräten
-   - REST API für HMI
-   - Schnittstelle zur KI-Ebene
+   - Datenaggregation von mehreren Geräten mit konfigurierbarem Time-Window
+   - REST API für HMI (FastAPI, Port 8000)
+   - Asynchrone KI-Analyse-Anfragen mit konfigurierbaren Timeouts
+   - MQTT-Handler mit automatischer Reconnection (exponentielles Backoff)
+   - Safety-Command-Validation vor Ausführung
+   - **Entry Point:** `python-control-layer/main.py`
 
 3. **KI-Ebene (Python)** - Intelligente Analyse (Querschnittsfunktion)
-   - Anomalieerkennung
-   - Verschleißvorhersage
-   - Optimierungsempfehlungen
-   - **NUR BERATEND** - keine Sicherheitsfunktionen
+   - Statistische Anomalieerkennung (Z-Score-basiert, konfigurierbare Schwellenwerte)
+   - Empirische Verschleißvorhersage (Stress-Akkumulation)
+   - Regelbasierte Optimierungsempfehlungen
+   - REST API (FastAPI, Port 8001)
+   - **NUR BERATEND** - keine Sicherheitsfunktionen, keine Echtzeit-Kontrolle
+   - **Entry Point:** `python-ai-layer/main.py`
 
 4. **HMI-Ebene (C#)** - Mensch-Maschine-Schnittstelle
-   - Echtzeit-Überwachung
-   - Sicherheitsstatus-Anzeige
-   - KI-Empfehlungen
-   - Steuerungsbefehle
+   - Echtzeit-Überwachung (2s Update-Intervall)
+   - Sicherheitsstatus-Anzeige mit Farbcodierung
+   - KI-Empfehlungen mit Confidence-Level
+   - Steuerungsbefehle mit Verbindungsstatus-Prüfung
+   - Fehlerbehandlung mit Troubleshooting-Hinweisen
+   - **Entry Point:** `csharp-hmi-layer/Program.cs`
 
 ## Hauptmerkmale
 
@@ -44,16 +61,20 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
 - Mehrschichtige Sicherheitsvalidierung
 
 ### 🤖 KI-Integration (beratend)
-- Statistische Anomalieerkennung
-- Empirische Verschleißvorhersage
-- Regelbasierte Optimierung
-- Bereit für ONNX ML-Modelle
+- **Anomalieerkennung:** Z-Score-basierte Analyse von Strom, Vibration, Temperatur
+- **Verschleißvorhersage:** Stress-Akkumulation mit geschätzter Restlebensdauer
+- **Optimierungsempfehlungen:** Regelbasiertes Expertensystem
+- **Confidence-Tracking:** Jede Analyse mit Vertrauenslevel
+- **Baseline-Learning:** Adaptive Schwellenwerte basierend auf historischen Daten
+- Bereit für ONNX ML-Modelle (zukünftige Erweiterung)
 
 ### 📊 Echtzeit-Überwachung
-- 10Hz Sensordaten
-- 20Hz Sicherheitsüberwachung
-- 2s HMI-Aktualisierung
-- MQTT-basierte Kommunikation
+- **10Hz Sensordaten:** Kontinuierliche Erfassung von Strom, Vibration, Temperatur
+- **20Hz Sicherheitsüberwachung:** Hochfrequente Sicherheitsprüfungen auf ESP32
+- **2s HMI-Aktualisierung:** Regelmäßige UI-Updates mit aktuellen Werten
+- **MQTT-basierte Kommunikation:** Pub/Sub-Pattern für lose Kopplung
+- **Time-Window-Aggregation:** Statistische Auswertung über konfigurierbare Zeitfenster
+- **Automatische Reconnection:** Robuste Fehlerbehandlung bei Verbindungsproblemen
 
 ### 🔧 Modular & Skalierbar
 - Mehrere Feldgeräte unterstützt
@@ -202,16 +223,23 @@ MODAX/
 ## API-Endpunkte
 
 ### Steuerungsebene (Port 8000)
-- `GET /status` - Systemstatus
-- `GET /devices` - Verbundene Geräte
-- `GET /devices/{id}/data` - Aktuelle Sensordaten
-- `GET /devices/{id}/ai-analysis` - KI-Analyse
-- `POST /control/command` - Steuerungsbefehl senden
+**Implementiert in:** `python-control-layer/control_api.py`
+- `GET /status` - Systemstatus mit Uptime und letztem Update
+- `GET /devices` - Liste aller verbundenen Geräte
+- `GET /devices/{id}/data` - Aktuelle Sensordaten (Raw und Aggregiert)
+- `GET /devices/{id}/safety` - Sicherheitsstatus des Geräts
+- `GET /devices/{id}/ai-analysis` - Letzte KI-Analyse mit Empfehlungen
+- `POST /control/command` - Steuerungsbefehl mit Safety-Validation
 
 ### KI-Ebene (Port 8001)
-- `POST /analyze` - Sensordaten analysieren
-- `GET /models/info` - Modellinformationen
-- `POST /reset-wear/{id}` - Verschleißzähler zurücksetzen
+**Implementiert in:** `python-ai-layer/ai_service.py`
+- `GET /` - Service-Info und Version
+- `GET /health` - Health-Check für Monitoring
+- `POST /analyze` - Sensordaten analysieren (mit SensorDataInput-Schema)
+- `GET /models/info` - Detaillierte Modellinformationen und Konfiguration
+- `POST /reset-wear/{device_id}` - Verschleißzähler nach Wartung zurücksetzen
+
+Vollständige API-Dokumentation siehe: [docs/API.md](docs/API.md)
 
 ## Sicherheitsdesign
 
@@ -224,7 +252,12 @@ Die KI-Ebene beteiligt sich **NICHT** an Sicherheitsentscheidungen:
 - ✅ Trendanalyse und Vorhersage
 - ✅ Optimierungsvorschläge
 
-Sicherheitsfunktionen bleiben in der Feldebene (ESP32) Hardware.
+### Mehrschichtige Sicherheitsarchitektur
+1. **Hardware-Ebene (ESP32):** Deterministische Sicherheitsüberwachung mit Hardware-Interlocks
+2. **Control Layer:** Safety-Command-Validation vor Ausführung (`is_system_safe()`)
+3. **HMI-Ebene:** Benutzer-Feedback bei Verbindungsproblemen und Fehlerzuständen
+
+Sicherheitsfunktionen bleiben in der Feldebene (ESP32) Hardware. Siehe [docs/SECURITY.md](docs/SECURITY.md) für Details.
 
 ## Zukünftige Erweiterungen
 

@@ -3,10 +3,37 @@
 ## Overview
 Complete documentation index for the MODAX industrial control system.
 
+**System Status:**
+- **Version:** 0.1.0 (Initial Release)
+- **Test Coverage:** 96-97% (98 Unit Tests)
+- **Main Entry Points:** 
+  - Field Layer: `esp32-field-layer/src/main.cpp`
+  - Control Layer: `python-control-layer/main.py` (Port 8000)
+  - AI Layer: `python-ai-layer/main.py` (Port 8001)
+  - HMI Layer: `csharp-hmi-layer/Program.cs`
+
 ## Quick Start
 - [README](../README.md) - Project overview and quick start guide
 - [SETUP](SETUP.md) - Detailed setup instructions
 - [ARCHITECTURE](ARCHITECTURE.md) - System architecture overview
+
+## Main Entry Points & Implementation
+
+### Control Layer (python-control-layer/main.py)
+**Port:** 8000 | **Framework:** FastAPI + uvicorn
+- Initialisiert ControlLayer mit MQTT-Handler und DataAggregator
+- Startet API-Server für HMI-Integration
+- Orchestriert Datenfluss zwischen Field, AI und HMI Layer
+- Implementiert Signal-Handler für graceful shutdown
+- Features: AI-Analysis-Loop, Safety-Command-Validation, Auto-Reconnect
+
+### AI Layer (python-ai-layer/main.py)
+**Port:** 8001 | **Framework:** FastAPI + uvicorn
+- Startet AI-Service mit REST API für Analyse-Anfragen
+- Komponenten: StatisticalAnomalyDetector, SimpleWearPredictor, OptimizationRecommender
+- Endpoints: POST /analyze, GET /models/info, POST /reset-wear/{id}
+- **NUR BERATEND:** Keine Sicherheitsfunktionen, keine Echtzeit-Kontrolle
+- Features: Z-Score-Anomalieerkennung, Stress-Akkumulations-Verschleiß, Baseline-Learning
 
 ## Core System Documentation
 
