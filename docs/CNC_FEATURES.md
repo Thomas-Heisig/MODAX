@@ -660,6 +660,8 @@ python -m unittest test_gcode_parser.py -v
 
 ## Future Enhancements
 
+⭐ **See [ADVANCED_CNC_INDUSTRY_4_0.md](ADVANCED_CNC_INDUSTRY_4_0.md) for comprehensive Industry 4.0 features roadmap**
+
 ### Phase 2 (Planned)
 - [ ] 5-axis simultaneous machining
 - [ ] RTCP (Rotary Tool Center Point)
@@ -669,13 +671,23 @@ python -m unittest test_gcode_parser.py -v
 - [ ] Simulation with 3D visualization
 - [ ] Collision detection with machine model
 
-### Phase 3 (Future)
+### Phase 3 (Future - See Advanced Documentation)
 - [ ] Adaptive feed control based on AI
 - [ ] Automatic program optimization
 - [ ] Digital twin integration
 - [ ] Cloud-based program library
 - [ ] Remote monitoring and control
 - [ ] AR/VR support for programming
+
+### Industry 4.0 Advanced Features (Roadmap)
+For detailed information on advanced CNC capabilities, see:
+- **[ADVANCED_CNC_INDUSTRY_4_0.md](ADVANCED_CNC_INDUSTRY_4_0.md)** - Comprehensive guide covering:
+  - Advanced Communication Protocols (EtherCAT, PROFINET, OPC UA, MQTT, MTConnect)
+  - Adaptive Process Control (Feed optimization, vibration monitoring, energy management)
+  - Intelligent Automation (Predictive maintenance, lights-out production, automated setup)
+  - Future Integration (AI optimization, digital twin, peer-to-peer learning)
+  - Next-Gen HMI (AR overlays, cloud-native interfaces, voice/gesture control)
+  - Implementation roadmap and ROI analysis
 
 ## References
 
