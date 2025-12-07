@@ -11,8 +11,9 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
 
 **Kernkonzept:** Sichere Automatisierung mit beratender KI - Die KI-Ebene liefert Empfehlungen und Analysen, während die Steuerungsebene alle sicherheitskritischen Entscheidungen trifft. Das System kombiniert Echtzeit-Reaktionsfähigkeit mit intelligenter Langzeit-Analyse.
 
-**Aktuelle Version:** 0.1.0 (Initial Release mit vollem Feature-Set)
-- 98 Unit-Tests, 96-97% Code Coverage
+**Aktuelle Version:** 0.2.0 (mit umfassenden CNC-Funktionen)
+- 123+ Unit-Tests, 96-97% Code Coverage
+- Vollständige CNC-Maschinen-Funktionalität
 - Produktionsreife Dokumentation
 - Docker-ready Architektur
 - MQTT-basierte IoT-Kommunikation
@@ -31,6 +32,8 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
 2. **Steuerungsebene (Python)** - Zentrale Koordination
    - Datenaggregation von mehreren Geräten mit konfigurierbarem Time-Window
    - REST API für HMI (FastAPI, Port 8000)
+   - **NEUE CNC-Funktionalität:** G-Code-Parsing, Motion Control, Werkzeugverwaltung
+   - Vollständige CNC-Maschinen-Steuerung (Fräsen, Drehen, Bohren)
    - Asynchrone KI-Analyse-Anfragen mit konfigurierbaren Timeouts
    - MQTT-Handler mit automatischer Reconnection (exponentielles Backoff)
    - Safety-Command-Validation vor Ausführung
@@ -75,6 +78,17 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
 - **MQTT-basierte Kommunikation:** Pub/Sub-Pattern für lose Kopplung
 - **Time-Window-Aggregation:** Statistische Auswertung über konfigurierbare Zeitfenster
 - **Automatische Reconnection:** Robuste Fehlerbehandlung bei Verbindungsproblemen
+
+### 🏭 CNC-Maschinen-Funktionalität (NEU in v0.2.0)
+- **G-Code-Unterstützung:** Vollständiger ISO 6983 Parser (100+ G/M-Codes)
+- **Motion Control:** Lineare, zirkuläre und helikale Interpolation
+- **Werkzeugverwaltung:** 24-Platz-Magazin, automatischer Werkzeugwechsel
+- **Koordinatensysteme:** 9 Arbeitskoordinatensysteme, Transformationen
+- **Festzyklen:** Bohren (G81-G89), Fräsen (G12/G13), Tappen (G84)
+- **Spindelsteuerung:** CW/CCW, Drehzahlregelung, CSS-Modus
+- **Vorschubsteuerung:** mm/min, mm/Umdrehung, Override 0-150%
+- **Sicherheitsfunktionen:** Software-Endlagen, Not-Aus, Kollisionsvermeidung
+- Siehe [CNC_FEATURES.md](docs/CNC_FEATURES.md) für Details
 
 ### 🔧 Modular & Skalierbar
 - Mehrere Feldgeräte unterstützt

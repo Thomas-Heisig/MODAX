@@ -17,11 +17,13 @@ from security_audit import get_security_audit_logger
 from websocket_manager import get_websocket_manager
 from data_export import get_data_exporter
 from config import config
+from cnc_integration import get_cnc_integration
 
 logger = logging.getLogger(__name__)
 audit_logger = get_security_audit_logger()
 ws_manager = get_websocket_manager()
 data_exporter = get_data_exporter()
+cnc = get_cnc_integration()
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address, enabled=config.control.rate_limit_enabled)
@@ -562,4 +564,381 @@ async def export_device_statistics(
         )
     except Exception as e:
         logger.error(f"Error exporting statistics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# CNC MACHINE ENDPOINTS
+# ============================================================================
+
+@app.get("/api/v1/cnc/status")
+@limiter.limit("30/minute")
+async def get_cnc_status(
+    request: Request,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
+    """
+    Get comprehensive CNC machine status
+    
+    Returns complete status including controller state, position, tools,
+    coordinate systems, and active cycles.
+    """
+    try:
+        status = cnc.get_comprehensive_status()
+        return JSONResponse(content=status)
+    except Exception as e:
+        logger.error(f"Error getting CNC status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/cnc/program/load")
+@limiter.limit("10/minute")
+async def load_cnc_program(
+    request: Request,
+    program: Dict,
+    api_key: str = Depends(require_control) if API_AUTH_ENABLED else None
+):
+    """
+    Load G-code program
+    
+    Request body:
+    {
+        "gcode": "G90 G54\\nG00 X10 Y20\\n...",
+        "name": "program_name" (optional)
+    }
+    """
+    try:
+        gcode = program.get("gcode", "")
+        name = program.get("name", "")
+        
+        if not gcode:
+            raise HTTPException(status_code=400, detail="No G-code provided")
+        
+        success = cnc.load_program(gcode, name)
+        
+        if success:
+            audit_logger.log_control_action(
+                "cnc_program_load",
+                {"program_name": name, "lines": len(gcode.split('\n'))}
+            )
+            return {"status": "success", "message": "Program loaded successfully"}
+        else:
+            return {"status": "error", "message": "Failed to load program"}
+            
+    except Exception as e:
+        logger.error(f"Error loading CNC program: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/cnc/mode/{mode}")
+@limiter.limit("20/minute")
+async def set_cnc_mode(
+    request: Request,
+    mode: str,
+    api_key: str = Depends(require_control) if API_AUTH_ENABLED else None
+):
+    """
+    Set CNC operation mode
+    
+    Modes: auto, manual, mdi, reference, handwheel, single_step, dry_run, simulation
+    """
+    try:
+        from cnc_controller import CNCMode
+        
+        # Validate mode
+        valid_modes = [m.value for m in CNCMode]
+        if mode not in valid_modes:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid mode. Valid modes: {', '.join(valid_modes)}"
+            )
+        
+        mode_enum = CNCMode(mode)
+        success = cnc.controller.set_mode(mode_enum)
+        
+        if success:
+            audit_logger.log_control_action("cnc_mode_change", {"mode": mode})
+            return {"status": "success", "mode": mode}
+        else:
+            return {"status": "error", "message": "Cannot change mode"}
+            
+    except Exception as e:
+        logger.error(f"Error setting CNC mode: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/cnc/spindle")
+@limiter.limit("30/minute")
+async def control_spindle(
+    request: Request,
+    command: Dict,
+    api_key: str = Depends(require_control) if API_AUTH_ENABLED else None
+):
+    """
+    Control spindle
+    
+    Request body:
+    {
+        "state": "cw" | "ccw" | "stopped",
+        "speed": 1000 (RPM, optional)
+    }
+    """
+    try:
+        from cnc_controller import SpindleState
+        
+        state_map = {
+            "cw": SpindleState.CW,
+            "ccw": SpindleState.CCW,
+            "stopped": SpindleState.STOPPED
+        }
+        
+        state_str = command.get("state", "").lower()
+        if state_str not in state_map:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid state. Use: cw, ccw, or stopped"
+            )
+        
+        state = state_map[state_str]
+        speed = command.get("speed")
+        
+        success = cnc.controller.set_spindle(state, speed)
+        
+        if success:
+            audit_logger.log_control_action(
+                "cnc_spindle_control",
+                {"state": state_str, "speed": speed}
+            )
+            return {
+                "status": "success",
+                "spindle_state": state_str,
+                "spindle_speed": cnc.controller.spindle_speed
+            }
+        else:
+            return {"status": "error", "message": "Cannot control spindle"}
+            
+    except Exception as e:
+        logger.error(f"Error controlling spindle: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/cnc/tool/change/{tool_number}")
+@limiter.limit("10/minute")
+async def change_tool(
+    request: Request,
+    tool_number: int,
+    api_key: str = Depends(require_control) if API_AUTH_ENABLED else None
+):
+    """
+    Execute tool change
+    
+    Args:
+        tool_number: Tool number to change to
+    """
+    try:
+        success = cnc.tools.change_tool(tool_number)
+        
+        if success:
+            audit_logger.log_control_action(
+                "cnc_tool_change",
+                {"tool_number": tool_number}
+            )
+            tool = cnc.tools.tools.get(tool_number)
+            return {
+                "status": "success",
+                "tool_number": tool_number,
+                "tool_name": tool.name if tool else None
+            }
+        else:
+            return {"status": "error", "message": "Tool change failed"}
+            
+    except Exception as e:
+        logger.error(f"Error changing tool: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v1/cnc/tools")
+@limiter.limit("30/minute")
+async def get_tool_list(
+    request: Request,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
+    """Get list of all tools in tool table"""
+    try:
+        tools = cnc.tools.get_tool_list()
+        return JSONResponse(content={"tools": tools})
+    except Exception as e:
+        logger.error(f"Error getting tool list: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v1/cnc/magazine")
+@limiter.limit("30/minute")
+async def get_magazine_status(
+    request: Request,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
+    """Get tool magazine status"""
+    try:
+        magazine = cnc.tools.get_magazine_status()
+        return JSONResponse(content=magazine)
+    except Exception as e:
+        logger.error(f"Error getting magazine status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/cnc/coordinate-system/{system}")
+@limiter.limit("20/minute")
+async def set_coordinate_system(
+    request: Request,
+    system: str,
+    api_key: str = Depends(require_control) if API_AUTH_ENABLED else None
+):
+    """
+    Set active work coordinate system
+    
+    Args:
+        system: G54, G55, G56, G57, G58, G59, G59.1, G59.2, or G59.3
+    """
+    try:
+        success = cnc.coords.set_active_coordinate_system(system.upper())
+        
+        if success:
+            audit_logger.log_control_action(
+                "cnc_coord_system_change",
+                {"system": system}
+            )
+            return {"status": "success", "system": system}
+        else:
+            return {"status": "error", "message": "Invalid coordinate system"}
+            
+    except Exception as e:
+        logger.error(f"Error setting coordinate system: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/cnc/override/feed")
+@limiter.limit("30/minute")
+async def set_feed_override(
+    request: Request,
+    override: Dict,
+    api_key: str = Depends(require_control) if API_AUTH_ENABLED else None
+):
+    """
+    Set feed override percentage
+    
+    Request body: {"percentage": 100}  (0-150)
+    """
+    try:
+        percentage = override.get("percentage", 100)
+        success = cnc.controller.set_feed_override(percentage)
+        
+        if success:
+            return {
+                "status": "success",
+                "feed_override": cnc.controller.feed_override
+            }
+        else:
+            return {"status": "error", "message": "Invalid override value"}
+            
+    except Exception as e:
+        logger.error(f"Error setting feed override: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/cnc/override/spindle")
+@limiter.limit("30/minute")
+async def set_spindle_override(
+    request: Request,
+    override: Dict,
+    api_key: str = Depends(require_control) if API_AUTH_ENABLED else None
+):
+    """
+    Set spindle override percentage
+    
+    Request body: {"percentage": 100}  (50-150)
+    """
+    try:
+        percentage = override.get("percentage", 100)
+        success = cnc.controller.set_spindle_override(percentage)
+        
+        if success:
+            return {
+                "status": "success",
+                "spindle_override": cnc.controller.spindle_override
+            }
+        else:
+            return {"status": "error", "message": "Invalid override value"}
+            
+    except Exception as e:
+        logger.error(f"Error setting spindle override: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/cnc/emergency-stop")
+@limiter.limit("100/minute")  # Higher limit for safety
+async def emergency_stop(
+    request: Request,
+    command: Dict,
+    api_key: str = Depends(require_control) if API_AUTH_ENABLED else None
+):
+    """
+    Activate or deactivate emergency stop
+    
+    Request body: {"active": true/false}
+    """
+    try:
+        active = command.get("active", True)
+        cnc.controller.set_emergency_stop(active)
+        
+        audit_logger.log_security_event(
+            "cnc_emergency_stop",
+            {"active": active},
+            "critical" if active else "info"
+        )
+        
+        return {
+            "status": "success",
+            "emergency_stop": active,
+            "machine_state": cnc.controller.state.value
+        }
+            
+    except Exception as e:
+        logger.error(f"Error setting emergency stop: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v1/cnc/gcode/parse")
+@limiter.limit("10/minute")
+async def parse_gcode(
+    request: Request,
+    gcode: str,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
+    """
+    Parse G-code without executing
+    
+    Query parameter: gcode=G00 X10 Y20
+    """
+    try:
+        from gcode_parser import GCodeParser
+        
+        parser = GCodeParser()
+        command = parser.parse_line(gcode, 1)
+        
+        if command:
+            valid, errors = parser.validate_command(command)
+            
+            return {
+                "valid": valid,
+                "g_codes": command.g_codes,
+                "m_codes": command.m_codes,
+                "parameters": command.parameters,
+                "errors": errors if not valid else []
+            }
+        else:
+            return {"valid": False, "errors": ["Empty or invalid command"]}
+            
+    except Exception as e:
+        logger.error(f"Error parsing G-code: {e}")
         raise HTTPException(status_code=500, detail=str(e))

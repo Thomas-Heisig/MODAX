@@ -4,8 +4,9 @@
 Complete documentation index for the MODAX industrial control system.
 
 **System Status:**
-- **Version:** 0.1.0 (Initial Release)
-- **Test Coverage:** 96-97% (98 Unit Tests)
+- **Version:** 0.2.0 (mit umfassenden CNC-Funktionen)
+- **Test Coverage:** 96-97% (123+ Unit Tests)
+- **NEW:** Vollständige CNC-Maschinen-Funktionalität
 - **Main Entry Points:** 
   - Field Layer: `esp32-field-layer/src/main.cpp`
   - Control Layer: `python-control-layer/main.py` (Port 8000)
@@ -42,6 +43,13 @@ Complete documentation index for the MODAX industrial control system.
 - [API.md](API.md) - REST API reference for Control and AI layers
 - [CONFIGURATION.md](CONFIGURATION.md) - Configuration options and environment variables
 - [NETWORK_ARCHITECTURE.md](NETWORK_ARCHITECTURE.md) - Network design, OT/IT separation, Purdue Model
+- **[CNC_FEATURES.md](CNC_FEATURES.md)** ⭐ **NEW** - Comprehensive CNC machine functionality
+  - G-code parser (ISO 6983)
+  - Motion control and interpolation
+  - Tool management and compensation
+  - Coordinate systems and transformations
+  - Fixed cycles (drilling, milling, tapping)
+  - API endpoints for CNC operations
 
 ### Security
 - [SECURITY.md](SECURITY.md) - Comprehensive security concept

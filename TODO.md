@@ -3,8 +3,8 @@
 Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufgaben werden nach `DONE.md` verschoben.
 
 **Letzte Aktualisierung:** 2025-12-07  
-**Aktuelle Version:** 0.1.0  
-**Status:** Produktionsreif mit vollständiger Dokumentation und Test-Coverage (96-97%)
+**Aktuelle Version:** 0.2.0  
+**Status:** Produktionsreif mit vollständiger Dokumentation, CNC-Funktionen und Test-Coverage (96-97%)
 
 ## Priorität 1: Kritisch
 
@@ -23,11 +23,13 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] OPC UA Integration dokumentieren (docs/OPC_UA_INTEGRATION.md)
 - [x] Dokumentations-Index erstellen (docs/INDEX.md)
 - [x] TODO.md und ISSUES.md Datum auf 2025 aktualisieren
+- [x] CNC-Funktionen dokumentieren (docs/CNC_FEATURES.md)
 - [ ] Dokumentation auf 2025 aktualisieren (verbleibende Dokumente im docs/ Verzeichnis)
 
 ### Tests
 - [x] Unit-Tests für Python Control Layer hinzufügen (42 Tests)
 - [x] Unit-Tests für Python AI Layer hinzufügen (56 Tests)
+- [x] Unit-Tests für CNC-Module hinzufügen (25+ Tests)
 - [x] Integrationstests für MQTT-Kommunikation erstellen
 - [x] Test-Coverage-Reporting einrichten (test_with_coverage.sh)
 - [ ] End-to-End-Tests für komplette Datenflusskette erweitern

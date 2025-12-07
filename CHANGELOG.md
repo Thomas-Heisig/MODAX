@@ -7,6 +7,136 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-12-07
+
+### Hinzugefügt - Umfassende CNC-Funktionalität
+- **🏭 CNC-Controller (`cnc_controller.py`):**
+  - Vollständige Maschinenzustandsverwaltung (IDLE, RUNNING, PAUSED, STOPPED, ERROR, EMERGENCY)
+  - 8 Betriebsmodi (AUTO, MANUAL, MDI, REFERENCE, HANDWHEEL, SINGLE_STEP, DRY_RUN, SIMULATION)
+  - Positionsverfolgung (Maschinen-, Arbeits- und Restweg-Koordinaten)
+  - Spindelsteuerung mit Drehzahl, Richtung und Override (50-150%)
+  - Vorschubsteuerung mit Override (0-150%)
+  - Kühlmittelsteuerung (OFF, FLOOD, MIST, BOTH)
+  - Not-Aus-Funktionalität
+  - Software-Endlagen für alle Achsen
+  - Fehler- und Warnungsverfolgung
+
+- **📝 G-Code-Parser (`gcode_parser.py`):**
+  - Vollständiger ISO 6983 (DIN 66025) Standard-Parser
+  - 100+ G-Codes unterstützt (G00-G99, erweiterte Codes)
+  - 15+ M-Codes (M00-M99)
+  - Bewegungsbefehle: G00/G01 (Linear), G02/G03 (Zirkular)
+  - Ebenenauswahl: G17 (XY), G18 (ZX), G19 (YZ)
+  - Einheiten: G20 (Zoll), G21 (Metrisch)
+  - Positionierungsmodi: G90 (Absolut), G91 (Inkrementell)
+  - Werkzeugkompensationen: G40-G42 (Radius), G43-G49 (Länge)
+  - 9 Arbeitskoordinatensysteme (G54-G59.3)
+  - Koordinatentransformationen: G68/G69 (Rotation), G50/G51 (Skalierung), G92 (Offset)
+  - Bohrzyklen: G81-G89 (Bohren, Tappen, Senken)
+  - Fräszyklen: G12/G13 (Kreistasche)
+  - Kommentar- und Zeilennummern-Parsing
+  - Befehlsvalidierung und Fehlerprüfung
+
+- **🎯 Motion Controller (`motion_controller.py`):**
+  - Lineare Interpolation (G01) mit Vorschubsteuerung
+  - Zirkuläre Interpolation (G02/G03) mit IJK- und R-Format
+  - Helikale Interpolation (Spirale mit Z-Bewegung)
+  - Bahnoptimierung mit Look-Ahead (100 Blöcke)
+  - Geschwindigkeitsplanung mit Eckenabrundung
+  - S-Kurven-Beschleunigung
+  - Konfigurierbare Bewegungsgrenzen
+  - Max. Vorschub: 15.000 mm/min
+  - Max. Eilgang: 30.000 mm/min
+  - Max. Beschleunigung: 5.000 mm/s²
+  - Max. Ruck: 50.000 mm/s³
+
+- **🔧 Tool Manager (`tool_manager.py`):**
+  - Werkzeugtabellen-Verwaltung (bis zu 999 Werkzeuge)
+  - 24-Platz-Werkzeugmagazin (konfigurierbar)
+  - Automatischer Werkzeugwechsel (M06)
+  - Werkzeug-Vorauswahl
+  - Werkzeuglängenkompensation (G43/G44/G49)
+  - Werkzeugradiuskompensation (G40/G41/G42)
+  - Verschleißverfolgung und Lebensdauerverwaltung
+  - Werkzeugbrucherkennung
+  - Automatische Werkzeugmessung
+  - Detaillierte Werkzeugeigenschaften (Durchmesser, Länge, Schneiden, Material, Beschichtung)
+
+- **📐 Coordinate System Manager (`coordinate_system.py`):**
+  - 9 Arbeitskoordinatensysteme (G54-G59, G59.1-G59.3)
+  - Maschinenkoordinatensystem (G53)
+  - Lokales Koordinatensystem (G52)
+  - G92 Koordinatenversatz
+  - Koordinatenrotation (G68/G69) mit beliebigem Winkel
+  - Koordinatenskalierung (G50/G51) pro Achse
+  - Koordinatenspiegelung
+  - Polarkoordinaten (G15/G16)
+  - Koordinatenkonvertierung (Maschine ↔ Arbeit)
+  - Transformationsstatus-Überwachung
+
+- **⚙️ CNC Cycles (`cnc_cycles.py`):**
+  - **Bohrzyklen:**
+    - G81: Einfaches Bohren
+    - G82: Bohren mit Verweilzeit
+    - G83: Tiefbohren (Peck Drilling)
+    - G84: Gewindebohren (synchronisiert mit Spindel)
+    - G85: Ausreiben
+    - G86: Ausreiben mit Spindelstopp
+  - **Fräszyklen:**
+    - G12/G13: Kreistaschenfräsen (CW/CCW)
+    - G26: Rechtecktaschenfräsen
+  - Konfigurierbare Zyklus-Parameter
+  - Automatische Bewegungsgenerierung
+
+- **🔗 CNC Integration (`cnc_integration.py`):**
+  - Vereint alle CNC-Komponenten
+  - G-Code-Programm-Laden und -Parsing
+  - Befehlsausführung
+  - Statusüberwachung
+  - Demo-Werkzeug-Initialisierung
+  - Umfassende Zustandsabfrage
+
+- **🌐 CNC REST API-Endpunkte (in `control_api.py`):**
+  - `GET /api/v1/cnc/status` - Umfassender Maschinenstatus
+  - `POST /api/v1/cnc/program/load` - G-Code-Programm laden
+  - `POST /api/v1/cnc/mode/{mode}` - Betriebsmodus setzen
+  - `POST /api/v1/cnc/spindle` - Spindelsteuerung
+  - `POST /api/v1/cnc/tool/change/{tool_number}` - Werkzeugwechsel
+  - `GET /api/v1/cnc/tools` - Werkzeugliste abrufen
+  - `GET /api/v1/cnc/magazine` - Magazinstatus
+  - `POST /api/v1/cnc/coordinate-system/{system}` - Koordinatensystem setzen
+  - `POST /api/v1/cnc/override/feed` - Vorschub-Override
+  - `POST /api/v1/cnc/override/spindle` - Spindel-Override
+  - `POST /api/v1/cnc/emergency-stop` - Not-Aus
+  - `GET /api/v1/cnc/gcode/parse` - G-Code parsen (ohne Ausführung)
+
+- **✅ Umfassende Unit-Tests:**
+  - `test_cnc_controller.py` - 11 Tests für CNC-Controller
+  - `test_gcode_parser.py` - 14 Tests für G-Code-Parser
+  - Alle Tests erfolgreich (25+ neue Tests)
+  - Test-Coverage beibehalten bei 96-97%
+
+- **📚 Dokumentation:**
+  - **docs/CNC_FEATURES.md** - Vollständige CNC-Funktionsdokumentation
+    - Architekturübersicht
+    - Komponentenbeschreibungen
+    - G-Code-Referenz (100+ Codes)
+    - API-Endpunkt-Dokumentation
+    - Sicherheitsfunktionen
+    - Performance-Spezifikationen
+    - Beispielprogramme
+    - Integration mit MODAX
+  - README.md aktualisiert mit CNC-Features
+  - docs/INDEX.md aktualisiert
+
+### Geändert
+- Versionsnummer auf 0.2.0 erhöht
+- Test-Anzahl von 98 auf 123+ erhöht
+- control_api.py erweitert um CNC-Endpunkte
+- README.md Hauptfeatures um CNC-Abschnitt erweitert
+
+## [0.1.0] - 2024-12-06
+
 ### Hinzugefügt
 - **README.md erweitert:** Detaillierte Main-Analyse mit Entry-Points und Implementierungsdetails
 - **TODO.md aktualisiert:** Realistischer Status mit 98 Tests und 96-97% Coverage
