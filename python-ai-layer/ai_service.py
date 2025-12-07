@@ -1,16 +1,58 @@
 """AI Service - Main AI analysis service with REST API"""
 import logging
 import time
-from fastapi import FastAPI, HTTPException
+import os
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 from typing import List, Dict, Optional
+from datetime import datetime
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from anomaly_detector import StatisticalAnomalyDetector
 from wear_predictor import SimpleWearPredictor
 from optimizer import OptimizationRecommender
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="MODAX AI Layer", version="1.0.0")
+# Initialize rate limiter
+RATE_LIMIT_ENABLED = os.getenv("RATE_LIMIT_ENABLED", "true").lower() == "true"
+RATE_LIMIT_DEFAULT = os.getenv("RATE_LIMIT_DEFAULT", "100/minute")
+limiter = Limiter(key_func=get_remote_address, enabled=RATE_LIMIT_ENABLED)
+
+# Prometheus metrics
+ANALYSIS_COUNT = Counter('ai_analysis_requests_total', 'Total analysis requests', ['status'])
+ANALYSIS_DURATION = Histogram('ai_analysis_duration_seconds', 'Analysis request duration')
+ANOMALY_DETECTED = Counter('ai_anomalies_detected_total', 'Total anomalies detected', ['type'])
+
+app = FastAPI(
+    title="MODAX AI Layer",
+    version="1.0.0",
+    docs_url="/api/v1/docs",
+    openapi_url="/api/v1/openapi.json"
+)
+
+# Add rate limiter
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Configure CORS
+CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*")
+CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
+CORS_ALLOW_METHODS = os.getenv("CORS_ALLOW_METHODS", "*")
+CORS_ALLOW_HEADERS = os.getenv("CORS_ALLOW_HEADERS", "*")
+
+cors_origins = CORS_ORIGINS.split(",") if CORS_ORIGINS != "*" else ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=CORS_ALLOW_CREDENTIALS,
+    allow_methods=CORS_ALLOW_METHODS.split(",") if CORS_ALLOW_METHODS != "*" else ["*"],
+    allow_headers=CORS_ALLOW_HEADERS.split(",") if CORS_ALLOW_HEADERS != "*" else ["*"],
+)
 
 # Initialize AI components
 anomaly_detector = StatisticalAnomalyDetector(z_threshold=3.0)
@@ -48,6 +90,52 @@ class AIAnalysisResponse(BaseModel):
     analysis_details: Optional[Dict] = None
 
 
+class ErrorResponse(BaseModel):
+    """Standardized error response"""
+    error: str
+    message: str
+    status_code: int
+    timestamp: str
+    details: Optional[Dict] = None
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Global exception handler for standardized error responses"""
+    error_response = ErrorResponse(
+        error=type(exc).__name__,
+        message=str(exc),
+        status_code=500,
+        timestamp=datetime.utcnow().isoformat(),
+        details={"path": request.url.path, "method": request.method}
+    )
+    logger.error("Unhandled exception", extra={
+        "error": error_response.error,
+        "message": error_response.message,
+        "path": request.url.path
+    })
+    return JSONResponse(
+        status_code=500,
+        content=error_response.dict()
+    )
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Handle HTTP exceptions with standardized format"""
+    error_response = ErrorResponse(
+        error="HTTPException",
+        message=exc.detail,
+        status_code=exc.status_code,
+        timestamp=datetime.utcnow().isoformat(),
+        details={"path": request.url.path, "method": request.method}
+    )
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=error_response.dict()
+    )
+
+
 @app.get("/")
 def root():
     """API root"""
@@ -55,6 +143,7 @@ def root():
         "service": "MODAX AI Layer",
         "version": "1.0.0",
         "status": "operational",
+        "api_prefix": "/api/v1",
         "models": {
             "anomaly_detection": "Statistical (Z-score based)",
             "wear_prediction": "Empirical stress accumulation",
@@ -64,17 +153,38 @@ def root():
 
 
 @app.get("/health")
-def health_check():
-    """Health check endpoint"""
+@limiter.limit(RATE_LIMIT_DEFAULT)
+def health_check(request: Request):
+    """Health check endpoint - returns 200 if service is running"""
     return {
         "status": "healthy",
-        "timestamp": time.time(),
-        "models_loaded": True
+        "service": "modax-ai-layer",
+        "version": "1.0.0",
+        "timestamp": datetime.utcnow().isoformat()
     }
 
 
-@app.post("/analyze", response_model=AIAnalysisResponse)
-def analyze_sensor_data(data: SensorDataInput):
+@app.get("/ready")
+@limiter.limit(RATE_LIMIT_DEFAULT)
+def readiness_check(request: Request):
+    """Readiness check endpoint - returns 200 if service is ready to accept requests"""
+    return {
+        "status": "ready",
+        "service": "modax-ai-layer",
+        "models_loaded": True,
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+
+@app.get("/metrics")
+def metrics():
+    """Prometheus metrics endpoint"""
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+
+@app.post("/api/v1/analyze", response_model=AIAnalysisResponse)
+@limiter.limit(RATE_LIMIT_DEFAULT)
+def analyze_sensor_data(request: Request, data: SensorDataInput):
     """
     Analyze sensor data and provide AI-based insights
 
@@ -86,8 +196,9 @@ def analyze_sensor_data(data: SensorDataInput):
     Note: All analysis is for advisory purposes only.
     Safety-critical decisions remain in the control layer.
     """
+    start_time = time.time()
     try:
-        logger.info(f"Analyzing data for device {data.device_id}")
+        logger.info("Analyzing data", extra={"device_id": data.device_id})
 
         # Convert to dict for processing
         sensor_data = data.dict()
@@ -114,16 +225,19 @@ def analyze_sensor_data(data: SensorDataInput):
             anomalies.append(current_anomaly.description)
             max_anomaly_score = max(max_anomaly_score, current_anomaly.score)
             min_confidence = min(min_confidence, current_anomaly.confidence)
+            ANOMALY_DETECTED.labels(type="current").inc()
 
         if vibration_anomaly.is_anomaly:
             anomalies.append(vibration_anomaly.description)
             max_anomaly_score = max(max_anomaly_score, vibration_anomaly.score)
             min_confidence = min(min_confidence, vibration_anomaly.confidence)
+            ANOMALY_DETECTED.labels(type="vibration").inc()
 
         if temperature_anomaly.is_anomaly:
             anomalies.append(temperature_anomaly.description)
             max_anomaly_score = max(max_anomaly_score, temperature_anomaly.score)
             min_confidence = min(min_confidence, temperature_anomaly.confidence)
+            ANOMALY_DETECTED.labels(type="temperature").inc()
 
         anomaly_detected = len(anomalies) > 0
         anomaly_description = "; ".join(anomalies) if anomalies else "No anomalies detected"
@@ -170,32 +284,44 @@ def analyze_sensor_data(data: SensorDataInput):
             }
         )
 
-        logger.info(f"Analysis complete for {data.device_id}: "
-                    f"anomaly={anomaly_detected}, wear={wear_prediction.wear_level:.2%}")
+        # Record metrics
+        duration = time.time() - start_time
+        ANALYSIS_DURATION.observe(duration)
+        ANALYSIS_COUNT.labels(status="success").inc()
+
+        logger.info("Analysis complete", extra={
+            "device_id": data.device_id,
+            "anomaly_detected": anomaly_detected,
+            "wear_level": wear_prediction.wear_level,
+            "duration_seconds": duration
+        })
 
         return response
 
     except Exception as e:
-        logger.error(f"Error analyzing sensor data: {e}", exc_info=True)
+        ANALYSIS_COUNT.labels(status="error").inc()
+        logger.error("Error analyzing sensor data", extra={"error": str(e)}, exc_info=True)
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
 
-@app.post("/reset-wear/{device_id}")
-def reset_device_wear(device_id: str):
+@app.post("/api/v1/reset-wear/{device_id}")
+@limiter.limit("10/minute")  # Stricter rate limit for maintenance operations
+def reset_device_wear(request: Request, device_id: str):
     """
     Reset wear counter for a device (e.g., after maintenance)
     """
     try:
         wear_predictor.reset_wear(device_id)
-        logger.info(f"Wear counter reset for device {device_id}")
+        logger.info("Wear counter reset", extra={"device_id": device_id})
         return {"status": "success", "device_id": device_id, "message": "Wear counter reset"}
     except Exception as e:
-        logger.error(f"Error resetting wear: {e}")
+        logger.error("Error resetting wear", extra={"error": str(e)})
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/models/info")
-def get_model_info():
+@app.get("/api/v1/models/info")
+@limiter.limit(RATE_LIMIT_DEFAULT)
+def get_model_info(request: Request):
     """Get information about loaded models"""
     return {
         "anomaly_detection": {

@@ -14,19 +14,34 @@ Features:
 import logging
 import signal
 import sys
+import os
 import uvicorn
+from pythonjsonlogger import jsonlogger
 from config import config
 from control_layer import ControlLayer
 import control_api
 
-# Configure logging at application entry point
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout)
-    ]
-)
+# Configure structured JSON logging
+use_json_logs = os.getenv("USE_JSON_LOGS", "true").lower() == "true"
+
+if use_json_logs:
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = jsonlogger.JsonFormatter(
+        fmt='%(asctime)s %(name)s %(levelname)s %(message)s',
+        rename_fields={'asctime': 'timestamp', 'name': 'logger', 'levelname': 'level'}
+    )
+    handler.setFormatter(formatter)
+    logging.root.addHandler(handler)
+    logging.root.setLevel(logging.INFO)
+else:
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+
 logger = logging.getLogger(__name__)
 
 # Global control layer instance
@@ -45,9 +60,11 @@ def main():
     """Main entry point"""
     global control_layer_instance
 
-    logger.info("=" * 60)
-    logger.info("MODAX Control Layer Starting")
-    logger.info("=" * 60)
+    logger.info("MODAX Control Layer Starting", extra={"component": "main"})
+
+    # Validate configuration before starting
+    logger.info("Validating configuration...")
+    config.validate()
 
     # Register signal handlers
     signal.signal(signal.SIGINT, signal_handler)
@@ -62,7 +79,10 @@ def main():
         control_layer_instance.start()
 
         # Start API server in main thread
-        logger.info(f"Starting API server on {config.control.api_host}:{config.control.api_port}")
+        logger.info("Starting API server", extra={
+            "host": config.control.api_host,
+            "port": config.control.api_port
+        })
         uvicorn.run(
             control_api.app,
             host=config.control.api_host,
@@ -71,7 +91,7 @@ def main():
         )
 
     except Exception as e:
-        logger.error(f"Error in control layer: {e}", exc_info=True)
+        logger.error("Error in control layer", extra={"error": str(e)}, exc_info=True)
         if control_layer_instance:
             control_layer_instance.stop()
         sys.exit(1)

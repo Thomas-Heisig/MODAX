@@ -1,0 +1,85 @@
+# Docker Compose for MODAX System
+version: '3.8'
+
+services:
+  # MQTT Broker
+  mqtt:
+    image: eclipse-mosquitto:2.0
+    container_name: modax-mqtt
+    ports:
+      - "1883:1883"
+    volumes:
+      - mqtt-data:/mosquitto/data
+      - mqtt-logs:/mosquitto/log
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Control Layer
+  control-layer:
+    build:
+      context: ./python-control-layer
+      dockerfile: Dockerfile
+    container_name: modax-control-layer
+    ports:
+      - "8000:8000"
+    environment:
+      - MQTT_BROKER_HOST=mqtt
+      - MQTT_BROKER_PORT=1883
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - AI_LAYER_URL=http://ai-layer:8001/api/v1/analyze
+      - AI_ENABLED=true
+      - USE_JSON_LOGS=true
+      - RATE_LIMIT_ENABLED=true
+      - RATE_LIMIT_DEFAULT=100/minute
+      - CORS_ORIGINS=*
+    depends_on:
+      - mqtt
+      - ai-layer
+    restart: unless-stopped
+
+  # AI Layer
+  ai-layer:
+    build:
+      context: ./python-ai-layer
+      dockerfile: Dockerfile
+    container_name: modax-ai-layer
+    ports:
+      - "8001:8001"
+    environment:
+      - AI_HOST=0.0.0.0
+      - AI_PORT=8001
+      - USE_JSON_LOGS=true
+      - RATE_LIMIT_ENABLED=true
+      - RATE_LIMIT_DEFAULT=100/minute
+      - CORS_ORIGINS=*
+    restart: unless-stopped
+
+  # Prometheus (Optional - for metrics collection)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: modax-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+volumes:
+  mqtt-data:
+  mqtt-logs:
+  prometheus-data:
+
+networks:
+  default:
+    name: modax-network
