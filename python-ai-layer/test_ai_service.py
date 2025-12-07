@@ -42,12 +42,21 @@ class TestAIService(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data["status"], "healthy")
+        self.assertIn("timestamp", data)
+
+    def test_readiness_check_endpoint(self):
+        """Test readiness check endpoint"""
+        response = self.client.get("/ready")
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["status"], "ready")
         self.assertTrue(data["models_loaded"])
         self.assertIn("timestamp", data)
 
     def test_analyze_endpoint_success(self):
         """Test analyze endpoint with valid data"""
-        response = self.client.post("/analyze", json=self.test_sensor_data)
+        response = self.client.post("/api/v1/analyze", json=self.test_sensor_data)
 
         self.assertEqual(response.status_code, 200)
         data = response.json()
@@ -85,7 +94,7 @@ class TestAIService(unittest.TestCase):
         anomalous_data["current_mean"] = [15.0, 15.5, 14.8]  # Very high current
         anomalous_data["vibration_mean"]["magnitude"] = 8.0  # High vibration
 
-        response = self.client.post("/analyze", json=anomalous_data)
+        response = self.client.post("/api/v1/analyze", json=anomalous_data)
 
         self.assertEqual(response.status_code, 200)
         data = response.json()
@@ -103,7 +112,7 @@ class TestAIService(unittest.TestCase):
             # Missing many required fields
         }
 
-        response = self.client.post("/analyze", json=incomplete_data)
+        response = self.client.post("/api/v1/analyze", json=incomplete_data)
 
         # Should return validation error
         self.assertEqual(response.status_code, 422)
@@ -113,14 +122,14 @@ class TestAIService(unittest.TestCase):
         invalid_data = self.test_sensor_data.copy()
         invalid_data["current_mean"] = "not a list"  # Invalid type
 
-        response = self.client.post("/analyze", json=invalid_data)
+        response = self.client.post("/api/v1/analyze", json=invalid_data)
 
         # Should return validation error
         self.assertEqual(response.status_code, 422)
 
     def test_analyze_response_includes_details(self):
         """Test that analysis response includes detailed information"""
-        response = self.client.post("/analyze", json=self.test_sensor_data)
+        response = self.client.post("/api/v1/analyze", json=self.test_sensor_data)
 
         self.assertEqual(response.status_code, 200)
         data = response.json()
@@ -138,7 +147,7 @@ class TestAIService(unittest.TestCase):
 
     def test_analyze_recommendations_not_empty(self):
         """Test that analysis always provides recommendations"""
-        response = self.client.post("/analyze", json=self.test_sensor_data)
+        response = self.client.post("/api/v1/analyze", json=self.test_sensor_data)
 
         self.assertEqual(response.status_code, 200)
         data = response.json()
@@ -153,7 +162,7 @@ class TestAIService(unittest.TestCase):
     def test_reset_wear_endpoint(self):
         """Test reset wear endpoint"""
         device_id = "test_device_001"
-        response = self.client.post(f"/reset-wear/{device_id}")
+        response = self.client.post(f"/api/v1/reset-wear/{device_id}")
 
         self.assertEqual(response.status_code, 200)
         data = response.json()
@@ -164,7 +173,7 @@ class TestAIService(unittest.TestCase):
 
     def test_model_info_endpoint(self):
         """Test model info endpoint"""
-        response = self.client.get("/models/info")
+        response = self.client.get("/api/v1/models/info")
 
         self.assertEqual(response.status_code, 200)
         data = response.json()
@@ -189,13 +198,13 @@ class TestAIService(unittest.TestCase):
         test_data["device_id"] = device_id
 
         # First analysis
-        response1 = self.client.post("/analyze", json=test_data)
+        response1 = self.client.post("/api/v1/analyze", json=test_data)
         self.assertEqual(response1.status_code, 200)
         data1 = response1.json()
 
         # Second analysis with slightly different data
         test_data["current_mean"] = [5.2, 5.3, 5.1]
-        response2 = self.client.post("/analyze", json=test_data)
+        response2 = self.client.post("/api/v1/analyze", json=test_data)
         self.assertEqual(response2.status_code, 200)
         data2 = response2.json()
 
@@ -213,7 +222,7 @@ class TestAIService(unittest.TestCase):
         test_data = self.test_sensor_data.copy()
         test_data["sample_count"] = 0
 
-        response = self.client.post("/analyze", json=test_data)
+        response = self.client.post("/api/v1/analyze", json=test_data)
 
         # Should still return 200 with reduced confidence
         self.assertEqual(response.status_code, 200)
@@ -232,8 +241,8 @@ class TestAIService(unittest.TestCase):
         device2_data["current_mean"] = [8.0, 8.1, 7.9]  # Different values
 
         # Analyze both devices
-        response1 = self.client.post("/analyze", json=device1_data)
-        response2 = self.client.post("/analyze", json=device2_data)
+        response1 = self.client.post("/api/v1/analyze", json=device1_data)
+        response2 = self.client.post("/api/v1/analyze", json=device2_data)
 
         self.assertEqual(response1.status_code, 200)
         self.assertEqual(response2.status_code, 200)
