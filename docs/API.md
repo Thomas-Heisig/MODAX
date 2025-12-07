@@ -568,6 +568,201 @@ curl http://localhost:8000/devices/ESP32_FIELD_001/ai-analysis
 curl -X POST http://localhost:8001/analyze \
   -H "Content-Type: application/json" \
   -d @sensor_data.json
+
+# WebSocket connection (all devices)
+wscat -c ws://localhost:8000/ws
+
+# WebSocket connection (specific device)
+wscat -c ws://localhost:8000/ws/device/ESP32_FIELD_001
+
+# Export data as CSV
+curl -H "X-API-Key: your_api_key" \
+  http://localhost:8000/export/ESP32_FIELD_001/csv?hours=24 \
+  -o data.csv
+
+# Export data as JSON
+curl -H "X-API-Key: your_api_key" \
+  http://localhost:8000/export/ESP32_FIELD_001/json?hours=24 \
+  -o data.json
+```
+
+---
+
+## WebSocket Endpoints (Real-Time Updates)
+
+### WS /ws
+Connect to receive real-time updates from all devices.
+
+**Message Types:**
+- `sensor_data` - Real-time sensor readings
+- `safety_status` - Safety status changes
+- `ai_analysis` - AI analysis results
+- `system_status` - System status updates
+
+**Example Message:**
+```json
+{
+  "type": "sensor_data",
+  "device_id": "ESP32_FIELD_001",
+  "data": {
+    "timestamp": 1234567890.123,
+    "current": 5.2,
+    "vibration": 100.5,
+    "temperature": 45.3
+  }
+}
+```
+
+### WS /ws/device/{device_id}
+Connect to receive real-time updates from a specific device.
+
+**Parameters:**
+- `device_id` (string, required): Device identifier
+
+**Example:**
+```javascript
+const ws = new WebSocket('ws://localhost:8000/ws/device/ESP32_FIELD_001');
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  console.log('Received:', data);
+};
+```
+
+---
+
+## Data Export Endpoints
+
+### GET /export/{device_id}/csv
+Export sensor data in CSV format.
+
+**Parameters:**
+- `device_id` (string, required): Device identifier
+- `hours` (int, optional): Number of hours to export (default: 24)
+
+**Headers:**
+- `X-API-Key` (required if authentication enabled): API key
+
+**Response (200 OK):**
+Returns CSV file with headers:
+```csv
+timestamp,device_id,current_a,current_b,current_c,vibration,temperature,rpm,power_kw
+2024-12-07T12:00:00Z,ESP32_FIELD_001,5.2,5.1,5.3,100.5,45.3,1500,7.8
+```
+
+**Response (404 Not Found):**
+```json
+{
+  "detail": "No data available for device ESP32_FIELD_001"
+}
+```
+
+### GET /export/{device_id}/json
+Export sensor data in JSON format.
+
+**Parameters:**
+- `device_id` (string, required): Device identifier
+- `hours` (int, optional): Number of hours to export (default: 24)
+
+**Headers:**
+- `X-API-Key` (required if authentication enabled): API key
+
+**Response (200 OK):**
+```json
+[
+  {
+    "timestamp": "2024-12-07T12:00:00Z",
+    "device_id": "ESP32_FIELD_001",
+    "current_a": 5.2,
+    "current_b": 5.1,
+    "current_c": 5.3,
+    "vibration": 100.5,
+    "temperature": 45.3,
+    "rpm": 1500,
+    "power_kw": 7.8
+  }
+]
+```
+
+### GET /export/{device_id}/statistics
+Export hourly statistics in JSON format.
+
+**Parameters:**
+- `device_id` (string, required): Device identifier
+- `hours` (int, optional): Number of hours of statistics (default: 24)
+
+**Headers:**
+- `X-API-Key` (required if authentication enabled): API key
+
+**Response (200 OK):**
+```json
+[
+  {
+    "hour": "2024-12-07T12:00:00Z",
+    "avg_current": 5.2,
+    "max_current": 6.1,
+    "avg_vibration": 102.3,
+    "max_vibration": 150.2,
+    "avg_temperature": 45.0,
+    "sample_count": 36000
+  }
+]
+```
+
+---
+
+## Authentication
+
+API authentication can be enabled using API keys.
+
+### Configuration
+
+Set in environment variables:
+```bash
+API_KEY_ENABLED=true
+HMI_API_KEY=your_hmi_api_key
+MONITORING_API_KEY=your_monitoring_api_key
+ADMIN_API_KEY=your_admin_api_key
+```
+
+### Using API Keys
+
+Include the API key in the request header:
+```bash
+curl -H "X-API-Key: your_api_key" http://localhost:8000/status
+```
+
+### Permissions
+
+Different API keys have different permission levels:
+
+| Key Type | Permissions | Rate Limit |
+|----------|-------------|------------|
+| HMI Client | read, write, control | 100 req/min |
+| Monitoring | read | 1000 req/min |
+| Admin | read, write, control, admin | 1000 req/min |
+
+### Error Responses
+
+**401 Unauthorized (Missing API Key):**
+```json
+{
+  "detail": "API key is missing"
+}
+```
+
+**401 Unauthorized (Invalid API Key):**
+```json
+{
+  "detail": "Invalid API key"
+}
+```
+
+**403 Forbidden (Insufficient Permissions):**
+```json
+{
+  "detail": "Insufficient permissions: 'control' required"
+}
 ```
 
 ---
@@ -577,10 +772,11 @@ curl -X POST http://localhost:8001/analyze \
 For API issues or questions:
 - Check this documentation
 - Review [ARCHITECTURE.md](ARCHITECTURE.md) for system design
+- Review [SECURITY_IMPLEMENTATION.md](SECURITY_IMPLEMENTATION.md) for security setup
 - See [ISSUES.md](../ISSUES.md) for known problems
 - Check application logs for detailed error messages
 
 ---
 
-**Last Updated:** 2024-12-06  
-**Documentation Version:** 1.0
+**Last Updated:** 2025-12-07  
+**Documentation Version:** 1.1
