@@ -1,7 +1,7 @@
 # MODAX Dokumentations-Update - Session Summary
 
 **Datum:** 2024-12-07  
-**Aufgabe:** Analysiere die Main des repository und überarbeite mit den Ergebnissen die gesamte Dokumentation und Readme, TODO, ISSUES und so weiter
+**Aufgabe:** Analysiere die Main-Entry-Points des Repository und überarbeite mit den Ergebnissen die gesamte Dokumentation und Readme, TODO, ISSUES und so weiter
 
 ## Zusammenfassung
 
@@ -11,7 +11,7 @@ Diese Session hat eine umfassende Analyse der Main-Entry-Points des MODAX-System
 
 ### 1. Main-Analyse
 
-Analysiert wurden folgende Entry-Points:
+Analysiert wurden die folgenden Entry-Points:
 - **python-ai-layer/main.py** - AI-Service mit FastAPI (Port 8001)
 - **python-control-layer/main.py** - Control Layer mit MQTT und FastAPI (Port 8000)
 - **python-ai-layer/ai_service.py** - REST API mit Anomalieerkennung, Verschleißvorhersage, Optimierung
