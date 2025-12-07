@@ -1,11 +1,20 @@
 """REST API for Control Layer - Interface for HMI"""
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, Security, WebSocket, WebSocketDisconnect, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict
 import logging
+import os
+from datetime import datetime, timedelta
+from auth import get_api_key, require_read, require_write, require_control
+from security_audit import get_security_audit_logger
+from websocket_manager import get_websocket_manager
+from data_export import get_data_exporter
 
 logger = logging.getLogger(__name__)
+audit_logger = get_security_audit_logger()
+ws_manager = get_websocket_manager()
+data_exporter = get_data_exporter()
 
 app = FastAPI(title="MODAX Control Layer API", version="1.0.0")
 
@@ -17,6 +26,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Check if API authentication is enabled
+API_AUTH_ENABLED = os.getenv("API_KEY_ENABLED", "false").lower() == "true"
 
 # Global reference to control layer (set by main)
 control_layer = None
@@ -72,7 +84,9 @@ def root():
 
 
 @app.get("/status", response_model=SystemStatus)
-def get_system_status():
+async def get_system_status(
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
     """Get overall system status"""
     if not control_layer:
         raise HTTPException(status_code=503, detail="Control layer not initialized")
@@ -86,7 +100,9 @@ def get_system_status():
 
 
 @app.get("/devices", response_model=List[str])
-def get_devices():
+async def get_devices(
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
     """Get list of connected devices"""
     if not control_layer:
         raise HTTPException(status_code=503, detail="Control layer not initialized")
@@ -95,7 +111,11 @@ def get_devices():
 
 
 @app.get("/devices/{device_id}/data", response_model=DeviceData)
-def get_device_data(device_id: str, count: int = 1):
+async def get_device_data(
+    device_id: str,
+    count: int = 1,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
     """Get latest data from a specific device"""
     if not control_layer:
         raise HTTPException(status_code=503, detail="Control layer not initialized")
@@ -127,7 +147,11 @@ def get_device_data(device_id: str, count: int = 1):
 
 
 @app.get("/devices/{device_id}/history")
-def get_device_history(device_id: str, count: int = 100):
+async def get_device_history(
+    device_id: str,
+    count: int = 100,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
     """Get historical data from a device"""
     if not control_layer:
         raise HTTPException(status_code=503, detail="Control layer not initialized")
@@ -151,7 +175,10 @@ def get_device_history(device_id: str, count: int = 100):
 
 
 @app.get("/devices/{device_id}/ai-analysis", response_model=AIAnalysisResponse)
-def get_ai_analysis(device_id: str):
+async def get_ai_analysis(
+    device_id: str,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
     """Get latest AI analysis for a device"""
     if not control_layer:
         raise HTTPException(status_code=503, detail="Control layer not initialized")
@@ -164,25 +191,53 @@ def get_ai_analysis(device_id: str):
 
 
 @app.post("/control/command")
-def send_control_command(command: ControlCommandRequest):
+async def send_control_command(
+    command: ControlCommandRequest,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
     """Send control command to system"""
     if not control_layer:
         raise HTTPException(status_code=503, detail="Control layer not initialized")
 
     # Safety check - don't allow commands if system is not safe
     if not control_layer.aggregator.is_system_safe():
+        audit_logger.log_control_command(
+            user="api_key_user",
+            device_id="system",
+            command=command.command_type,
+            status="blocked",
+            parameters=command.parameters,
+            reason="system_not_safe"
+        )
         raise HTTPException(status_code=403, detail="System not in safe state")
 
     try:
         control_layer.send_control_command(command.command_type, command.parameters or {})
+        audit_logger.log_control_command(
+            user="api_key_user",
+            device_id="system",
+            command=command.command_type,
+            status="executed",
+            parameters=command.parameters
+        )
         return {"status": "success", "command": command.command_type}
     except Exception as e:
         logger.error(f"Error sending control command: {e}")
+        audit_logger.log_control_command(
+            user="api_key_user",
+            device_id="system",
+            command=command.command_type,
+            status="failed",
+            parameters=command.parameters,
+            reason=str(e)
+        )
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/ai/status")
-def get_ai_status():
+async def get_ai_status(
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
     """Get AI layer status"""
     if not control_layer:
         raise HTTPException(status_code=503, detail="Control layer not initialized")
@@ -206,3 +261,152 @@ def health_check():
         "devices_online": len(control_layer.aggregator.get_device_ids()),
         "system_safe": control_layer.aggregator.is_system_safe()
     }
+
+
+# WebSocket endpoints for real-time updates
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    """WebSocket endpoint for real-time updates (all devices)"""
+    await ws_manager.connect(websocket)
+    try:
+        while True:
+            # Keep connection alive and handle incoming messages if needed
+            data = await websocket.receive_text()
+            # Echo back for now (can be extended to handle commands)
+            await websocket.send_json({"type": "ping", "message": "pong"})
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket)
+        logger.info("WebSocket client disconnected")
+
+
+@app.websocket("/ws/device/{device_id}")
+async def websocket_device_endpoint(websocket: WebSocket, device_id: str):
+    """WebSocket endpoint for device-specific real-time updates"""
+    await ws_manager.connect(websocket, device_id)
+    try:
+        while True:
+            # Keep connection alive and handle incoming messages if needed
+            data = await websocket.receive_text()
+            await websocket.send_json({"type": "ping", "message": "pong"})
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket)
+        logger.info(f"WebSocket client disconnected from device {device_id}")
+
+
+# Data export endpoints
+@app.get("/export/{device_id}/csv")
+async def export_device_data_csv(
+    device_id: str,
+    hours: int = 24,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
+    """
+    Export device sensor data as CSV
+    
+    Args:
+        device_id: Device identifier
+        hours: Number of hours of data to export (default: 24)
+    """
+    try:
+        end_time = datetime.now()
+        start_time = end_time - timedelta(hours=hours)
+        
+        csv_content = data_exporter.export_to_csv(
+            device_id, start_time, end_time
+        )
+        
+        if not csv_content:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No data available for device {device_id}"
+            )
+        
+        filename = f"modax_{device_id}_{start_time.strftime('%Y%m%d_%H%M%S')}.csv"
+        
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}"
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error exporting CSV data: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/export/{device_id}/json")
+async def export_device_data_json(
+    device_id: str,
+    hours: int = 24,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
+    """
+    Export device sensor data as JSON
+    
+    Args:
+        device_id: Device identifier
+        hours: Number of hours of data to export (default: 24)
+    """
+    try:
+        end_time = datetime.now()
+        start_time = end_time - timedelta(hours=hours)
+        
+        json_content = data_exporter.export_to_json(
+            device_id, start_time, end_time
+        )
+        
+        if json_content == "[]":
+            raise HTTPException(
+                status_code=404,
+                detail=f"No data available for device {device_id}"
+            )
+        
+        filename = f"modax_{device_id}_{start_time.strftime('%Y%m%d_%H%M%S')}.json"
+        
+        return Response(
+            content=json_content,
+            media_type="application/json",
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}"
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error exporting JSON data: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/export/{device_id}/statistics")
+async def export_device_statistics(
+    device_id: str,
+    hours: int = 24,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
+    """
+    Export device hourly statistics as JSON
+    
+    Args:
+        device_id: Device identifier
+        hours: Number of hours of statistics to export (default: 24)
+    """
+    try:
+        json_content = data_exporter.export_statistics_to_json(device_id, hours)
+        
+        if json_content == "[]":
+            raise HTTPException(
+                status_code=404,
+                detail=f"No statistics available for device {device_id}"
+            )
+        
+        filename = f"modax_{device_id}_statistics_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        
+        return Response(
+            content=json_content,
+            media_type="application/json",
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}"
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error exporting statistics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
