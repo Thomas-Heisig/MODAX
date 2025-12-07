@@ -125,8 +125,13 @@ class DataAggregator:
     def aggregate_for_ai(self, device_id: str,
                          window_seconds: Optional[int] = None) -> Optional[AggregatedData]:
         """
-        Aggregate recent sensor data for AI analysis
-        Returns statistical summaries suitable for ML models
+        Aggregate recent sensor data for AI analysis.
+        Returns statistical summaries suitable for ML models.
+
+        Performance optimizations:
+        - Uses numpy array operations for vectorized computation
+        - Pre-allocates arrays for better memory efficiency
+        - Single-pass data extraction
         """
         if device_id not in self.sensor_data or not self.sensor_data[device_id]:
             return None
@@ -142,47 +147,58 @@ class DataAggregator:
         if not recent_data:
             return None
 
-        # Extract arrays for statistics
+        # Pre-determine array dimensions for efficiency
+        num_samples = len(recent_data)
         num_motors = len(recent_data[0].motor_currents)
         num_temps = len(recent_data[0].temperatures)
 
-        currents = [[] for _ in range(num_motors)]
-        vibrations = {'x': [], 'y': [], 'z': [], 'magnitude': []}
-        temperatures = [[] for _ in range(num_temps)]
+        # Pre-allocate numpy arrays for better performance
+        currents_array = np.zeros((num_samples, num_motors), dtype=np.float32)
+        vibrations_array = np.zeros((num_samples, 4), dtype=np.float32)  # x, y, z, magnitude
+        temperatures_array = np.zeros((num_samples, num_temps), dtype=np.float32)
 
-        for reading in recent_data:
-            for i, current in enumerate(reading.motor_currents):
-                currents[i].append(current)
+        # Single-pass data extraction into pre-allocated arrays
+        for i, reading in enumerate(recent_data):
+            currents_array[i] = reading.motor_currents
+            vibrations_array[i] = [
+                reading.vibration['x'],
+                reading.vibration['y'],
+                reading.vibration['z'],
+                reading.vibration['magnitude']
+            ]
+            temperatures_array[i] = reading.temperatures
 
-            vibrations['x'].append(reading.vibration['x'])
-            vibrations['y'].append(reading.vibration['y'])
-            vibrations['z'].append(reading.vibration['z'])
-            vibrations['magnitude'].append(reading.vibration['magnitude'])
-
-            for i, temp in enumerate(reading.temperatures):
-                temperatures[i].append(temp)
-
-        # Calculate statistics
+        # Calculate statistics using vectorized numpy operations
         aggregated = AggregatedData(
             device_id=device_id,
             time_window_start=recent_data[0].timestamp / 1000.0,
             time_window_end=recent_data[-1].timestamp / 1000.0,
-            sample_count=len(recent_data)
+            sample_count=num_samples
         )
 
-        # Current statistics
-        aggregated.current_mean = [float(np.mean(c)) for c in currents]
-        aggregated.current_std = [float(np.std(c)) for c in currents]
-        aggregated.current_max = [float(np.max(c)) for c in currents]
+        # Current statistics - vectorized computation
+        aggregated.current_mean = currents_array.mean(axis=0).tolist()
+        aggregated.current_std = currents_array.std(axis=0).tolist()
+        aggregated.current_max = currents_array.max(axis=0).tolist()
 
-        # Vibration statistics
-        aggregated.vibration_mean = {k: float(np.mean(v)) for k, v in vibrations.items()}
-        aggregated.vibration_std = {k: float(np.std(v)) for k, v in vibrations.items()}
-        aggregated.vibration_max = {k: float(np.max(v)) for k, v in vibrations.items()}
+        # Vibration statistics - vectorized computation
+        vib_keys = ['x', 'y', 'z', 'magnitude']
+        aggregated.vibration_mean = {
+            key: float(vibrations_array[:, i].mean())
+            for i, key in enumerate(vib_keys)
+        }
+        aggregated.vibration_std = {
+            key: float(vibrations_array[:, i].std())
+            for i, key in enumerate(vib_keys)
+        }
+        aggregated.vibration_max = {
+            key: float(vibrations_array[:, i].max())
+            for i, key in enumerate(vib_keys)
+        }
 
-        # Temperature statistics
-        aggregated.temperature_mean = [float(np.mean(t)) for t in temperatures]
-        aggregated.temperature_max = [float(np.max(t)) for t in temperatures]
+        # Temperature statistics - vectorized computation
+        aggregated.temperature_mean = temperatures_array.mean(axis=0).tolist()
+        aggregated.temperature_max = temperatures_array.max(axis=0).tolist()
 
         return aggregated
 
