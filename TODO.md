@@ -22,7 +22,8 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] Backup & Recovery Prozeduren dokumentieren (docs/BACKUP_RECOVERY.md)
 - [x] OPC UA Integration dokumentieren (docs/OPC_UA_INTEGRATION.md)
 - [x] Dokumentations-Index erstellen (docs/INDEX.md)
-- [ ] Dokumentation auf 2025 aktualisieren (Datum-Inkonsistenzen beheben)
+- [x] TODO.md und ISSUES.md Datum auf 2025 aktualisieren
+- [ ] Dokumentation auf 2025 aktualisieren (verbleibende Dokumente im docs/ Verzeichnis)
 
 ### Tests
 - [x] Unit-Tests für Python Control Layer hinzufügen (42 Tests)
@@ -160,7 +161,7 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 ### Wartung & Aktualisierung
 - [x] TODO.md Datum auf 2025 korrigieren
 - [x] ISSUES.md Datum auf 2025 korrigieren
-- [ ] DONE.md mit erledigten Aufgaben von 2025-12-07 aktualisieren
+- [x] DONE.md mit erledigten Aufgaben von 2025-12-07 aktualisieren
 - [ ] Alle Dokumentationsdateien auf Datum 2025 prüfen
 - [ ] CHANGELOG.md für Version 0.2.0 vorbereiten
 - [ ] Dokumentations-Index auf Vollständigkeit prüfen
