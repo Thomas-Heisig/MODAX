@@ -269,12 +269,44 @@ supported = parser.supports_foreign_machine_codes()
 - G54.1: Erweiterte Koordinatensysteme
 - #-Variablen: Makro-Variablen
 
+### Haas (NEU)
+- **G47**: Engraving (Gravieren) - Vereinfachte Textgravur
+- **G71**: Turning Roughing Cycle (Radial) - Schrupp-Zyklus für Drehmaschinen
+- **G72**: Turning Roughing Cycle (Facing) - Plandrehen-Schrupp-Zyklus
+- **M130**: Media Player Control - Steuert integrierten Media Player
+
+**Beispiel G47 (Engraving):**
+```gcode
+G47 (PART-123) X10.0 Y10.0 Z-0.5 I5.0 J0.5 D6.0 F200
+; Graviert "PART-123" bei (10,10) mit 5mm Höhe
+```
+
+**Beispiel G71 (Roughing):**
+```gcode
+G71 P100 Q200 U1.0 W0.5 D2.0 F0.3 S800
+; Schruppt Kontur zwischen N100-N200 mit 2mm Zustellung
+```
+
+**Beispiel M130 (Media Player):**
+```gcode
+M130 (SETUP-INSTRUCTIONS.mp4)
+; Spielt Setup-Video während Werkstückeinrichtung
+```
+
 ### Okuma OSP
 - VC-Befehle: Variable Code (in Zukunft)
 - CALL OOxx: Makro-Aufrufe (in Zukunft)
 
 ### Mazak Mazatrol
 - M200+ Serie: Palettensteuerung
+
+### Estlcam (Hobbyist/Desktop CNC)
+Estlcam ist eine spezialisierte Software für Desktop-CNC-Maschinen mit einzigartigen Features.
+Siehe [HOBBYIST_CNC_SYSTEMS.md](HOBBYIST_CNC_SYSTEMS.md) für detaillierte Informationen zu:
+- Bild- und QR-Code-Bearbeitung (PNG/JPG/GIF)
+- Alternative Steuerungsmethoden (Gamepad, Handrad)
+- Winkelfehler-Kompensation
+- Fernsteuerungs-API (START LOCAL, PROG queries, etc.)
 
 ## API-Referenz
 

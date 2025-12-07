@@ -60,11 +60,17 @@ Complete documentation index for the MODAX industrial control system.
   - API endpoints for CNC operations
 - **[EXTENDED_GCODE_SUPPORT.md](EXTENDED_GCODE_SUPPORT.md)** ⭐ **NEW** - Extended G-code and Interpreter
   - 150+ G/M-codes (NURBS, threading, probing)
-  - Manufacturer-specific codes (Siemens, Fanuc, Heidenhain, Okuma, Mazak)
+  - Manufacturer-specific codes (Siemens, Fanuc, Heidenhain, Okuma, Mazak, Haas)
   - Macro support (G65/G66, O-codes, variables)
   - Control flow (GOTO, GOSUB, RETURN, labels)
   - Interpreter with subroutines and loops
   - F and S code handling
+- **[HOBBYIST_CNC_SYSTEMS.md](HOBBYIST_CNC_SYSTEMS.md)** ⭐ **NEW** - Hobbyist & Desktop CNC Systems
+  - **Estlcam:** Image/QR-code processing (PNG/JPG/GIF), alternative controls (gamepad, handwheel), angle error compensation, remote API
+  - **UCCNC:** Universal CNC controller for various hardware platforms
+  - **Haas:** Industrial CNC with specific codes (G47 engraving, G71/G72 roughing, M130 media player)
+  - Integration recommendations for MODAX
+  - Comparison table and safety guidelines
 - **[ADVANCED_CNC_INDUSTRY_4_0.md](ADVANCED_CNC_INDUSTRY_4_0.md)** ⭐ **NEW** - Industry 4.0 Advanced Features
   - Advanced Communication Protocols (EtherCAT, PROFINET, OPC UA, MQTT, MTConnect)
   - Intelligent Process Control (Adaptive Feed, Vibration Monitoring, Energy Management)
