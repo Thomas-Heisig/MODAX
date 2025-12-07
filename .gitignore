@@ -99,3 +99,9 @@ mosquitto.db
 data/
 *.csv
 *.json.bak
+
+# Test coverage reports
+coverage_reports/
+.coverage
+htmlcov/
+.pytest_cache/

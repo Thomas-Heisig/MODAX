@@ -20,10 +20,10 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] Dokumentations-Index erstellen (docs/INDEX.md)
 
 ### Tests
-- [ ] Unit-Tests für Python Control Layer hinzufügen
-- [ ] Unit-Tests für Python AI Layer hinzufügen
-- [ ] Integrationstests für MQTT-Kommunikation erstellen
-- [ ] End-to-End-Tests für komplette Datenflusskette
+- [x] Unit-Tests für Python Control Layer hinzufügen
+- [x] Unit-Tests für Python AI Layer hinzufügen
+- [x] Integrationstests für MQTT-Kommunikation erstellen (bereits vorhanden)
+- [ ] End-to-End-Tests für komplette Datenflusskette erweitern
 
 ### Sicherheit
 - [x] Sicherheitskonzept dokumentieren (docs/SECURITY.md)
@@ -45,9 +45,9 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 ### Code-Qualität
 - [x] Logging-Format über alle Ebenen standardisieren (docs/LOGGING_STANDARDS.md)
 - [x] Magic Numbers zu benannten Konstanten extrahieren (anomaly_detector.py, wear_predictor.py, optimizer.py)
+- [x] Code-Linting mit flake8/pylint für Python-Code (lint.sh)
+- [x] Code-Coverage-Berichte generieren (test_with_coverage.sh, 96-97% coverage)
 - [ ] Fehlerbehandlung in allen API-Endpunkten vereinheitlichen
-- [ ] Code-Linting mit flake8/pylint für Python-Code
-- [ ] Code-Coverage-Berichte generieren
 
 ### Konfiguration
 - [x] Standardwerte für alle Konfigurationsoptionen dokumentieren (docs/CONFIGURATION.md)

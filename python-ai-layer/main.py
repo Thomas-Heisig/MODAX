@@ -29,12 +29,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 def main():
     """Main entry point"""
     logger.info("=" * 60)
     logger.info("MODAX AI Layer Starting")
     logger.info("=" * 60)
-    
+
     # Start API server
     uvicorn.run(
         app,
@@ -42,6 +43,7 @@ def main():
         port=8001,
         log_level="info"
     )
+
 
 if __name__ == "__main__":
     main()

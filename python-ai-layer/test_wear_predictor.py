@@ -5,7 +5,7 @@ from wear_predictor import SimpleWearPredictor, WearPrediction
 
 class TestWearPrediction(unittest.TestCase):
     """Tests for WearPrediction dataclass"""
-    
+
     def test_creation(self):
         """Test creating WearPrediction"""
         prediction = WearPrediction(
@@ -14,7 +14,7 @@ class TestWearPrediction(unittest.TestCase):
             contributing_factors=["High current", "Elevated temperature"],
             confidence=0.85
         )
-        
+
         self.assertEqual(prediction.wear_level, 0.35)
         self.assertEqual(prediction.estimated_remaining_hours, 5000)
         self.assertEqual(len(prediction.contributing_factors), 2)
@@ -22,17 +22,17 @@ class TestWearPrediction(unittest.TestCase):
 
 class TestSimpleWearPredictor(unittest.TestCase):
     """Tests for SimpleWearPredictor class"""
-    
+
     def setUp(self):
         """Set up test fixtures"""
         self.predictor = SimpleWearPredictor()
         self.device_id = "test_device_001"
-    
+
     def test_initialization(self):
         """Test predictor initialization"""
         self.assertGreater(self.predictor.nominal_lifetime, 0)
         self.assertEqual(len(self.predictor.wear_rates), 0)
-    
+
     def test_predict_wear_normal_conditions(self):
         """Test wear prediction under normal operating conditions"""
         sensor_data = {
@@ -46,15 +46,15 @@ class TestSimpleWearPredictor(unittest.TestCase):
             "temperature_mean": [45.0, 46.0, 44.5],
             "temperature_max": [48.0, 49.0, 47.5]
         }
-        
+
         prediction = self.predictor.predict_wear(sensor_data, self.device_id)
-        
+
         self.assertIsInstance(prediction, WearPrediction)
         self.assertGreaterEqual(prediction.wear_level, 0.0)
         self.assertLessEqual(prediction.wear_level, 1.0)
         self.assertGreater(prediction.estimated_remaining_hours, 0)
         self.assertGreater(prediction.confidence, 0.0)
-    
+
     def test_predict_wear_high_stress(self):
         """Test wear prediction under high stress conditions"""
         sensor_data = {
@@ -68,14 +68,14 @@ class TestSimpleWearPredictor(unittest.TestCase):
             "temperature_mean": [70.0, 71.0, 69.5],  # High temperature
             "temperature_max": [75.0, 76.0, 74.5]
         }
-        
+
         prediction = self.predictor.predict_wear(sensor_data, self.device_id)
-        
+
         # Should have higher wear under stress
         self.assertGreater(prediction.wear_level, 0.0)
         # Should have contributing factors
         self.assertGreater(len(prediction.contributing_factors), 0)
-    
+
     def test_predict_wear_accumulation(self):
         """Test that wear accumulates over multiple predictions"""
         sensor_data = {
@@ -89,18 +89,18 @@ class TestSimpleWearPredictor(unittest.TestCase):
             "temperature_mean": [55.0, 56.0, 54.5],
             "temperature_max": [60.0, 61.0, 59.5]
         }
-        
+
         # First prediction
         prediction1 = self.predictor.predict_wear(sensor_data, self.device_id)
         wear_level1 = prediction1.wear_level
-        
+
         # Second prediction (same conditions)
         prediction2 = self.predictor.predict_wear(sensor_data, self.device_id)
         wear_level2 = prediction2.wear_level
-        
+
         # Wear should increase
         self.assertGreaterEqual(wear_level2, wear_level1)
-    
+
     def test_reset_wear(self):
         """Test resetting wear counter after maintenance"""
         # Accumulate some wear
@@ -115,16 +115,16 @@ class TestSimpleWearPredictor(unittest.TestCase):
             "temperature_mean": [55.0, 56.0, 54.5],
             "temperature_max": [60.0, 61.0, 59.5]
         }
-        
+
         self.predictor.predict_wear(sensor_data, self.device_id)
-        
+
         # Reset wear
         self.predictor.reset_wear(self.device_id)
-        
+
         # Check that wear was reset
         if self.device_id in self.predictor.wear_rates:
             self.assertEqual(self.predictor.wear_rates[self.device_id], 0.0)
-    
+
     def test_contributing_factors_high_current(self):
         """Test that high current is identified as contributing factor"""
         sensor_data = {
@@ -138,13 +138,13 @@ class TestSimpleWearPredictor(unittest.TestCase):
             "temperature_mean": [45.0, 46.0, 44.5],
             "temperature_max": [48.0, 49.0, 47.5]
         }
-        
+
         prediction = self.predictor.predict_wear(sensor_data, self.device_id)
-        
+
         # Check if high current is mentioned in contributing factors
         factors_text = " ".join(prediction.contributing_factors).lower()
         self.assertIn("current", factors_text)
-    
+
     def test_contributing_factors_high_vibration(self):
         """Test that high vibration is identified as contributing factor"""
         sensor_data = {
@@ -158,9 +158,9 @@ class TestSimpleWearPredictor(unittest.TestCase):
             "temperature_mean": [45.0, 46.0, 44.5],
             "temperature_max": [48.0, 49.0, 47.5]
         }
-        
+
         prediction = self.predictor.predict_wear(sensor_data, self.device_id)
-        
+
         # Check if vibration is mentioned in contributing factors
         factors_text = " ".join(prediction.contributing_factors).lower()
         self.assertIn("vibration", factors_text)
