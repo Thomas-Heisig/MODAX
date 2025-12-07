@@ -161,6 +161,7 @@ Ausführliche Anweisungen finden Sie unter [docs/SETUP.md](docs/SETUP.md)
 - [🔧 Setup-Anleitung](docs/SETUP.md) - Vollständige Installationsanleitung
 - [📡 API-Dokumentation](docs/API.md) - REST API Referenz
 - [⚙️ Konfiguration](docs/CONFIGURATION.md) - Konfigurationsoptionen
+- [🚀 Quick Wins (TOFU)](docs/TOFU.md) - Produktionsreife Features und Best Practices
 
 #### Sicherheit & Netzwerk
 - [🔒 Sicherheit](docs/SECURITY.md) - Sicherheitskonzept und Implementierung
