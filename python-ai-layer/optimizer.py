@@ -162,8 +162,7 @@ class OptimizationRecommender:
                     and vib_magnitude < VIBRATION_ELEVATED_THRESHOLD):
                 recommendations.append(
                     "System operating within normal parameters - "
-                    "no immediate action required"
-                )
+                    "no immediate action required")
 
         # Energy efficiency recommendations
         if current_mean and temperature_mean:

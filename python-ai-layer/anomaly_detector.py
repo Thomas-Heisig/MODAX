@@ -64,13 +64,10 @@ class StatisticalAnomalyDetector:
                     if z_score > self.z_threshold:
                         score = min(1.0, z_score / (self.z_threshold * 2))
                         max_score = max(max_score, score)
+                        motor_num = i + 1
                         anomalies.append(
-                            f"Motor {
-                                i
-                                + 1} current anomaly: {
-                                mean:.2f}A (expected {
-                                baseline_mean:.2f}±{
-                                baseline_std:.2f})")
+                            f"Motor {motor_num} current anomaly: {mean:.2f}A "
+                            f"(expected {baseline_mean:.2f}±{baseline_std:.2f})")
 
             # Simple threshold checks (domain knowledge)
             if max_val > CURRENT_ABSOLUTE_MAX_THRESHOLD:

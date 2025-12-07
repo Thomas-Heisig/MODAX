@@ -107,8 +107,8 @@ class MQTTHandler:
         if rc != 0:
             logger.warning(f"Unexpected disconnect from MQTT broker, return code: {rc}")
             logger.info(
-                f"Automatic reconnection will be attempted with exponential backoff (delay: {
-                    self._reconnect_delay}s)")
+                f"Automatic reconnection will be attempted with "
+                f"exponential backoff (delay: {self._reconnect_delay}s)")
 
             # Update reconnect delay with exponential backoff
             self._reconnect_delay = min(

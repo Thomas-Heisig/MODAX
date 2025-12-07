@@ -75,8 +75,9 @@ class SimpleWearPredictor:
 
             # Current spikes cause additional wear
             if current_max > CURRENT_SPIKE_THRESHOLD:
-                spike_factor = CURRENT_SPIKE_BASE_FACTOR + \
-                    (current_max - CURRENT_SPIKE_THRESHOLD) * CURRENT_SPIKE_INCREMENT
+                spike_delta = (current_max - CURRENT_SPIKE_THRESHOLD)
+                spike_factor = (CURRENT_SPIKE_BASE_FACTOR +
+                                spike_delta * CURRENT_SPIKE_INCREMENT)
                 wear_factor *= spike_factor
                 contributing_factors.append(f"Current spikes ({current_max:.1f}A)")
 
