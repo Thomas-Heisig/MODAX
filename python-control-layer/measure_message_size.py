@@ -11,7 +11,7 @@ Usage:
 
 import json
 import sys
-from typing import Dict, List
+from typing import Dict
 
 
 def create_sample_sensor_data() -> Dict:

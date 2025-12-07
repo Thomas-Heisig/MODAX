@@ -12,11 +12,11 @@ logger = logging.getLogger(__name__)
 
 class DataExporter:
     """Handles data export in various formats"""
-    
+
     def __init__(self):
         """Initialize data exporter"""
         self.data_reader = get_data_reader()
-    
+
     def export_to_csv(
         self,
         device_id: str,
@@ -26,39 +26,39 @@ class DataExporter:
     ) -> str:
         """
         Export sensor data to CSV format
-        
+
         Args:
             device_id: Device identifier
             start_time: Start of time range
             end_time: End of time range
             limit: Maximum number of records
-            
+
         Returns:
             CSV string
         """
         data = self.data_reader.get_data_for_export(
             device_id, start_time, end_time, limit
         )
-        
+
         if not data:
             return ""
-        
+
         # Create CSV in memory
         output = io.StringIO()
-        
+
         # Get field names from first record
         fieldnames = data[0].keys()
-        
+
         writer = csv.DictWriter(output, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(data)
-        
+
         csv_content = output.getvalue()
         output.close()
-        
+
         logger.info(f"Exported {len(data)} records to CSV for device {device_id}")
         return csv_content
-    
+
     def export_to_json(
         self,
         device_id: str,
@@ -68,28 +68,28 @@ class DataExporter:
     ) -> str:
         """
         Export sensor data to JSON format
-        
+
         Args:
             device_id: Device identifier
             start_time: Start of time range
             end_time: End of time range
             limit: Maximum number of records
-            
+
         Returns:
             JSON string
         """
         data = self.data_reader.get_data_for_export(
             device_id, start_time, end_time, limit
         )
-        
+
         if not data:
             return "[]"
-        
+
         json_content = json.dumps(data, indent=2)
-        
+
         logger.info(f"Exported {len(data)} records to JSON for device {device_id}")
         return json_content
-    
+
     def export_statistics_to_json(
         self,
         device_id: str,
@@ -97,26 +97,26 @@ class DataExporter:
     ) -> str:
         """
         Export hourly statistics to JSON format
-        
+
         Args:
             device_id: Device identifier
             hours: Number of hours of statistics
-            
+
         Returns:
             JSON string
         """
         data = self.data_reader.get_hourly_statistics(device_id, hours)
-        
+
         if not data:
             return "[]"
-        
+
         # Convert datetime objects to ISO format strings
         for record in data:
             if 'hour' in record and isinstance(record['hour'], datetime):
                 record['hour'] = record['hour'].isoformat()
-        
+
         json_content = json.dumps(data, indent=2)
-        
+
         logger.info(f"Exported {len(data)} hourly statistics to JSON for device {device_id}")
         return json_content
 

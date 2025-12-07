@@ -53,16 +53,16 @@ AI_PORT = int(os.getenv("AI_PORT", "8001"))
 def validate_config():
     """Validate environment configuration"""
     errors = []
-    
+
     if AI_PORT < 1 or AI_PORT > 65535:
         errors.append(f"Invalid AI_PORT: {AI_PORT} (must be 1-65535)")
-    
+
     if errors:
         logger.error("Configuration validation failed:")
         for error in errors:
             logger.error(f"  - {error}")
         sys.exit(1)
-    
+
     logger.info("Configuration validation passed")
     return True
 
@@ -76,10 +76,10 @@ def signal_handler(signum, frame):
 def main():
     """Main entry point"""
     logger.info("MODAX AI Layer Starting", extra={"component": "main"})
-    
+
     # Validate configuration
     validate_config()
-    
+
     # Register signal handlers for graceful shutdown
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
