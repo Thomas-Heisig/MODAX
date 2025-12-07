@@ -2,8 +2,8 @@
 
 Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Probleme werden nach `DONE.md` verschoben.
 
-**Letzte Aktualisierung:** 2024-12-07  
-**Anzahl offener Issues:** 10 (2 kritisch, 3 wichtig, 5 kleinere Probleme)
+**Letzte Aktualisierung:** 2025-12-07  
+**Anzahl offener Issues:** 14 (2 kritisch, 5 wichtig, 7 kleinere Probleme)
 
 ## Kritische Probleme
 
@@ -142,6 +142,15 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
 
 ## Kleinere Probleme
 
+### Wartung & Dokumentation
+
+#### #027: Datum-Inkonsistenzen in Dokumentation
+**Beschreibung:** Einige Dokumentationsdateien verwenden noch das Jahr 2024 statt 2025.
+- **Betroffene Komponenten:** Diverse .md Dateien in docs/
+- **Auswirkung:** Verwirrung über Aktualität der Dokumentation
+- **Priorität:** Niedrig
+- **Vorgeschlagene Lösung:** Systematische Aktualisierung aller Datums-Referenzen auf 2025
+
 ### Code-Qualität
 
 #### #008: Einige Python-Module haben keine Type Hints
@@ -239,6 +248,27 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
 - **Auswirkung:** Höhere Latenz und mehr Netzwerklast
 - **Priorität:** Mittel
 - **Vorgeschlagene Lösung:** FastAPI WebSocket für Echtzeit-Push implementieren
+
+### #028: Fehlende Internationalisierung (i18n)
+**Beschreibung:** UI-Texte sind nur auf Deutsch verfügbar.
+- **Betroffene Komponenten:** HMI Layer
+- **Auswirkung:** Eingeschränkte internationale Nutzbarkeit
+- **Priorität:** Niedrig
+- **Vorgeschlagene Lösung:** Resource-basiertes i18n-System mit Unterstützung für EN, DE
+
+### #029: Keine automatische Schema-Migration für Datenbank
+**Beschreibung:** Datenbankschema-Änderungen müssen manuell durchgeführt werden.
+- **Betroffene Komponenten:** Control Layer, AI Layer
+- **Auswirkung:** Fehleranfällige Updates
+- **Priorität:** Mittel
+- **Vorgeschlagene Lösung:** Alembic oder ähnliches Migrations-Tool einführen
+
+### #030: Fehlende Health-Check-Endpunkte
+**Beschreibung:** Kubernetes/Docker Health-Checks nicht standardisiert implementiert.
+- **Betroffene Komponenten:** Alle Layer
+- **Auswirkung:** Eingeschränktes Container-Orchestrierungs-Management
+- **Priorität:** Mittel
+- **Vorgeschlagene Lösung:** Standardisierte /health und /ready Endpunkte implementieren
 
 ## Hinweise
 
