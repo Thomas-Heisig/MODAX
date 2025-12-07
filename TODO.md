@@ -2,7 +2,7 @@
 
 Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufgaben werden nach `DONE.md` verschoben.
 
-**Letzte Aktualisierung:** 2024-12-07  
+**Letzte Aktualisierung:** 2025-12-07  
 **Aktuelle Version:** 0.1.0  
 **Status:** Produktionsreif mit vollständiger Dokumentation und Test-Coverage (96-97%)
 
@@ -22,6 +22,7 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] Backup & Recovery Prozeduren dokumentieren (docs/BACKUP_RECOVERY.md)
 - [x] OPC UA Integration dokumentieren (docs/OPC_UA_INTEGRATION.md)
 - [x] Dokumentations-Index erstellen (docs/INDEX.md)
+- [ ] Dokumentation auf 2025 aktualisieren (Datum-Inkonsistenzen beheben)
 
 ### Tests
 - [x] Unit-Tests für Python Control Layer hinzufügen (42 Tests)
@@ -105,6 +106,8 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [ ] Docker-Compose-Datei für schnellen Start (siehe docs/CONTAINERIZATION.md)
 - [ ] Kubernetes-Manifeste für Produktionsbereitstellung
 - [ ] CI/CD-Pipeline mit GitHub Actions implementieren (siehe docs/CI_CD.md)
+- [ ] Helm Charts für Kubernetes Deployment erstellen
+- [ ] GitOps-Workflow mit ArgoCD oder Flux einrichten
 
 ### Integration
 - [x] OPC UA Integration dokumentieren (docs/OPC_UA_INTEGRATION.md)
@@ -132,6 +135,41 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [ ] Cloud-Integration (AWS, Azure, GCP)
 - [ ] Automatisierte Wartungsplanung
 - [ ] Predictive Maintenance mit Deep Learning
+- [ ] Edge Computing Optimierungen für ESP32
+- [ ] Federated Learning über mehrere MODAX-Instanzen
+- [ ] Integration mit bestehenden MES/ERP-Systemen (SAP, etc.)
+- [ ] Blockchain für unveränderliche Audit-Trails
+- [ ] Digital Twin Integration für Simulationen
+
+## Quick Wins (Schnell umsetzbar, hoher Wert)
+
+### Sofort umsetzbare Verbesserungen
+- [ ] Health-Check-Endpunkte zu allen APIs hinzufügen (/health, /ready)
+- [ ] API-Versionierung einführen (z.B. /api/v1/...)
+- [ ] Standardisierte Error-Response-Struktur über alle APIs
+- [ ] Rate-Limiting für öffentliche API-Endpunkte
+- [ ] CORS-Header konfigurierbar machen
+- [ ] Graceful Shutdown für alle Services implementieren
+- [ ] Umgebungsvariablen-Validierung beim Start
+- [ ] Strukturierte JSON-Logs einführen
+- [ ] Prometheus Metrics Endpunkte hinzufügen
+- [ ] Docker Health-Checks in alle Dockerfiles
+
+## Priorität 5: Housekeeping
+
+### Wartung & Aktualisierung
+- [x] TODO.md Datum auf 2025 korrigieren
+- [x] ISSUES.md Datum auf 2025 korrigieren
+- [ ] DONE.md mit erledigten Aufgaben von 2025-12-07 aktualisieren
+- [ ] Alle Dokumentationsdateien auf Datum 2025 prüfen
+- [ ] CHANGELOG.md für Version 0.2.0 vorbereiten
+- [ ] Dokumentations-Index auf Vollständigkeit prüfen
+
+### Code-Cleanup
+- [ ] Deprecated Features identifizieren und entfernen
+- [ ] Code-Kommentare auf Aktualität prüfen
+- [ ] TODO-Kommentare im Code konsolidieren
+- [ ] Ungenutzte Konfigurationsoptionen entfernen
 
 ## Hinweise
 
@@ -139,3 +177,4 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - Dokumentation muss parallel zum Code aktualisiert werden
 - Sicherheitsrelevante Änderungen erfordern ein Review
 - Breaking Changes müssen im CHANGELOG.md dokumentiert werden
+- TODO.md und ISSUES.md werden regelmäßig am 1. und 15. jeden Monats überprüft
