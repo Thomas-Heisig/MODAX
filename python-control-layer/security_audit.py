@@ -55,7 +55,7 @@ class SecurityAuditLogger:
     def _log_event(self, event_type: str, severity: str, **kwargs):
         """Log a security audit event"""
         event = {
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": datetime.now().astimezone().isoformat(),
             "event_type": event_type,
             "severity": severity,
             **kwargs
