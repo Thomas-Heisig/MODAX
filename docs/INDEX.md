@@ -88,10 +88,14 @@ Complete documentation index for the MODAX industrial control system.
   - AutoML
   - Advanced anomaly detection
 
-## Testing & Quality Assurance (Coming Soon)
-- TESTING_STRATEGY.md - Comprehensive testing strategy
-  - Unit testing
-  - Integration testing
+## Testing & Quality Assurance
+- [TESTING.md](TESTING.md) - Testing and code quality guide
+  - Running tests (98 tests total)
+  - Code coverage reporting (96-97%)
+  - Linting with flake8 and pylint
+  - Test structure and best practices
+  - Writing new tests
+- TESTING_STRATEGY.md (Coming Soon) - Advanced testing strategy
   - Hardware-in-the-loop (HIL) testing
   - Performance testing
   - Security testing
@@ -146,7 +150,8 @@ Complete documentation index for the MODAX industrial control system.
 1. [ARCHITECTURE](ARCHITECTURE.md) - Understand the system
 2. [SETUP](SETUP.md) - Get environment running
 3. [API](API.md) - Learn the APIs
-4. [CI_CD](CI_CD.md) - Development workflow
+4. [TESTING](TESTING.md) - Testing and code quality
+5. [CI_CD](CI_CD.md) - Development workflow
 
 **Advanced Topics:**
 - [OPC_UA_INTEGRATION](OPC_UA_INTEGRATION.md) - Protocol integration
@@ -282,6 +287,7 @@ Each documentation file should include:
 - Backup & recovery
 - Monitoring stack
 - OPC UA integration
+- Testing and code quality guide
 
 ### In Progress 🔄
 - External system integrations
@@ -311,6 +317,7 @@ Each documentation file should include:
 │ Getting Started:          SETUP.md                  │
 │ System Overview:          ARCHITECTURE.md           │
 │ API Reference:            API.md                    │
+│ Testing & Quality:        TESTING.md                │
 │ Configuration:            CONFIGURATION.md          │
 │ Security:                 SECURITY.md               │
 │ Deployment:               CONTAINERIZATION.md       │

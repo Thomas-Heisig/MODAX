@@ -240,6 +240,33 @@ Sicherheitsfunktionen bleiben in der Feldebene (ESP32) Hardware.
 - Cloud-Integration
 - Mobile App (nur Überwachung)
 
+## Testing & Code Quality
+
+Das Projekt verfügt über umfassende Tests und Code-Qualitätstools:
+
+- **98 Unit-Tests** (42 Control Layer, 56 AI Layer)
+- **96-97% Code Coverage**
+- **Flake8 und Pylint** für Code-Qualitätsprüfungen
+
+### Tests ausführen
+```bash
+# Alle Tests
+./test_with_coverage.sh
+
+# Nur Control Layer
+cd python-control-layer && python -m unittest discover -v
+
+# Nur AI Layer
+cd python-ai-layer && python -m unittest discover -v
+```
+
+### Code-Linting
+```bash
+./lint.sh
+```
+
+Siehe [docs/TESTING.md](docs/TESTING.md) für weitere Details.
+
 ## Mitwirken
 
 Beiträge sind willkommen! Bitte lesen Sie die Beitragsrichtlinien, bevor Sie einen Pull Request einreichen.
@@ -247,8 +274,9 @@ Beiträge sind willkommen! Bitte lesen Sie die Beitragsrichtlinien, bevor Sie ei
 1. Fork das Repository
 2. Erstellen Sie einen Feature-Branch
 3. Committen Sie Ihre Änderungen
-4. Pushen Sie zum Branch
-5. Öffnen Sie einen Pull Request
+4. Führen Sie Tests und Linting aus (`./test_with_coverage.sh && ./lint.sh`)
+5. Pushen Sie zum Branch
+6. Öffnen Sie einen Pull Request
 
 ## Lizenz
 
