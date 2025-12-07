@@ -147,17 +147,19 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 
 ## Quick Wins (Schnell umsetzbar, hoher Wert)
 
-### Sofort umsetzbare Verbesserungen
-- [ ] Health-Check-Endpunkte zu allen APIs hinzufügen (/health, /ready)
-- [ ] API-Versionierung einführen (z.B. /api/v1/...)
-- [ ] Standardisierte Error-Response-Struktur über alle APIs
-- [ ] Rate-Limiting für öffentliche API-Endpunkte
-- [ ] CORS-Header konfigurierbar machen
-- [ ] Graceful Shutdown für alle Services implementieren
-- [ ] Umgebungsvariablen-Validierung beim Start
-- [ ] Strukturierte JSON-Logs einführen
-- [ ] Prometheus Metrics Endpunkte hinzufügen
-- [ ] Docker Health-Checks in alle Dockerfiles
+### ✅ Sofort umsetzbare Verbesserungen (Alle implementiert - siehe [docs/TOFU.md](docs/TOFU.md))
+- [x] Health-Check-Endpunkte zu allen APIs hinzufügen (/health, /ready)
+- [x] API-Versionierung einführen (z.B. /api/v1/...)
+- [x] Standardisierte Error-Response-Struktur über alle APIs
+- [x] Rate-Limiting für öffentliche API-Endpunkte
+- [x] CORS-Header konfigurierbar machen
+- [x] Graceful Shutdown für alle Services implementieren
+- [x] Umgebungsvariablen-Validierung beim Start
+- [x] Strukturierte JSON-Logs einführen
+- [x] Prometheus Metrics Endpunkte hinzufügen
+- [x] Docker Health-Checks in alle Dockerfiles
+- [x] TOFU.md Dokumentation erstellt
+- [x] README.md aktualisiert mit Verweis auf TOFU.md
 
 ## Priorität 5: Housekeeping
 

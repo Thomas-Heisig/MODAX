@@ -43,7 +43,15 @@ Complete documentation index for the MODAX industrial control system.
 - [API.md](API.md) - REST API reference for Control and AI layers
 - [CONFIGURATION.md](CONFIGURATION.md) - Configuration options and environment variables
 - [NETWORK_ARCHITECTURE.md](NETWORK_ARCHITECTURE.md) - Network design, OT/IT separation, Purdue Model
-- **[CNC_FEATURES.md](CNC_FEATURES.md)** ⭐ **NEW** - Comprehensive CNC machine functionality
+- **[TOFU.md](TOFU.md)** ⭐ **NEW** - Quick Wins: Production-ready features and best practices
+  - Health-check endpoints (/health, /ready)
+  - API versioning (/api/v1/...)
+  - Standardized error responses
+  - Rate limiting & CORS configuration
+  - Graceful shutdown & environment validation
+  - Structured JSON logs & Prometheus metrics
+  - Docker health checks
+- **[CNC_FEATURES.md](CNC_FEATURES.md)** ⭐ - Comprehensive CNC machine functionality
   - G-code parser (ISO 6983)
   - Motion control and interpolation
   - Tool management and compensation
