@@ -39,12 +39,18 @@ namespace MODAX.HMI.Views
         private Button? _startButton;
         private Button? _stopButton;
         private Button? _refreshButton;
+        
+        // Loading indicator
+        private Panel? _loadingPanel;
+        private Label? _loadingLabel;
+        private bool _isLoading = false;
 
         public MainForm()
         {
             _controlClient = new ControlLayerClient();
             InitializeComponents();
             InitializeTimer();
+            InitializeKeyboardShortcuts();
         }
 
         private void InitializeComponents()
@@ -53,6 +59,7 @@ namespace MODAX.HMI.Views
             Text = "MODAX - Industrial Control HMI";
             Size = new Size(1200, 800);
             StartPosition = FormStartPosition.CenterScreen;
+            KeyPreview = true; // Enable keyboard shortcuts
 
             // Main layout
             var mainPanel = new TableLayoutPanel
@@ -316,6 +323,9 @@ namespace MODAX.HMI.Views
 
         private async Task RefreshDevicesAsync()
         {
+            if (_isLoading) return; // Prevent concurrent refresh operations
+            
+            ShowLoading("Refreshing devices...");
             try
             {
                 var devices = await _controlClient.GetDevicesAsync();
@@ -344,27 +354,102 @@ namespace MODAX.HMI.Views
                         _systemStatusLabel.Text = "Status: ⚠️ Cannot retrieve device list";
                         _systemStatusLabel.ForeColor = Color.Red;
                     }
+                    
+                    // Show user-friendly error dialog with troubleshooting tips
+                    ShowErrorDialog(
+                        "Unable to Connect",
+                        "Could not retrieve device list from Control Layer.",
+                        new string[]
+                        {
+                            "Verify the Control Layer service is running",
+                            "Check the API URL configuration",
+                            "Ensure network connectivity is available",
+                            "Check firewall settings"
+                        }
+                    );
                 }
+            }
+            catch (HttpRequestException ex)
+            {
+                if (_systemStatusLabel != null)
+                {
+                    _systemStatusLabel.Text = "Status: ⚠️ Network Error";
+                    _systemStatusLabel.ForeColor = Color.Red;
+                }
+                
+                ShowErrorDialog(
+                    "Connection Failed",
+                    $"Network error connecting to Control Layer:\n{ex.Message}",
+                    new string[]
+                    {
+                        "Check that the Control Layer is running on " + _controlClient.BaseUrl,
+                        "Verify network connectivity",
+                        "Check firewall settings allow connection",
+                        "Ensure the API port is not blocked"
+                    }
+                );
+            }
+            catch (TaskCanceledException)
+            {
+                if (_systemStatusLabel != null)
+                {
+                    _systemStatusLabel.Text = "Status: ⚠️ Connection Timeout";
+                    _systemStatusLabel.ForeColor = Color.OrangeRed;
+                }
+                
+                ShowErrorDialog(
+                    "Request Timeout",
+                    "The Control Layer did not respond in time.",
+                    new string[]
+                    {
+                        "The Control Layer may be overloaded",
+                        "Network latency may be too high",
+                        "Try again in a few moments"
+                    }
+                );
             }
             catch (Exception ex)
             {
                 if (_systemStatusLabel != null)
                 {
-                    _systemStatusLabel.Text = $"Status: ⚠️ Error loading devices: {ex.Message}";
+                    _systemStatusLabel.Text = $"Status: ⚠️ Error: {ex.Message}";
                     _systemStatusLabel.ForeColor = Color.Red;
                 }
-                MessageBox.Show(
-                    $"Failed to connect to Control Layer at {_controlClient.BaseUrl}.\n\n" +
-                    $"Error: {ex.Message}\n\n" +
-                    "Please ensure:\n" +
-                    "1. The Control Layer is running\n" +
-                    "2. The API is accessible at the configured URL\n" +
-                    "3. Network connectivity is available",
-                    "Connection Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
+                
+                ShowErrorDialog(
+                    "Unexpected Error",
+                    $"An unexpected error occurred:\n{ex.Message}",
+                    new string[]
+                    {
+                        "Try refreshing the device list again (F5)",
+                        "Restart the HMI application if the problem persists",
+                        "Contact support if the error continues"
+                    }
                 );
             }
+            finally
+            {
+                HideLoading();
+            }
+        }
+        
+        /// <summary>
+        /// Show a user-friendly error dialog with troubleshooting steps
+        /// </summary>
+        private void ShowErrorDialog(string title, string message, string[] troubleshootingSteps)
+        {
+            var fullMessage = message + "\n\nTroubleshooting steps:\n";
+            for (int i = 0; i < troubleshootingSteps.Length; i++)
+            {
+                fullMessage += $"{i + 1}. {troubleshootingSteps[i]}\n";
+            }
+            
+            MessageBox.Show(
+                fullMessage,
+                title,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning
+            );
         }
 
         private async Task UpdateDataAsync()
@@ -548,7 +633,132 @@ namespace MODAX.HMI.Views
         protected override async void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+            // Create loading panel
+            CreateLoadingPanel();
             await RefreshDevicesAsync();
+        }
+
+        /// <summary>
+        /// Create a loading indicator panel for async operations
+        /// </summary>
+        private void CreateLoadingPanel()
+        {
+            _loadingPanel = new Panel
+            {
+                Size = new Size(200, 80),
+                BackColor = Color.FromArgb(200, 50, 50, 50),
+                BorderStyle = BorderStyle.FixedSingle,
+                Visible = false
+            };
+
+            _loadingLabel = new Label
+            {
+                Text = "Loading...",
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.Fill
+            };
+
+            _loadingPanel.Controls.Add(_loadingLabel);
+            Controls.Add(_loadingPanel);
+            _loadingPanel.BringToFront();
+            
+            // Center the loading panel
+            _loadingPanel.Location = new Point(
+                (Width - _loadingPanel.Width) / 2,
+                (Height - _loadingPanel.Height) / 2
+            );
+        }
+
+        /// <summary>
+        /// Show loading indicator with optional message
+        /// </summary>
+        private void ShowLoading(string message = "Loading...")
+        {
+            if (_loadingPanel != null && _loadingLabel != null)
+            {
+                _loadingLabel.Text = message;
+                _loadingPanel.Visible = true;
+                _loadingPanel.BringToFront();
+                _isLoading = true;
+                // Note: UI updates automatically when control properties change
+                // Using async/await pattern in calling methods ensures proper UI threading
+            }
+        }
+
+        /// <summary>
+        /// Hide loading indicator
+        /// </summary>
+        private void HideLoading()
+        {
+            if (_loadingPanel != null)
+            {
+                _loadingPanel.Visible = false;
+                _isLoading = false;
+            }
+        }
+
+        /// <summary>
+        /// Initialize keyboard shortcuts for common operations
+        /// Shortcuts:
+        /// - F5: Refresh device list
+        /// - Ctrl+R: Refresh device list
+        /// - Ctrl+S: Start motor (if device selected)
+        /// - Ctrl+T: Stop motor (if device selected)
+        /// - F1: Show help/shortcuts
+        /// </summary>
+        private void InitializeKeyboardShortcuts()
+        {
+            KeyDown += (sender, e) =>
+            {
+                // Refresh shortcuts
+                if (e.KeyCode == Keys.F5 || (e.Control && e.KeyCode == Keys.R))
+                {
+                    e.Handled = true;
+                    _ = RefreshDevicesAsync();
+                }
+                // Start motor shortcut
+                else if (e.Control && e.KeyCode == Keys.S && !string.IsNullOrEmpty(_selectedDeviceId))
+                {
+                    e.Handled = true;
+                    _ = SendCommandAsync("start_motor");
+                }
+                // Stop motor shortcut
+                else if (e.Control && e.KeyCode == Keys.T && !string.IsNullOrEmpty(_selectedDeviceId))
+                {
+                    e.Handled = true;
+                    _ = SendCommandAsync("stop_motor");
+                }
+                // Help shortcut
+                else if (e.KeyCode == Keys.F1)
+                {
+                    e.Handled = true;
+                    ShowKeyboardShortcutsHelp();
+                }
+            };
+        }
+
+        /// <summary>
+        /// Display keyboard shortcuts help dialog
+        /// </summary>
+        private void ShowKeyboardShortcutsHelp()
+        {
+            var helpText = @"Keyboard Shortcuts:
+
+F5 or Ctrl+R     - Refresh device list
+Ctrl+S           - Start motor (requires device selection)
+Ctrl+T           - Stop motor (requires device selection)
+F1               - Show this help
+
+Note: Control commands require a device to be selected first.";
+
+            MessageBox.Show(
+                helpText,
+                "MODAX HMI - Keyboard Shortcuts",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information
+            );
         }
     }
 }

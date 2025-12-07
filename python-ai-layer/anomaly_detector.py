@@ -45,13 +45,31 @@ class StatisticalAnomalyDetector:
     def detect_current_anomaly(self, current_mean: List[float],
                                current_max: List[float],
                                device_id: str) -> AnomalyResult:
-        """Detect current anomalies"""
+        """
+        Detect current anomalies using multi-layered statistical analysis.
+
+        Algorithm overview:
+        1. Z-score based statistical anomaly detection against historical baseline
+        2. Absolute threshold checks for safety-critical current levels
+        3. Motor load imbalance detection (comparing currents across motors)
+
+        Args:
+            current_mean: Average current readings per motor during the time window
+            current_max: Maximum current readings per motor during the time window
+            device_id: Unique identifier for the device being analyzed
+
+        Returns:
+            AnomalyResult with detection status, score (0-1), description, and confidence
+
+        Performance: O(n) where n is number of motors (typically 2-4)
+        """
         anomalies = []
         max_score = 0.0
 
-        # Check each motor
+        # Layer 1: Per-motor statistical anomaly detection using Z-score
+        # Z-score measures how many standard deviations away from the mean a value is
         for i, (mean, max_val) in enumerate(zip(current_mean, current_max)):
-            # Check against historical baseline
+            # Check against historical baseline (adaptive learning from past behavior)
             baseline_key = f'current_{i}'
             if (device_id in self.baseline_stats
                     and baseline_key in self.baseline_stats[device_id]):
@@ -59,9 +77,13 @@ class StatisticalAnomalyDetector:
                     self.baseline_stats[device_id][baseline_key])
 
                 if baseline_std > 0:
+                    # Calculate Z-score: (observed - expected) / standard_deviation
+                    # This normalizes the deviation to make it comparable across different scales
                     z_score = abs((mean - baseline_mean) / baseline_std)
 
+                    # Z-score > threshold indicates statistically significant deviation
                     if z_score > self.z_threshold:
+                        # Normalize score to 0-1 range, capping at 1.0 for very high Z-scores
                         score = min(1.0, z_score / (self.z_threshold * 2))
                         max_score = max(max_score, score)
                         motor_num = i + 1
@@ -69,12 +91,14 @@ class StatisticalAnomalyDetector:
                             f"Motor {motor_num} current anomaly: {mean:.2f}A "
                             f"(expected {baseline_mean:.2f}±{baseline_std:.2f})")
 
-            # Simple threshold checks (domain knowledge)
+            # Layer 2: Absolute safety threshold checks (domain knowledge based)
+            # These are hard limits that should never be exceeded regardless of baseline
             if max_val > CURRENT_ABSOLUTE_MAX_THRESHOLD:
                 max_score = max(max_score, 0.9)
                 anomalies.append(f"Motor {i + 1} current spike: {max_val:.2f}A")
 
-            # Detect current imbalance between motors
+            # Layer 3: Load imbalance detection across motors
+            # Motors in the same system should draw similar current; imbalance indicates issues
             if i > 0 and len(current_mean) > 1:
                 diff = abs(current_mean[i] - current_mean[0])
                 if diff > CURRENT_IMBALANCE_THRESHOLD:
