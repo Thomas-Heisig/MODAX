@@ -79,16 +79,21 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
 - **Time-Window-Aggregation:** Statistische Auswertung über konfigurierbare Zeitfenster
 - **Automatische Reconnection:** Robuste Fehlerbehandlung bei Verbindungsproblemen
 
-### 🏭 CNC-Maschinen-Funktionalität (NEU in v0.2.0)
-- **G-Code-Unterstützung:** Vollständiger ISO 6983 Parser (100+ G/M-Codes)
+### 🏭 CNC-Maschinen-Funktionalität (NEU in v0.2.0, Erweitert in v0.4.0)
+- **G-Code-Unterstützung:** Vollständiger ISO 6983 Parser (150+ G/M-Codes)
+- **Erweiterte Codes:** NURBS (G05), Zylindrische Interpolation (G07.1), Threading (G33, G76, G84.2/3)
+- **Herstellerspezifisch:** Siemens Sinumerik, Fanuc Macro B, Heidenhain TNC, Okuma OSP, Mazak
+- **Makro-Unterstützung:** G65/G66/G67, O-Codes, Variablen (#1-#999)
+- **Kontrollfluss:** GOTO, GOSUB, RETURN, Labels, Unterprogramme
 - **Motion Control:** Lineare, zirkuläre und helikale Interpolation
-- **Werkzeugverwaltung:** 24-Platz-Magazin, automatischer Werkzeugwechsel
-- **Koordinatensysteme:** 9 Arbeitskoordinatensysteme, Transformationen
-- **Festzyklen:** Bohren (G81-G89), Fräsen (G12/G13), Tappen (G84)
-- **Spindelsteuerung:** CW/CCW, Drehzahlregelung, CSS-Modus
-- **Vorschubsteuerung:** mm/min, mm/Umdrehung, Override 0-150%
-- **Sicherheitsfunktionen:** Software-Endlagen, Not-Aus, Kollisionsvermeidung
-- Siehe [CNC_FEATURES.md](docs/CNC_FEATURES.md) für Details
+- **Werkzeugverwaltung:** 24-Platz-Magazin, automatischer Werkzeugwechsel, Auto-Messung (G36/G37)
+- **Koordinatensysteme:** 9 + erweiterte (G54.1 P1-P300), Transformationen
+- **Festzyklen:** Bohren (G81-G89, G73), Fräsen (G12/G13), Tappen (G84)
+- **Spindelsteuerung:** CW/CCW, Orientierung (M19), Getriebe (M21/M22), Starr-Tappen (M29)
+- **Kühlmittel:** Flood/Mist (M07/M08), Hochdruck (M50), Through-Spindle (M88/M89)
+- **Vorschubsteuerung:** mm/min, mm/Umdrehung, Override 0-150%, Bereichsbegrenzung (M36/M37)
+- **Sicherheitsfunktionen:** Software-Endlagen, Not-Aus, Kollisionsvermeidung, Arbeitsbereichsbegrenzung (G22/G23)
+- Siehe [CNC_FEATURES.md](docs/CNC_FEATURES.md) und [EXTENDED_GCODE_SUPPORT.md](docs/EXTENDED_GCODE_SUPPORT.md) für Details
 
 ### 🚀 Industry 4.0 Roadmap (NEU v0.3.0)
 - **Advanced Communication:** OPC UA (✅), MQTT (✅), EtherCAT, PROFINET, MTConnect
