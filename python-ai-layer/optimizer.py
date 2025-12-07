@@ -22,42 +22,43 @@ ANOMALY_LOW_THRESHOLD = 0.3  # Low anomaly score (normal operation)
 ENERGY_EFFICIENCY_CURRENT_THRESHOLD = 5.0  # Amperes - for energy efficiency check
 ENERGY_EFFICIENCY_TEMP_THRESHOLD = 45.0  # °C - for energy efficiency check
 
+
 class OptimizationRecommender:
     """
     Generates optimization recommendations based on sensor analysis
     Provides actionable advice to improve efficiency and reduce wear
     """
-    
-    def generate_recommendations(self, sensor_data: dict, 
-                                anomaly_score: float,
-                                wear_level: float) -> List[str]:
+
+    def generate_recommendations(self, sensor_data: dict,
+                                 anomaly_score: float,
+                                 wear_level: float) -> List[str]:
         """
         Generate optimization recommendations
-        
+
         Args:
             sensor_data: Aggregated sensor data
             anomaly_score: Current anomaly score
             wear_level: Current wear level
-            
+
         Returns:
             List of recommendation strings
         """
         recommendations = []
-        
+
         # Current-based recommendations
         current_mean = sensor_data.get('current_mean', [])
         current_max = sensor_data.get('current_max', [])
-        
+
         if current_mean:
             avg_current = sum(current_mean) / len(current_mean)
             max_current = max(current_max) if current_max else 0
-            
+
             # High current recommendations
             if avg_current > CURRENT_HIGH_THRESHOLD:
                 recommendations.append(
                     "Consider reducing load or operating speed to decrease current consumption"
                 )
-            
+
             # Current imbalance
             if len(current_mean) > 1:
                 current_diff = max(current_mean) - min(current_mean)
@@ -65,23 +66,23 @@ class OptimizationRecommender:
                     recommendations.append(
                         "Current imbalance detected - check for mechanical binding or motor issues"
                     )
-            
+
             # Efficiency optimization
             if CURRENT_OPTIMAL_MIN < avg_current < CURRENT_OPTIMAL_MAX:
                 recommendations.append(
                     "System operating in optimal current range - maintain current settings"
                 )
-            
+
             # Current spikes
             if max_current > avg_current * CURRENT_SPIKE_RATIO:
                 recommendations.append(
                     "Frequent current spikes detected - consider smoother acceleration profiles"
                 )
-        
+
         # Vibration-based recommendations
         vibration = sensor_data.get('vibration_mean', {})
         vib_magnitude = vibration.get('magnitude', 0)
-        
+
         if vib_magnitude > VIBRATION_HIGH_THRESHOLD:
             recommendations.append(
                 "High vibration levels - schedule maintenance check for bearings and alignment"
@@ -90,26 +91,26 @@ class OptimizationRecommender:
             recommendations.append(
                 "Elevated vibration - consider re-balancing rotating components"
             )
-        
+
         # Check for axis-specific vibration
         x = abs(vibration.get('x', 0))
         y = abs(vibration.get('y', 0))
         z = abs(vibration.get('z', 0))
-        
+
         if max([x, y, z]) > VIBRATION_AXIS_IMBALANCE_FACTOR * min([x, y, z]):
             axes = ['X', 'Y', 'Z']
             dominant = axes[[x, y, z].index(max([x, y, z]))]
             recommendations.append(
                 f"Dominant {dominant}-axis vibration suggests alignment issue in that direction"
             )
-        
+
         # Temperature-based recommendations
         temperature_mean = sensor_data.get('temperature_mean', [])
         temperature_max = sensor_data.get('temperature_max', [])
-        
+
         if temperature_max:
             max_temp = max(temperature_max)
-            
+
             if max_temp > TEMPERATURE_HIGH_THRESHOLD:
                 recommendations.append(
                     "High operating temperature - improve cooling or reduce duty cycle"
@@ -118,7 +119,7 @@ class OptimizationRecommender:
                 recommendations.append(
                     "Monitor temperature trends - ensure adequate ventilation"
                 )
-            
+
             # Temperature range check
             if temperature_mean:
                 avg_temp = sum(temperature_mean) / len(temperature_mean)
@@ -127,7 +128,7 @@ class OptimizationRecommender:
                     recommendations.append(
                         "Large temperature variations - consider thermal management improvements"
                     )
-        
+
         # Wear-based recommendations
         if wear_level > WEAR_URGENT_THRESHOLD:
             recommendations.append(
@@ -141,7 +142,7 @@ class OptimizationRecommender:
             recommendations.append(
                 "Wear accumulation progressing normally - continue monitoring"
             )
-        
+
         # Anomaly-based recommendations
         if anomaly_score > ANOMALY_HIGH_THRESHOLD:
             recommendations.append(
@@ -151,31 +152,36 @@ class OptimizationRecommender:
             recommendations.append(
                 "Minor anomaly detected - review recent operational changes"
             )
-        
+
         # Preventive recommendations
         sample_count = sensor_data.get('sample_count', 0)
         if sample_count > 0:
             # Good data quality
-            if anomaly_score < ANOMALY_LOW_THRESHOLD and wear_level < WEAR_MEDIUM_THRESHOLD and vib_magnitude < VIBRATION_ELEVATED_THRESHOLD:
+            if (anomaly_score < ANOMALY_LOW_THRESHOLD
+                    and wear_level < WEAR_MEDIUM_THRESHOLD
+                    and vib_magnitude < VIBRATION_ELEVATED_THRESHOLD):
                 recommendations.append(
-                    "System operating within normal parameters - no immediate action required"
+                    "System operating within normal parameters - "
+                    "no immediate action required"
                 )
-        
+
         # Energy efficiency recommendations
         if current_mean and temperature_mean:
             avg_current = sum(current_mean) / len(current_mean)
             avg_temp = sum(temperature_mean) / len(temperature_mean)
-            
+
             # Estimate efficiency
-            if avg_current > ENERGY_EFFICIENCY_CURRENT_THRESHOLD and avg_temp > ENERGY_EFFICIENCY_TEMP_THRESHOLD:
+            if (avg_current > ENERGY_EFFICIENCY_CURRENT_THRESHOLD
+                    and avg_temp > ENERGY_EFFICIENCY_TEMP_THRESHOLD):
                 recommendations.append(
-                    "Consider optimizing operating parameters for better energy efficiency"
+                    "Consider optimizing operating parameters for "
+                    "better energy efficiency"
                 )
-        
+
         # If no specific recommendations, provide general guidance
         if not recommendations:
             recommendations.append(
                 "Insufficient data for specific recommendations - continue normal operation"
             )
-        
+
         return recommendations

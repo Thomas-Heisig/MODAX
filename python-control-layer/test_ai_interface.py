@@ -1,6 +1,6 @@
 """Unit tests for AI Interface module"""
 import unittest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 import requests
 from ai_interface import request_ai_analysis
 from data_aggregator import AggregatedData
@@ -8,7 +8,7 @@ from data_aggregator import AggregatedData
 
 class TestAIInterface(unittest.TestCase):
     """Tests for AI Interface module"""
-    
+
     def setUp(self):
         """Set up test fixtures"""
         self.device_id = "test_device_001"
@@ -26,7 +26,7 @@ class TestAIInterface(unittest.TestCase):
             temperature_max=[48.0, 49.0, 47.5],
             sample_count=10
         )
-    
+
     @patch('ai_interface.requests.post')
     def test_request_ai_analysis_success(self, mock_post):
         """Test successful AI analysis request"""
@@ -40,15 +40,15 @@ class TestAIInterface(unittest.TestCase):
             "recommendations": ["System operating normally"]
         }
         mock_post.return_value = mock_response
-        
+
         # Call function
         result = request_ai_analysis(self.aggregated_data)
-        
+
         # Assertions
         self.assertIsNotNone(result)
         self.assertFalse(result['anomaly_detected'])
         self.assertEqual(result['anomaly_score'], 0.2)
-        
+
         # Verify request was made correctly
         mock_post.assert_called_once()
         call_kwargs = mock_post.call_args[1]
@@ -56,7 +56,7 @@ class TestAIInterface(unittest.TestCase):
         self.assertIn('timeout', call_kwargs)
         payload = call_kwargs['json']
         self.assertEqual(payload['device_id'], self.device_id)
-    
+
     @patch('ai_interface.requests.post')
     def test_request_ai_analysis_http_error(self, mock_post):
         """Test AI analysis request with HTTP error"""
@@ -64,37 +64,37 @@ class TestAIInterface(unittest.TestCase):
         mock_response = Mock()
         mock_response.status_code = 500
         mock_post.return_value = mock_response
-        
+
         # Call function
         result = request_ai_analysis(self.aggregated_data)
-        
+
         # Should return None on error
         self.assertIsNone(result)
-    
+
     @patch('ai_interface.requests.post')
     def test_request_ai_analysis_connection_error(self, mock_post):
         """Test AI analysis request with connection error"""
         # Mock connection error
         mock_post.side_effect = requests.exceptions.ConnectionError("Connection refused")
-        
+
         # Call function
         result = request_ai_analysis(self.aggregated_data)
-        
+
         # Should return None on connection error
         self.assertIsNone(result)
-    
+
     @patch('ai_interface.requests.post')
     def test_request_ai_analysis_timeout(self, mock_post):
         """Test AI analysis request with timeout"""
         # Mock timeout error
         mock_post.side_effect = requests.exceptions.Timeout("Request timed out")
-        
+
         # Call function
         result = request_ai_analysis(self.aggregated_data)
-        
+
         # Should return None on timeout
         self.assertIsNone(result)
-    
+
     @patch('ai_interface.requests.post')
     def test_request_ai_analysis_payload_structure(self, mock_post):
         """Test that payload has correct structure"""
@@ -103,13 +103,13 @@ class TestAIInterface(unittest.TestCase):
         mock_response.status_code = 200
         mock_response.json.return_value = {}
         mock_post.return_value = mock_response
-        
+
         # Call function
         request_ai_analysis(self.aggregated_data)
-        
+
         # Verify payload structure
         payload = mock_post.call_args[1]['json']
-        
+
         # Check all required fields are present
         required_fields = [
             'device_id', 'time_window_start', 'time_window_end',
@@ -117,23 +117,23 @@ class TestAIInterface(unittest.TestCase):
             'vibration_mean', 'vibration_std', 'vibration_max',
             'temperature_mean', 'temperature_max', 'sample_count'
         ]
-        
+
         for field in required_fields:
             self.assertIn(field, payload)
-        
+
         # Verify values match
         self.assertEqual(payload['device_id'], self.device_id)
         self.assertEqual(payload['sample_count'], 10)
-    
+
     @patch('ai_interface.requests.post')
     def test_request_ai_analysis_general_exception(self, mock_post):
         """Test AI analysis request with general exception"""
         # Mock general exception
         mock_post.side_effect = Exception("Unexpected error")
-        
+
         # Call function
         result = request_ai_analysis(self.aggregated_data)
-        
+
         # Should return None on exception
         self.assertIsNone(result)
 

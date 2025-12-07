@@ -7,13 +7,14 @@ from config import config
 
 logger = logging.getLogger(__name__)
 
+
 def request_ai_analysis(aggregated_data: AggregatedData) -> Optional[dict]:
     """
     Request AI analysis from the AI layer
-    
+
     Args:
         aggregated_data: Aggregated sensor data
-        
+
     Returns:
         AI analysis results or None if failed
     """
@@ -33,20 +34,20 @@ def request_ai_analysis(aggregated_data: AggregatedData) -> Optional[dict]:
             "temperature_max": aggregated_data.temperature_max,
             "sample_count": aggregated_data.sample_count
         }
-        
+
         # Send request to AI layer with configurable timeout
         response = requests.post(
             config.control.ai_layer_url,
             json=payload,
             timeout=config.control.ai_layer_timeout
         )
-        
+
         if response.status_code == 200:
             return response.json()
         else:
             logger.error(f"AI layer returned error: {response.status_code}")
             return None
-            
+
     except requests.exceptions.ConnectionError:
         logger.warning("Could not connect to AI layer - is it running?")
         return None
