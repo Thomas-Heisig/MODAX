@@ -861,7 +861,7 @@ services:
 docker-compose exec timescaledb pg_dump -U modax_user modax > backup_$(date +%Y%m%d).sql
 
 # Restore database
-cat backup_20241206.sql | docker-compose exec -T timescaledb psql -U modax_user -d modax
+cat backup_20251207.sql | docker-compose exec -T timescaledb psql -U modax_user -d modax
 ```
 
 ### Volume Backup

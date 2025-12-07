@@ -368,7 +368,7 @@ ingester:
 
 schema_config:
   configs:
-    - from: 2024-01-01
+    - from: 2025-01-01
       store: boltdb-shipper
       object_store: filesystem
       schema: v11

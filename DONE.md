@@ -49,6 +49,34 @@ Jeder Eintrag sollte folgende Informationen enthalten:
     - test_secrets_manager.py - 10 Tests für Secrets Management
     - test_websocket_manager.py - 11 Tests für WebSocket Manager
 
+### ISSUES.md aufgeräumt und Dokumentation auf 2025 aktualisiert
+- **Datum:** 2025-12-07
+- **Typ:** Maintenance/Documentation
+- **Beschreibung:** Gelöste Issues aus ISSUES.md nach DONE.md verschoben, Datum-Inkonsistenzen behoben
+- **Commit:** Pending
+- **Autor:** GitHub Copilot Agent
+- **Details:**
+  - **Issue #027 behoben:** Datum-Inkonsistenzen in Dokumentation
+    - docs/MONITORING.md: Schema-Konfiguration von 2024-01-01 auf 2025-01-01 aktualisiert
+    - docs/CONTAINERIZATION.md: Backup-Beispiel von backup_20241206.sql auf backup_20251207.sql aktualisiert
+    - docs/DATA_PERSISTENCE.md: PITR-Beispiel von modax_full_20241206.dump auf modax_full_20251207.dump aktualisiert
+  - **Issues aus ISSUES.md nach DONE.md verschoben:**
+    - Issue #001: Fehlende Fehlerbehandlung bei MQTT-Verbindungsabbruch (Commit 5dafac9)
+    - Issue #002: API-Timeouts nicht konfigurierbar (Commit 5dafac9)
+    - Issue #003: HMI zeigt keine Fehlermeldung bei API-Verbindungsfehler (Commit e20cd31)
+    - Issue #004: Inkonsistente Log-Level über Komponenten hinweg (Commit 5dafac9)
+    - Issue #006: Fehlende API-Dokumentation (docs/API.md erstellt)
+    - Issue #007: Konfigurationsoptionen nicht vollständig dokumentiert (docs/CONFIGURATION.md erstellt)
+    - Issue #009: Magic Numbers in Code (Commit 5dafac9)
+    - Issue #018: Fehlende Sicherheitsdokumentation (docs/SECURITY.md erstellt)
+    - Issue #019: Fehlende Datenpersistenz-Dokumentation (docs/DATA_PERSISTENCE.md erstellt)
+    - Issue #020: Fehlende Containerisierungs-Dokumentation (docs/CONTAINERIZATION.md erstellt)
+    - Issue #021: Fehlende Monitoring-Dokumentation (docs/MONITORING.md erstellt)
+  - **ISSUES.md aktualisiert:**
+    - Gelöste Issues entfernt
+    - Anzahl offener Issues von 14 auf 3 reduziert (2 kritisch, 1 kleineres Problem)
+    - Issue #027 als behoben markiert
+
 ### Projektdokumentation aktualisiert - Datum auf 2025 korrigiert
 - **Datum:** 2025-12-07
 - **Typ:** Maintenance
