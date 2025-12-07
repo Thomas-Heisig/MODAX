@@ -644,5 +644,5 @@ logging.getLogger("asyncua").setLevel(logging.DEBUG)
 - [OPC UA Security Best Practices](https://opcfoundation.org/about/opc-technologies/opc-ua/security/)
 
 ---
-**Last Updated:** 2024-12-06  
+**Last Updated:** 2025-12-07  
 **Maintained By:** MODAX Integration Team

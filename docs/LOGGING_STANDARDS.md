@@ -127,16 +127,16 @@ logging.basicConfig(
 
 **Output example:**
 ```
-2024-12-06 15:30:45,123 - mqtt_handler - INFO - Connected to MQTT broker
-2024-12-06 15:30:45,234 - control_layer - INFO - Started data aggregation
-2024-12-06 15:30:46,567 - ai_interface - WARNING - AI layer timeout, retrying
+2025-12-07 15:30:45,123 - mqtt_handler - INFO - Connected to MQTT broker
+2025-12-07 15:30:45,234 - control_layer - INFO - Started data aggregation
+2025-12-07 15:30:46,567 - ai_interface - WARNING - AI layer timeout, retrying
 ```
 
 ### Format Components
 
 | Component | Description | Example |
 |-----------|-------------|---------|
-| `%(asctime)s` | Timestamp | `2024-12-06 15:30:45,123` |
+| `%(asctime)s` | Timestamp | `2025-12-07 15:30:45,123` |
 | `%(name)s` | Logger name (module) | `mqtt_handler` |
 | `%(levelname)s` | Log level | `INFO`, `WARNING`, `ERROR` |
 | `%(message)s` | Log message | `Connected to MQTT broker` |
@@ -498,5 +498,5 @@ if not status.is_safe():
 
 ---
 
-**Last Updated:** 2024-12-06  
+**Last Updated:** 2025-12-07  
 **Maintained By:** MODAX Development Team

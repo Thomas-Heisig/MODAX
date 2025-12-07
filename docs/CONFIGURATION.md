@@ -551,5 +551,5 @@ For configuration help:
 
 ---
 
-**Last Updated:** 2024-12-06  
+**Last Updated:** 2025-12-07  
 **Documentation Version:** 1.0

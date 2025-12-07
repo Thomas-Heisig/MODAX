@@ -204,7 +204,7 @@ Complete documentation index for the MODAX industrial control system.
 
 ### Recent Updates
 - [IMPROVEMENTS_SUMMARY.md](IMPROVEMENTS_SUMMARY.md) - Summary of improvements
-- [IMPROVEMENTS_2024-12-06.md](IMPROVEMENTS_2024-12-06.md) - Recent improvements
+- [IMPROVEMENTS_2025-12-07.md](IMPROVEMENTS_2025-12-07.md) - Recent improvements
 
 ## Documentation by Role
 
@@ -368,7 +368,7 @@ Each documentation file should include:
 - Case studies
 
 ---
-**Last Updated:** 2024-12-06  
+**Last Updated:** 2025-12-07  
 **Maintained By:** MODAX Documentation Team
 
 ## Quick Reference Card

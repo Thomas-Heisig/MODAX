@@ -143,7 +143,7 @@ All security events are logged to a dedicated audit log file.
 Logs are in JSON format for easy parsing:
 ```json
 {
-  "timestamp": "2024-12-07T13:51:07.731Z",
+  "timestamp": "2025-12-07T13:51:07.731Z",
   "event_type": "authentication",
   "severity": "INFO",
   "user": "operator1",
