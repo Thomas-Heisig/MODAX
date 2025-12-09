@@ -115,7 +115,7 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] Kubernetes-Manifeste für Produktionsbereitstellung (k8s/base/)
 - [x] CI/CD-Pipeline mit GitHub Actions implementieren (.github/workflows/ci.yml, deploy.yml)
 - [x] Helm Charts für Kubernetes Deployment erstellen (helm/modax/)
-- [ ] GitOps-Workflow mit ArgoCD oder Flux einrichten
+- [x] GitOps-Workflow mit ArgoCD oder Flux einrichten (docs/GITOPS_DEPLOYMENT.md - Vollständiger Guide)
 
 ### Integration
 - [x] OPC UA Integration dokumentieren (docs/OPC_UA_INTEGRATION.md)
