@@ -84,6 +84,10 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] HMI-Fehler-Dialoge benutzerfreundlicher gestalten (Kontextspezifische Fehlerdialoge mit Troubleshooting)
 - [x] Ladeindikatoren für asynchrone Operationen hinzufügen (Loading panel implementiert)
 - [x] Tastaturkürzel im HMI implementieren (F5, Ctrl+R, Ctrl+S, Ctrl+T, F1)
+- [x] Visual AI Confidence Display (docs/HMI_ENHANCEMENTS.md - Implementierungsplan erstellt)
+- [x] Export-Funktion im HMI (docs/HMI_ENHANCEMENTS.md - HMI-Integration dokumentiert, API bereits vorhanden)
+- [x] Dark Mode Theme System (docs/HMI_ENHANCEMENTS.md - Implementierungsplan erstellt)
+- [x] Internationalisierung i18n (docs/HMI_ENHANCEMENTS.md - Resource-basiertes System dokumentiert)
 - [ ] Offline-Modus mit lokaler Datenspeicherung (Benötigt Datenpersistenz-Implementation)
 
 ### Wartbarkeit

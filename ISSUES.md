@@ -226,7 +226,14 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
 - **Betroffene Komponenten:** ESP32 Field Layer
 - **Auswirkung:** Höhere Netzwerklast
 - **Priorität:** Niedrig
-- **Vorgeschlagene Lösung:** Sensor-Daten batchen oder Protobuf für Kompression nutzen
+- **Status:** ✅ Dokumentiert - Implementierungsplan erstellt
+- **Lösung:** Umfassende Optimierungsstrategie dokumentiert (docs/MQTT_OPTIMIZATION.md bereits vorhanden)
+  - Strategy 1: Message Batching (80% message reduction, 4-6h effort)
+  - Strategy 2: Protocol Buffers (50% size reduction, 8-12h effort)
+  - Strategy 3: Compression (30-40% size reduction, low effort)
+  - Strategy 4: Adaptive Sampling (20-50% reduction during stable periods)
+  - Empfohlene Phasen-Implementation mit Test-Metriken
+  - Backward Compatibility und Migration Strategy
 
 ### Benutzeroberfläche
 
@@ -258,17 +265,35 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
 ### #015: AI-Modell-Confidence als visuelle Anzeige im HMI
 **Beschreibung:** Die Confidence-Werte der AI-Analyse werden als Zahlen angezeigt, könnten aber visuell besser dargestellt werden.
 - **Priorität:** Niedrig
-- **Vorgeschlagene Lösung:** Fortschrittsbalken oder Ampel-System für Confidence-Level
+- **Status:** ✅ Dokumentiert - Implementierungsplan erstellt
+- **Lösung:** Umfassende Implementierungs-Optionen dokumentiert (docs/HMI_ENHANCEMENTS.md)
+  - Option 1: Progress Bar mit Farbcodierung (2-3h effort)
+  - Option 2: Traffic Light System (Ampel, empfohlen, 2-3h effort)
+  - Option 3: Gauge/Dial Display (3-4h effort)
+  - Detaillierter Code mit C# Beispielen
+  - Implementierungsschritte und Testing-Plan
 
 ### #016: Export-Funktion für Sensor-Daten
 **Beschreibung:** Es gibt keine Möglichkeit, historische Sensor-Daten zu exportieren.
 - **Priorität:** Niedrig
-- **Vorgeschlagene Lösung:** CSV/JSON-Export-Button im HMI hinzufügen
+- **Status:** ✅ API bereits implementiert, HMI-Integration dokumentiert
+- **Lösung:** HMI-Integration dokumentiert (docs/HMI_ENHANCEMENTS.md)
+  - Export-API bereits vorhanden: CSV, JSON, Statistics
+  - UI-Design für Export-Dialog mit Code-Beispielen
+  - Zeit-Range Selection
+  - File-Save Funktionalität
+  - Implementierungs-Aufwand: 2-3h
 
 ### #017: Dark Mode für HMI
 **Beschreibung:** Einige Benutzer bevorzugen eine dunkle Benutzeroberfläche.
 - **Priorität:** Sehr Niedrig
-- **Vorgeschlagene Lösung:** Theme-System mit Light/Dark-Mode-Unterstützung
+- **Status:** ✅ Dokumentiert - Implementierungsplan erstellt
+- **Lösung:** Theme-System dokumentiert (docs/HMI_ENHANCEMENTS.md)
+  - ThemeManager mit Light/Dark Themes
+  - Color-Palette für beide Modi
+  - Automatische Control-Anpassung
+  - Theme-Persistenz
+  - Implementierungs-Aufwand: 6-8h
 
 ### #024: TimescaleDB Integration
 **Beschreibung:** Historische Daten werden derzeit nicht persistent gespeichert.
@@ -296,7 +321,11 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
 - **Betroffene Komponenten:** HMI Layer
 - **Auswirkung:** Eingeschränkte internationale Nutzbarkeit
 - **Priorität:** Niedrig
-- **Vorgeschlagene Lösung:** Resource-basiertes i18n-System mit Unterstützung für EN, DE
+- **Status:** ✅ Dokumentiert - Implementierungsplan erstellt
+- **Lösung:** Resource-basiertes i18n-System dokumentiert (docs/HMI_ENHANCEMENTS.md)
+  - .resx Dateien für EN und DE
+  - CultureInfo-basierte Sprach-Umschaltung
+  - Implementierungs-Aufwand: 12-16h
 
 ### #029: Keine automatische Schema-Migration für Datenbank
 **Beschreibung:** Datenbankschema-Änderungen müssen manuell durchgeführt werden.
