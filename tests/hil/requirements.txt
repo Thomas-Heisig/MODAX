@@ -1,0 +1,6 @@
+# ESP32 HIL Test Requirements
+
+pytest>=7.4.0
+paho-mqtt>=1.6.1
+pytest-cov>=4.1.0
+pytest-timeout>=2.1.0
