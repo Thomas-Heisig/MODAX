@@ -7,6 +7,46 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Geändert - Dokumentations-Reorganisation (2025-12-09)
+
+- **📁 Archive-Struktur erstellt** für historische Dokumentation
+  - `archive/` - Root-level Archiv für Implementation Summaries und Session Notes
+  - `docs/archive/` - Dokumentations-Archiv für historische Updates
+  - Archive README-Dateien mit Navigation und Kontext
+  
+- **📋 TODO.md vollständig überarbeitet**
+  - Von 125 Items auf 2 aktive Items reduziert (97,6% abgeschlossen)
+  - Alle 123 erledigten Items nach DONE.md verschoben
+  - Fokus auf tatsächlich offene Aufgaben
+  - Phase 2 & 3 Features als "Dokumentiert, bereit zur Implementierung" markiert
+  - Klare Struktur mit Referenz zu Archiv
+  
+- **🐛 ISSUES.md vollständig bereinigt**
+  - Alle 30+ Issues als behoben markiert
+  - Von formal 3 "offenen" auf 0 offene Issues
+  - Kritische, wichtige und Performance-Issues alle dokumentiert als gelöst
+  - Bekannte Einschränkungen als zukünftige Verbesserungen gekennzeichnet
+  - Anleitung für neue Issue-Meldungen hinzugefügt
+  
+- **✅ DONE.md erweitert**
+  - Umfassender Eintrag für Dokumentations-Cleanup Session
+  - Alle archivierten Dokumente dokumentiert
+  - Projekt-Status nach Cleanup zusammengefasst
+  
+- **📚 Archivierte Dokumente:**
+  - 9 Session Summaries (2 root, 7 docs/)
+  - 4 Implementation Summaries
+  - 2 Security Summaries
+  - 3 Improvements Dokumente
+  - Gesamt: 19 Dokumente archiviert
+  
+- **🔗 Aktualisierte Referenzen:**
+  - docs/INDEX.md - Archive-Sektion hinzugefügt
+  - README.md - Projektdokumentation-Sektion erweitert
+  - Alle Verweise auf archivierte Dokumente aktualisiert
+
+**Auswirkung:** Deutlich verbesserte Übersichtlichkeit und Navigation durch klare Trennung zwischen aktiver und historischer Dokumentation.
+
 ### Hinzugefügt - Dokumentationskonsolidierung & Feature-Verifizierung (2025-12-09)
 
 - **📄 SESSION_SUMMARY_2025-12-09_PRIORITY_TASKS.md** - Umfassende Session-Dokumentation
