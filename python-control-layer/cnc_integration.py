@@ -15,6 +15,12 @@ class CNCIntegration:
     """Integrates all CNC components into a unified system"""
 
     def __init__(self):
+        """
+        Initialize CNC integration system
+        
+        Creates and connects all CNC components including controller, parser,
+        motion controller, tool manager, coordinate system manager, and cycles.
+        """
         # Initialize all CNC components
         self.controller = CNCController()
         self.parser = GCodeParser()

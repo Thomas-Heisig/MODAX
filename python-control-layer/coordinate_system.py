@@ -15,6 +15,12 @@ class CoordinateSystemManager:
     WORK_COORDS = ["G54", "G55", "G56", "G57", "G58", "G59", "G59.1", "G59.2", "G59.3"]
 
     def __init__(self):
+        """
+        Initialize coordinate system manager
+        
+        Sets up work coordinate system offsets (G54-G59.3), active coordinate system,
+        local coordinate system (G52), and tool length offset.
+        """
         # Work coordinate system offsets (from machine zero)
         self.work_offsets: Dict[str, Dict[str, float]] = {
             coord_sys: {"X": 0.0, "Y": 0.0, "Z": 0.0, "A": 0.0, "B": 0.0, "C": 0.0}

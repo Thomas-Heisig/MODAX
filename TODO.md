@@ -63,7 +63,7 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] Ungenutzte Imports entfernen (pyflakes-clean)
 - [x] Type Hints für alle Python-Funktionen vervollständigen (API-Endpunkte typisiert)
 - [x] mypy für statische Type-Checking aktivieren (mypy.ini erstellt)
-- [ ] Docstring-Coverage auf 100% bringen
+- [x] Docstring-Coverage auf 100% bringen (Alle öffentlichen Funktionen dokumentiert)
 - [x] Fehlerbehandlung in allen API-Endpunkten vereinheitlichen (ErrorResponse Model, global exception handlers)
 
 ### Konfiguration

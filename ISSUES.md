@@ -3,8 +3,8 @@
 Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Probleme werden nach `DONE.md` verschoben.
 
 **Letzte Aktualisierung:** 2025-12-09  
-**Anzahl offener Issues:** 7 (0 kritisch, 1 wichtig, 6 kleinere Probleme)  
-**Behobene Issues in dieser Session:** 7 (#027, #008 teilweise, #010, #013, #014, #022, #023)
+**Anzahl offener Issues:** 3 (0 kritisch, 0 wichtig, 3 kleinere Probleme)  
+**Behobene Issues in dieser Session:** 11 (#027, #008 teilweise, #010, #013, #014, #022, #023, #024, #025, #026, #030)
 
 ## ~~Kritische Probleme~~ - Alle behoben! 🎉
 
@@ -295,26 +295,61 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
   - Theme-Persistenz
   - Implementierungs-Aufwand: 6-8h
 
-### #024: TimescaleDB Integration
+### ~~#024: TimescaleDB Integration~~ ✅ BEHOBEN
 **Beschreibung:** Historische Daten werden derzeit nicht persistent gespeichert.
 - **Betroffene Komponenten:** Control Layer
 - **Auswirkung:** Keine Langzeit-Trendanalyse möglich
 - **Priorität:** Mittel
-- **Vorgeschlagene Lösung:** TimescaleDB implementieren wie in docs/DATA_PERSISTENCE.md beschrieben
+- **Status:** ✅ Behoben - Vollständig implementiert
+- **Lösung:** TimescaleDB vollständig implementiert
+  - db_connection.py: DatabaseConnectionPool mit ThreadedConnectionPool
+  - data_writer.py: Sensor-Daten Persistierung
+  - data_reader.py: Historische Daten-Abfrage
+  - docker-compose.prod.yml: TimescaleDB Container (timescale/timescaledb:2.13.0-pg15)
+  - Secrets Management für DB-Credentials
+  - Connection Pooling für Performance
+  - Dokumentation in docs/DATA_PERSISTENCE.md
 
-### #025: Prometheus Metrics Export
+### ~~#025: Prometheus Metrics Export~~ ✅ BEHOBEN
 **Beschreibung:** System-Metriken werden nicht für Prometheus exportiert.
 - **Betroffene Komponenten:** Control Layer, AI Layer
 - **Auswirkung:** Eingeschränktes Monitoring
 - **Priorität:** Mittel
-- **Vorgeschlagene Lösung:** prometheus-client einbinden und Metriken-Endpunkte hinzufügen
+- **Status:** ✅ Behoben - Vollständig implementiert
+- **Lösung:** Prometheus Metrics vollständig implementiert
+  - Control Layer: Counter, Histogram, Gauge metrics
+    - control_api_requests_total (by method, endpoint, status)
+    - control_api_request_duration_seconds (histogram)
+    - control_devices_online (gauge)
+    - control_system_safe (gauge)
+    - control_cache_hits_total, control_cache_misses_total
+  - AI Layer: Counter, Histogram metrics
+    - ai_analysis_requests_total (by status)
+    - ai_analysis_duration_seconds (histogram)
+    - ai_anomalies_detected_total (by type)
+  - /metrics Endpunkte auf beiden Layern
+  - config/prometheus.yml: Scraping-Konfiguration
+  - Dokumentation in docs/MONITORING.md und IMPROVEMENTS.md
 
-### #026: WebSocket-Support für Echtzeit-Updates
+### ~~#026: WebSocket-Support für Echtzeit-Updates~~ ✅ BEHOBEN
 **Beschreibung:** HMI verwendet Polling statt Push-Updates.
 - **Betroffene Komponenten:** Control Layer, HMI Layer
 - **Auswirkung:** Höhere Latenz und mehr Netzwerklast
 - **Priorität:** Mittel
-- **Vorgeschlagene Lösung:** FastAPI WebSocket für Echtzeit-Push implementieren
+- **Status:** ✅ Behoben - Vollständig implementiert
+- **Lösung:** WebSocket vollständig implementiert
+  - websocket_manager.py: WebSocketManager-Klasse
+    - Connection Management (connect, disconnect)
+    - Broadcast zu allen Clients oder spezifischen Geräten
+    - Device-spezifische Subscriptions
+    - Async/Thread-safe Implementierung
+  - control_api.py: WebSocket Endpoints
+    - /ws: All-device updates
+    - /ws/{device_id}: Device-specific updates
+  - Automatische Push-Updates bei Datenänderungen
+  - Ping/Pong für Connection Keep-Alive
+  - Fehlerbehandlung und Reconnection-Support
+  - Dokumentation in docs/IMPROVEMENTS.md
 
 ### #028: Fehlende Internationalisierung (i18n)
 **Beschreibung:** UI-Texte sind nur auf Deutsch verfügbar.
@@ -346,12 +381,23 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
   - Troubleshooting-Guide
   - Implementierungs-Checklist
 
-### #030: Fehlende Health-Check-Endpunkte
+### ~~#030: Fehlende Health-Check-Endpunkte~~ ✅ BEHOBEN
 **Beschreibung:** Kubernetes/Docker Health-Checks nicht standardisiert implementiert.
 - **Betroffene Komponenten:** Alle Layer
 - **Auswirkung:** Eingeschränktes Container-Orchestrierungs-Management
 - **Priorität:** Mittel
-- **Vorgeschlagene Lösung:** Standardisierte /health und /ready Endpunkte implementieren
+- **Status:** ✅ Behoben - Vollständig implementiert
+- **Lösung:** Health-Check-Endpunkte vollständig implementiert
+  - Control Layer:
+    - GET /health: Basis Health-Check (Service läuft)
+    - GET /ready: Readiness-Check (Control Layer initialisiert, Devices online, Safety Status)
+  - AI Layer:
+    - GET /health: Basis Health-Check (Service läuft)
+    - GET /ready: Readiness-Check (AI-Modelle geladen, Service bereit)
+  - Docker Health-Checks in allen Dockerfiles
+  - docker-compose.yml: Health-Check-Konfiguration für alle Services
+  - Kubernetes Health-Probes in k8s/base/
+  - Dokumentation in docs/IMPROVEMENTS.md und docs/CONTAINERIZATION.md
 
 ## Hinweise
 

@@ -49,6 +49,12 @@ class CNCController:
     """Main CNC controller managing machine state and operations"""
 
     def __init__(self):
+        """
+        Initialize CNC controller with default state
+        
+        Sets up machine state, position tracking, spindle state, feed rate,
+        tool management, coolant system, coordinate systems, and program state.
+        """
         # Machine state
         self.state = CNCState.IDLE
         self.mode = CNCMode.MANUAL
