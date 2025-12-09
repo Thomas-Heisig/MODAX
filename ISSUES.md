@@ -3,34 +3,37 @@
 Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Probleme werden nach `DONE.md` verschoben.
 
 **Letzte Aktualisierung:** 2025-12-09  
-**Anzahl offener Issues:** 9 (2 kritisch, 3 wichtig, 4 kleinere Probleme)  
-**Behobene Issues in dieser Session:** 5 (#027, #008 teilweise, #010, #013, #014)
+**Anzahl offener Issues:** 7 (0 kritisch, 1 wichtig, 6 kleinere Probleme)  
+**Behobene Issues in dieser Session:** 7 (#027, #008 teilweise, #010, #013, #014, #022, #023)
 
-## Kritische Probleme
+## ~~Kritische Probleme~~ - Alle behoben! 🎉
 
 ### Sicherheit
 
-#### #022: Fehlende Authentifizierung für MQTT-Broker
+#### ~~#022: Fehlende Authentifizierung für MQTT-Broker~~ ✅ BEHOBEN
 **Beschreibung:** Der MQTT-Broker läuft ohne Authentifizierung, jeder kann Nachrichten publizieren/subscriben.
 - **Betroffene Komponenten:** MQTT Broker, alle Ebenen
 - **Auswirkung:** Unbefugter Zugriff auf Sensor-Daten und Steuerungsbefehle möglich
 - **Priorität:** Kritisch
-- **Vorgeschlagene Lösung:** 
-  - MQTT-Broker mit Benutzername/Passwort konfigurieren
-  - TLS/SSL für verschlüsselte Kommunikation aktivieren
-  - ACL-Regeln für Topic-basierte Zugriffskontrolle
-  - Siehe docs/SECURITY.md für Implementierungsdetails
+- **Status:** ✅ Behoben in Commit be44153
+- **Lösung:** Produktions-Konfiguration erstellt
+  - config/mosquitto-prod.conf: TLS/SSL aktiviert, Authentifizierung erforderlich
+  - config/mosquitto-acl.example: Topic-basierte Zugriffskontrolle
+  - docker-compose.prod.yml: Produktions-Setup mit Sicherheit
+  - Dokumentation in docs/API_AUTHENTICATION_GUIDE.md
 
-#### #023: API-Endpunkte ohne Authentifizierung
+#### ~~#023: API-Endpunkte ohne Authentifizierung~~ ✅ BEHOBEN
 **Beschreibung:** Control Layer und AI Layer APIs sind ohne Authentifizierung zugänglich.
 - **Betroffene Komponenten:** control_api.py, ai_service.py
 - **Auswirkung:** Unbefugter Zugriff auf System-Daten und Steuerung
 - **Priorität:** Kritisch
-- **Vorgeschlagene Lösung:**
-  - API-Keys oder JWT-Token für Authentifizierung
-  - FastAPI Security Dependencies verwenden
-  - Rate-Limiting implementieren
-  - Siehe docs/SECURITY.md für Implementierungsdetails
+- **Status:** ✅ Behoben - bereits implementiert, jetzt dokumentiert
+- **Lösung:** API Key Authentifizierung bereits vorhanden
+  - auth.py: APIKeyManager mit rollenbasierter Zugriffskontrolle
+  - control_api.py: Security Dependencies integriert
+  - config.py: API_KEY_ENABLED Flag
+  - docs/API_AUTHENTICATION_GUIDE.md: Vollständige Anleitung erstellt
+  - Aktivierung via Umgebungsvariable API_KEY_ENABLED=true
 
 ## Wichtige Probleme
 
@@ -84,12 +87,18 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
   - Konsistentes Format über alle Python-Module
   - Klare Definition wann welches Log-Level zu verwenden ist
 
-#### #005: Fehlende strukturierte Logs
+#### ~~#005: Fehlende strukturierte Logs~~ ✅ BEHOBEN
 **Beschreibung:** Logs sind als einfache Strings formatiert, nicht als strukturierte JSON-Objekte.
 - **Betroffene Komponenten:** Alle Python-Ebenen
 - **Auswirkung:** Erschwert automatisierte Log-Analyse
 - **Priorität:** Niedrig
-- **Vorgeschlagene Lösung:** python-json-logger oder strukturiertes Logging einführen
+- **Status:** ✅ Behoben - bereits implementiert
+- **Lösung:** JSON-Logging bereits vorhanden
+  - python-json-logger in requirements.txt
+  - main.py: JsonFormatter konfiguriert
+  - Aktivierung via USE_JSON_LOGS=true (Standard)
+  - config/loki-config.yml: Log-Aggregation konfiguriert
+  - config/promtail-config.yml: Log-Shipping konfiguriert
 
 ### Dokumentation
 

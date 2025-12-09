@@ -1,0 +1,117 @@
+{
+  "dashboard": {
+    "title": "MODAX System Overview",
+    "tags": ["modax", "overview"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "refresh": "5s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Status",
+        "type": "stat",
+        "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "expr": "control_system_safe",
+            "legendFormat": "System Safe",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "justifyMode": "center"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {"type": "value", "value": "1", "text": "SAFE", "color": "green"},
+              {"type": "value", "value": "0", "text": "UNSAFE", "color": "red"}
+            ]
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Devices Online",
+        "type": "stat",
+        "gridPos": {"x": 6, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "expr": "control_devices_online",
+            "legendFormat": "Online Devices",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area"
+        }
+      },
+      {
+        "id": 3,
+        "title": "API Request Rate",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "rate(control_api_requests_total[5m])",
+            "legendFormat": "{{method}} {{endpoint}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "API Response Time (95th percentile)",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(control_api_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "{{endpoint}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "s", "label": "Response Time"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Anomalies Detected",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "rate(ai_anomalies_detected_total[1h])",
+            "legendFormat": "{{type}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Recent Logs",
+        "type": "logs",
+        "gridPos": {"x": 0, "y": 16, "w": 24, "h": 8},
+        "datasource": "Loki",
+        "targets": [
+          {
+            "expr": "{job=\"modax\"} |= ``",
+            "refId": "A"
+          }
+        ]
+      }
+    ],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    }
+  }
+}

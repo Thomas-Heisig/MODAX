@@ -1,0 +1,50 @@
+MODAX has been installed!
+
+Chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+Release: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+1. Get the application URL:
+{{- if .Values.ingress.enabled }}
+  {{- range .Values.ingress.hosts }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}
+  {{- end }}
+{{- else if contains "NodePort" .Values.controlLayer.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "modax.fullname" . }}-control-layer)
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.controlLayer.service.type }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+        Watch the status with:
+        kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "modax.fullname" . }}-control-layer
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "modax.fullname" . }}-control-layer -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo http://$SERVICE_IP:{{ .Values.controlLayer.service.port }}
+{{- else if contains "ClusterIP" .Values.controlLayer.service.type }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "modax.name" . }},app.kubernetes.io/component=control-layer" -o jsonpath="{.items[0].metadata.name}")
+  echo "Visit http://127.0.0.1:8000 to use Control Layer"
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8000:{{ .Values.controlLayer.service.port }}
+{{- end }}
+
+2. Check the status of your deployment:
+  kubectl get pods --namespace {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "modax.name" . }}
+
+3. View logs:
+  kubectl logs --namespace {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "modax.name" . }} -f
+
+4. Health checks:
+  Control Layer Health: GET /health
+  AI Layer Health: GET /health
+  
+5. Metrics (if Prometheus is enabled):
+  Control Layer: /metrics
+  AI Layer: /metrics
+
+{{ if .Values.grafana.enabled }}
+6. Access Grafana Dashboard:
+  Username: {{ .Values.grafana.adminUser }}
+  Password: (stored in secret {{ .Values.secrets.existingSecret }})
+{{ end }}
+
+For more information, visit:
+  Documentation: https://github.com/Thomas-Heisig/MODAX/tree/main/docs
+  Issues: https://github.com/Thomas-Heisig/MODAX/issues

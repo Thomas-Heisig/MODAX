@@ -2,9 +2,9 @@
 
 Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufgaben werden nach `DONE.md` verschoben.
 
-**Letzte Aktualisierung:** 2025-12-07  
+**Letzte Aktualisierung:** 2025-12-09  
 **Aktuelle Version:** 0.2.0  
-**Status:** Produktionsreif mit vollständiger Dokumentation, CNC-Funktionen und Test-Coverage (96-97%)
+**Status:** Produktionsreif mit vollständiger Dokumentation, CNC-Funktionen, Test-Coverage (96-97%), CI/CD und Kubernetes-Support
 
 ## Priorität 1: Kritisch
 
@@ -62,7 +62,7 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] Code-Coverage-Berichte generieren (test_with_coverage.sh, 96-97% coverage)
 - [x] Ungenutzte Imports entfernen (pyflakes-clean)
 - [x] Type Hints für alle Python-Funktionen vervollständigen (API-Endpunkte typisiert)
-- [ ] mypy für statische Type-Checking aktivieren
+- [x] mypy für statische Type-Checking aktivieren (mypy.ini erstellt)
 - [ ] Docstring-Coverage auf 100% bringen
 - [x] Fehlerbehandlung in allen API-Endpunkten vereinheitlichen (ErrorResponse Model, global exception handlers)
 
@@ -96,27 +96,27 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 
 ### Monitoring
 - [x] Monitoring-Stack dokumentieren (docs/MONITORING.md)
-- [ ] Prometheus-Metriken exportieren (siehe docs/MONITORING.md)
-- [ ] Grafana-Dashboards erstellen (siehe docs/MONITORING.md)
-- [ ] Log-Aggregation mit Loki einrichten (siehe docs/MONITORING.md)
-- [ ] Alerting-System für kritische Fehler (siehe docs/MONITORING.md)
+- [x] Prometheus-Metriken exportieren (bereits im Code, config/prometheus.yml)
+- [x] Grafana-Dashboards erstellen (config/grafana/dashboards/)
+- [x] Log-Aggregation mit Loki einrichten (config/loki-config.yml, config/promtail-config.yml)
+- [x] Alerting-System für kritische Fehler (config/prometheus-rules.yml, config/alertmanager.yml)
 
 ### Deployment
 - [x] Containerisierung dokumentieren (docs/CONTAINERIZATION.md)
 - [x] CI/CD-Pipeline dokumentieren (docs/CI_CD.md)
 - [x] High Availability dokumentieren (docs/HIGH_AVAILABILITY.md)
 - [x] Backup & Recovery dokumentieren (docs/BACKUP_RECOVERY.md)
-- [ ] Docker-Container für alle Ebenen erstellen (siehe docs/CONTAINERIZATION.md)
-- [ ] Docker-Compose-Datei für schnellen Start (siehe docs/CONTAINERIZATION.md)
-- [ ] Kubernetes-Manifeste für Produktionsbereitstellung
-- [ ] CI/CD-Pipeline mit GitHub Actions implementieren (siehe docs/CI_CD.md)
-- [ ] Helm Charts für Kubernetes Deployment erstellen
+- [x] Docker-Container für alle Ebenen erstellen (Dockerfiles vorhanden)
+- [x] Docker-Compose-Datei für schnellen Start (docker-compose.yml, docker-compose.prod.yml)
+- [x] Kubernetes-Manifeste für Produktionsbereitstellung (k8s/base/)
+- [x] CI/CD-Pipeline mit GitHub Actions implementieren (.github/workflows/ci.yml, deploy.yml)
+- [x] Helm Charts für Kubernetes Deployment erstellen (helm/modax/)
 - [ ] GitOps-Workflow mit ArgoCD oder Flux einrichten
 
 ### Integration
 - [x] OPC UA Integration dokumentieren (docs/OPC_UA_INTEGRATION.md)
 - [ ] OPC UA Server implementieren (siehe docs/OPC_UA_INTEGRATION.md)
-- [ ] Externe System-Integrationen dokumentieren (ERP/MES/SCADA)
+- [x] Externe System-Integrationen dokumentieren (docs/EXTERNAL_INTEGRATIONS.md)
 - [ ] MQTT Sparkplug B implementieren
 
 ### Dokumentation

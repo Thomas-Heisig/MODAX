@@ -1,0 +1,158 @@
+# Prometheus Alerting Rules for MODAX
+groups:
+  - name: modax_system
+    interval: 30s
+    rules:
+      # System Safety Alert
+      - alert: SystemUnsafe
+        expr: control_system_safe == 0
+        for: 30s
+        labels:
+          severity: critical
+          component: safety
+        annotations:
+          summary: "MODAX system is in unsafe state"
+          description: "System safety status is UNSAFE for {{ $labels.instance }}"
+
+      # Device Connectivity
+      - alert: NoDevicesOnline
+        expr: control_devices_online == 0
+        for: 2m
+        labels:
+          severity: warning
+          component: connectivity
+        annotations:
+          summary: "No devices are online"
+          description: "No ESP32 devices have been detected for 2 minutes"
+
+      - alert: DeviceCountDropped
+        expr: delta(control_devices_online[5m]) < -3
+        for: 1m
+        labels:
+          severity: warning
+          component: connectivity
+        annotations:
+          summary: "Multiple devices disconnected"
+          description: "{{ $value }} devices disconnected in the last 5 minutes"
+
+  - name: modax_api
+    interval: 30s
+    rules:
+      # High Error Rate
+      - alert: HighAPIErrorRate
+        expr: rate(control_api_requests_total{status_code=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High API error rate detected"
+          description: "{{ $labels.endpoint }} has error rate of {{ $value | humanizePercentage }}"
+
+      # Slow Response Times
+      - alert: SlowAPIResponse
+        expr: histogram_quantile(0.95, rate(control_api_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "API response time is slow"
+          description: "95th percentile response time is {{ $value }}s for {{ $labels.endpoint }}"
+
+      # Very Slow Response Times
+      - alert: VerySlowAPIResponse
+        expr: histogram_quantile(0.95, rate(control_api_request_duration_seconds_bucket[5m])) > 5
+        for: 2m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "API response time is critically slow"
+          description: "95th percentile response time is {{ $value }}s for {{ $labels.endpoint }}"
+
+  - name: modax_ai
+    interval: 30s
+    rules:
+      # High Anomaly Detection Rate
+      - alert: HighAnomalyRate
+        expr: rate(ai_anomalies_detected_total[10m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: ai
+        annotations:
+          summary: "High anomaly detection rate"
+          description: "Detecting {{ $value }} anomalies per second"
+
+      # AI Analysis Failures
+      - alert: AIAnalysisFailures
+        expr: rate(ai_analysis_requests_total{status="error"}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          component: ai
+        annotations:
+          summary: "AI analysis failures detected"
+          description: "AI analysis failing at rate of {{ $value }} per second"
+
+      # AI Service Down
+      - alert: AIServiceDown
+        expr: up{job="modax-ai-layer"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: ai
+        annotations:
+          summary: "AI service is down"
+          description: "AI Layer service {{ $labels.instance }} is not responding"
+
+  - name: modax_performance
+    interval: 1m
+    rules:
+      # High Request Rate
+      - alert: HighRequestRate
+        expr: rate(control_api_requests_total[5m]) > 100
+        for: 5m
+        labels:
+          severity: info
+          component: performance
+        annotations:
+          summary: "High request rate detected"
+          description: "Request rate is {{ $value }} requests/sec"
+
+      # Memory Usage (if available)
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes > 1e9
+        for: 10m
+        labels:
+          severity: warning
+          component: performance
+        annotations:
+          summary: "High memory usage"
+          description: "{{ $labels.job }} is using {{ $value | humanize }}B of memory"
+
+  - name: modax_health
+    interval: 30s
+    rules:
+      # Service Down
+      - alert: ControlLayerDown
+        expr: up{job="modax-control-layer"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: health
+        annotations:
+          summary: "Control Layer is down"
+          description: "Control Layer service {{ $labels.instance }} is not responding"
+
+      # Service Unhealthy
+      - alert: ServiceUnhealthy
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: health
+        annotations:
+          summary: "Service is unhealthy"
+          description: "{{ $labels.job }} at {{ $labels.instance }} is down"
