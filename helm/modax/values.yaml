@@ -1,0 +1,318 @@
+# Default values for MODAX Helm Chart
+
+# Global settings
+global:
+  # Image pull secrets for private registries
+  imagePullSecrets: []
+  # Timezone for all containers
+  timezone: UTC
+
+# MQTT Broker Configuration
+mqtt:
+  enabled: true
+  image:
+    repository: eclipse-mosquitto
+    tag: "2.0"
+    pullPolicy: IfNotPresent
+  
+  replicas: 1
+  
+  service:
+    type: LoadBalancer
+    port: 8883
+    # Uncomment for NodePort
+    # nodePort: 30883
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: ""
+    # existingClaim: ""
+  
+  # TLS configuration
+  tls:
+    enabled: true
+    # Provide existing secret name or use cert-manager
+    secretName: mqtt-tls-certs
+    # certManager:
+    #   issuerName: letsencrypt-prod
+    #   issuerKind: ClusterIssuer
+  
+  # Authentication
+  auth:
+    enabled: true
+    # Provide existing secret with passwd file
+    passwordSecretName: mqtt-passwd
+  
+  # ACL configuration
+  acl:
+    enabled: true
+    configMapName: mqtt-acl
+
+# Control Layer Configuration
+controlLayer:
+  enabled: true
+  
+  image:
+    repository: ghcr.io/thomas-heisig/modax-control-layer
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  replicas: 2
+  
+  service:
+    type: ClusterIP
+    port: 8000
+  
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  
+  # Horizontal Pod Autoscaling
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  
+  # Environment variables
+  env:
+    apiHost: "0.0.0.0"
+    apiPort: 8000
+    useJsonLogs: true
+    apiKeyEnabled: true
+    rateLimitEnabled: true
+    rateLimitDefault: "100/minute"
+  
+  # Probes
+  livenessProbe:
+    enabled: true
+    path: /health
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  
+  readinessProbe:
+    enabled: true
+    path: /ready
+    initialDelaySeconds: 10
+    periodSeconds: 5
+
+# AI Layer Configuration
+aiLayer:
+  enabled: true
+  
+  image:
+    repository: ghcr.io/thomas-heisig/modax-ai-layer
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  replicas: 2
+  
+  service:
+    type: ClusterIP
+    port: 8001
+  
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  
+  # Horizontal Pod Autoscaling
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  
+  # Environment variables
+  env:
+    aiHost: "0.0.0.0"
+    aiPort: 8001
+    useJsonLogs: true
+  
+  # Probes
+  livenessProbe:
+    enabled: true
+    path: /health
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  
+  readinessProbe:
+    enabled: true
+    path: /ready
+    initialDelaySeconds: 10
+    periodSeconds: 5
+
+# TimescaleDB Configuration
+timescaledb:
+  enabled: true
+  
+  image:
+    repository: timescale/timescaledb
+    tag: latest-pg15
+    pullPolicy: IfNotPresent
+  
+  replicas: 1
+  
+  service:
+    type: ClusterIP
+    port: 5432
+  
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClass: ""
+    # existingClaim: ""
+  
+  # Database initialization
+  initScript:
+    enabled: true
+    configMapName: timescaledb-init
+
+# Prometheus Configuration (for metrics)
+prometheus:
+  enabled: false
+  
+  image:
+    repository: prom/prometheus
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 9090
+  
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: ""
+
+# Grafana Configuration (for dashboards)
+grafana:
+  enabled: false
+  
+  image:
+    repository: grafana/grafana
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 3000
+  
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: ""
+  
+  adminUser: admin
+  # adminPassword: set via secrets
+
+# Ingress Configuration
+ingress:
+  enabled: true
+  className: nginx
+  
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+  
+  hosts:
+    - host: api.modax.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: control-layer
+          port: 8000
+        - path: /ai
+          pathType: Prefix
+          service: ai-layer
+          port: 8001
+    - host: grafana.modax.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: grafana
+          port: 3000
+  
+  tls:
+    - secretName: modax-tls
+      hosts:
+        - api.modax.example.com
+        - grafana.modax.example.com
+
+# Secrets Configuration
+secrets:
+  # Create secrets from existing secret
+  existingSecret: "modax-secrets"
+  # Or create from values (not recommended for production)
+  # create: false
+  # data:
+  #   mqtt-username: ""
+  #   mqtt-password: ""
+  #   hmi-api-key: ""
+  #   admin-api-key: ""
+  #   db-username: ""
+  #   db-password: ""
+
+# Network Policies
+networkPolicy:
+  enabled: false
+  # policyTypes:
+  #   - Ingress
+  #   - Egress
+
+# Pod Security Context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+# Security Context for containers
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Node selection
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity: {}

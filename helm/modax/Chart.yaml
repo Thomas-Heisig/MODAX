@@ -1,0 +1,19 @@
+apiVersion: v2
+name: modax
+description: A Helm chart for MODAX - Machine Operations Data Analysis and eXecution
+type: application
+version: 0.2.0
+appVersion: "0.2.0"
+keywords:
+  - iot
+  - manufacturing
+  - cnc
+  - ai
+  - monitoring
+home: https://github.com/Thomas-Heisig/MODAX
+sources:
+  - https://github.com/Thomas-Heisig/MODAX
+maintainers:
+  - name: Thomas Heisig
+    email: thomas.heisig@example.com
+icon: https://raw.githubusercontent.com/Thomas-Heisig/MODAX/main/docs/logo.png
