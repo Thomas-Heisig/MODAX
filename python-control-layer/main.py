@@ -10,16 +10,19 @@ Features:
 - Data aggregation for AI analysis
 - REST API for HMI integration
 - Safety monitoring and command validation
+- OPC UA server for industrial integration
 """
 import logging
 import signal
 import sys
 import os
+import asyncio
 import uvicorn
 from pythonjsonlogger import jsonlogger
 from config import config
 from control_layer import ControlLayer
 import control_api
+from opcua_server import init_opcua_server, stop_opcua_server, get_opcua_server
 
 # Configure structured JSON logging
 use_json_logs = os.getenv("USE_JSON_LOGS", "true").lower() == "true"
@@ -46,6 +49,7 @@ logger = logging.getLogger(__name__)
 
 # Global control layer instance
 control_layer_instance = None
+opcua_server_task = None
 
 
 def signal_handler(signum, frame):
@@ -53,12 +57,31 @@ def signal_handler(signum, frame):
     logger.info("Received shutdown signal")
     if control_layer_instance:
         control_layer_instance.stop()
+    
+    # Stop OPC UA server if running
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(stop_opcua_server())
+    loop.close()
+    
     sys.exit(0)
+
+
+async def start_opcua_background():
+    """Start OPC UA server in background"""
+    if config.opcua.enabled:
+        logger.info("Starting OPC UA server...")
+        await init_opcua_server(
+            enable=True,
+            endpoint=config.opcua.endpoint,
+            enable_security=config.opcua.enable_security
+        )
+        logger.info("OPC UA server started")
 
 
 def main():
     """Main entry point"""
-    global control_layer_instance
+    global control_layer_instance, opcua_server_task
 
     logger.info("MODAX Control Layer Starting", extra={"component": "main"})
 
@@ -78,6 +101,12 @@ def main():
         # Start control layer
         control_layer_instance.start()
 
+        # Start OPC UA server if enabled
+        if config.opcua.enabled:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(start_opcua_background())
+
         # Start API server in main thread
         logger.info("Starting API server", extra={
             "host": config.control.api_host,
@@ -94,6 +123,13 @@ def main():
         logger.error("Error in control layer", extra={"error": str(e)}, exc_info=True)
         if control_layer_instance:
             control_layer_instance.stop()
+        
+        # Stop OPC UA server
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(stop_opcua_server())
+        loop.close()
+        
         sys.exit(1)
 
 
