@@ -271,12 +271,13 @@ def readiness_check(request: Request):
 @app.get("/metrics")
 def metrics() -> Response:
     """Prometheus metrics endpoint"""
-    # Update cache metrics before exporting
+    # Update cache size gauge before exporting
     stats = cache.get_statistics()
-    CACHE_HITS._value.set(stats['hits'])
-    CACHE_MISSES._value.set(stats['misses'])
     for cache_type, size in stats['cache_sizes'].items():
         CACHE_SIZE.labels(cache_type=cache_type).set(size)
+    
+    # Note: CACHE_HITS and CACHE_MISSES are Counters that auto-increment
+    # during cache operations, so no manual update needed here
     
     return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 

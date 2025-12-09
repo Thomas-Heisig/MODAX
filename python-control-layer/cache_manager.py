@@ -7,8 +7,7 @@ while reducing redundant computations.
 Issue #011: Caching strategy for frequently accessed data
 """
 
-from cachetools import TTLCache, cached
-from cachetools.keys import hashkey
+from cachetools import TTLCache
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 import logging
@@ -191,11 +190,10 @@ class CacheManager:
             device_id: Device identifier
         """
         with self._device_data_lock:
-            # Remove all cached entries for this device
-            keys_to_remove = [k for k in self.device_data_cache.keys() 
-                            if k.startswith(f"{device_id}_")]
-            for key in keys_to_remove:
-                del self.device_data_cache[key]
+            # Remove all cached entries for this device (memory-efficient)
+            for key in list(self.device_data_cache.keys()):
+                if key.startswith(f"{device_id}_"):
+                    del self.device_data_cache[key]
         
         with self._ai_analysis_lock:
             if device_id in self.ai_analysis_cache:

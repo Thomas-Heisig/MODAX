@@ -4,7 +4,6 @@ Tests the caching functionality including TTL, thread safety, and cache invalida
 """
 
 import unittest
-import time
 from cache_manager import CacheManager, get_cache_manager
 
 
