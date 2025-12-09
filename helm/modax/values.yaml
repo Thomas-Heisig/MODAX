@@ -63,7 +63,7 @@ controlLayer:
   
   image:
     repository: ghcr.io/thomas-heisig/modax-control-layer
-    tag: latest
+    tag: "0.2.0"  # Use specific version for production
     pullPolicy: IfNotPresent
   
   replicas: 2
@@ -116,7 +116,7 @@ aiLayer:
   
   image:
     repository: ghcr.io/thomas-heisig/modax-ai-layer
-    tag: latest
+    tag: "0.2.0"  # Use specific version for production
     pullPolicy: IfNotPresent
   
   replicas: 2
@@ -166,7 +166,7 @@ timescaledb:
   
   image:
     repository: timescale/timescaledb
-    tag: latest-pg15
+    tag: "2.13.0-pg15"  # Use specific version for production
     pullPolicy: IfNotPresent
   
   replicas: 1
@@ -200,7 +200,7 @@ prometheus:
   
   image:
     repository: prom/prometheus
-    tag: latest
+    tag: "v2.48.0"  # Use specific version for production
     pullPolicy: IfNotPresent
   
   service:
@@ -218,7 +218,7 @@ grafana:
   
   image:
     repository: grafana/grafana
-    tag: latest
+    tag: "10.2.3"  # Use specific version for production
     pullPolicy: IfNotPresent
   
   service:
