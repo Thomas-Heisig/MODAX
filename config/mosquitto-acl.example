@@ -1,0 +1,142 @@
+# MODAX MQTT Broker - Access Control List (ACL)
+# This file defines topic-based access control for MQTT clients
+# Place in /etc/mosquitto/acl and reference in mosquitto.conf with: acl_file /etc/mosquitto/acl
+
+# ============================================================================
+# ACL SYNTAX
+# ============================================================================
+# user <username>
+#   Defines which user the following rules apply to
+#
+# topic [read|write|readwrite] <topic>
+#   read: User can subscribe to topic
+#   write: User can publish to topic
+#   readwrite: User can both subscribe and publish
+#   
+# %c = clientid
+# %u = username
+# + = single-level wildcard (e.g., modax/+/data)
+# # = multi-level wildcard (e.g., modax/#)
+
+# ============================================================================
+# ADMIN USER (Full Access)
+# ============================================================================
+user admin
+topic readwrite #
+
+# ============================================================================
+# CONTROL LAYER (Full System Access)
+# ============================================================================
+user control-layer
+topic readwrite modax/#
+
+# Allow control layer to monitor system topics
+topic read $SYS/#
+
+# ============================================================================
+# AI LAYER (Analysis Service)
+# ============================================================================
+user ai-layer
+topic read modax/sensor/data
+topic read modax/sensor/safety
+topic write modax/ai/analysis
+
+# Read control commands to understand context
+topic read modax/control/commands
+
+# ============================================================================
+# HMI CLIENTS (Read-Only + Commands)
+# ============================================================================
+user hmi-client
+topic read modax/sensor/data
+topic read modax/sensor/safety
+topic read modax/ai/analysis
+topic write modax/control/commands
+
+# ============================================================================
+# MONITORING USER (Read-Only System Access)
+# ============================================================================
+user monitoring
+topic read modax/#
+topic read $SYS/#
+
+# ============================================================================
+# ESP32 FIELD DEVICES (Sensor Publishing + Command Reception)
+# ============================================================================
+# Allow all esp32 devices (using client ID wildcard)
+pattern write modax/sensor/data/%c
+pattern write modax/sensor/safety/%c
+pattern read modax/control/commands/%c
+pattern read modax/control/commands/broadcast
+
+# Specific device example
+user esp32-device-01
+topic write modax/sensor/data/esp32-device-01
+topic write modax/sensor/safety/esp32-device-01
+topic read modax/control/commands/esp32-device-01
+topic read modax/control/commands/broadcast
+
+user esp32-device-02
+topic write modax/sensor/data/esp32-device-02
+topic write modax/sensor/safety/esp32-device-02
+topic read modax/control/commands/esp32-device-02
+topic read modax/control/commands/broadcast
+
+# ============================================================================
+# INTEGRATION SERVICES (External Systems)
+# ============================================================================
+# ERP/MES Integration (Read-Only)
+user erp-integration
+topic read modax/sensor/data
+topic read modax/ai/analysis
+
+# SCADA Integration
+user scada-integration
+topic readwrite modax/sensor/data
+topic readwrite modax/control/commands
+topic read modax/ai/analysis
+
+# OPC UA Server
+user opcua-server
+topic read modax/#
+
+# ============================================================================
+# DATA LOGGER (Historical Data Collection)
+# ============================================================================
+user data-logger
+topic read modax/sensor/data
+topic read modax/sensor/safety
+topic read modax/ai/analysis
+
+# ============================================================================
+# TESTING/DEVELOPMENT USERS
+# ============================================================================
+# Development user with full access (remove in production)
+# user dev-test
+# topic readwrite modax/#
+
+# ============================================================================
+# NOTES
+# ============================================================================
+# 1. Test ACL configuration:
+#    mosquitto -c mosquitto.conf -v
+#
+# 2. Create users:
+#    mosquitto_passwd -c /etc/mosquitto/passwd control-layer
+#
+# 3. Test access:
+#    # Should succeed
+#    mosquitto_pub -h localhost -p 8883 --cafile ca.crt -u esp32-device-01 -P password \
+#      -t "modax/sensor/data/esp32-device-01" -m "test"
+#    
+#    # Should fail (wrong topic)
+#    mosquitto_pub -h localhost -p 8883 --cafile ca.crt -u esp32-device-01 -P password \
+#      -t "modax/sensor/data/esp32-device-02" -m "test"
+#
+# 4. Security best practices:
+#    - Use unique passwords for each client
+#    - Restrict device topics to specific device IDs
+#    - Use read-only access for monitoring clients
+#    - Disable development users in production
+#    - Regularly rotate passwords
+#    - Use mutual TLS for high-security environments

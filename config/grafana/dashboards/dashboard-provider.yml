@@ -1,0 +1,14 @@
+# Grafana Dashboard Provisioning Configuration
+apiVersion: 1
+
+providers:
+  - name: 'MODAX Dashboards'
+    orgId: 1
+    folder: 'MODAX'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: true

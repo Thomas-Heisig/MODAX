@@ -1,0 +1,131 @@
+# Alertmanager Configuration for MODAX
+global:
+  resolve_timeout: 5m
+  # SMTP settings for email notifications
+  smtp_smarthost: 'smtp.example.com:587'
+  smtp_from: 'alertmanager@example.com'
+  smtp_auth_username: 'alertmanager@example.com'
+  smtp_auth_password: 'password'
+  smtp_require_tls: true
+
+# Templates for notifications
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Route tree for alert distribution
+route:
+  # Default receiver
+  receiver: 'team-email'
+  
+  # Group alerts by these labels
+  group_by: ['alertname', 'cluster', 'service']
+  
+  # Wait time before sending initial notification
+  group_wait: 30s
+  
+  # Wait time before sending notification about new alerts in group
+  group_interval: 5m
+  
+  # Wait time before sending notification about resolved alerts
+  repeat_interval: 4h
+
+  # Child routes
+  routes:
+    # Critical alerts go to on-call and email immediately
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 10s
+      repeat_interval: 1h
+      continue: true
+      
+    # System safety alerts - highest priority
+    - match:
+        component: safety
+      receiver: 'safety-team'
+      group_wait: 5s
+      repeat_interval: 30m
+      
+    # Warning alerts to team email
+    - match:
+        severity: warning
+      receiver: 'team-email'
+      repeat_interval: 12h
+      
+    # Info alerts to monitoring dashboard only
+    - match:
+        severity: info
+      receiver: 'monitoring-dashboard'
+      repeat_interval: 24h
+
+# Inhibition rules - suppress alerts if other alerts are firing
+inhibit_rules:
+  # Inhibit warning if critical is firing for same alert
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']
+    
+  # Inhibit device alerts if system is unsafe
+  - source_match:
+      alertname: 'SystemUnsafe'
+    target_match:
+      component: 'connectivity'
+    
+  # Inhibit high error rate if service is down
+  - source_match:
+      alertname: 'ControlLayerDown'
+    target_match:
+      component: 'api'
+
+# Receivers - where to send alerts
+receivers:
+  # Team email for general alerts
+  - name: 'team-email'
+    email_configs:
+      - to: 'team@example.com'
+        headers:
+          Subject: '[MODAX] {{ .GroupLabels.alertname }}'
+        html: |
+          <h2>MODAX Alert</h2>
+          {{ range .Alerts }}
+          <p><strong>Alert:</strong> {{ .Labels.alertname }}</p>
+          <p><strong>Severity:</strong> {{ .Labels.severity }}</p>
+          <p><strong>Component:</strong> {{ .Labels.component }}</p>
+          <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+          {{ end }}
+
+  # Critical alerts - multiple channels
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'oncall@example.com'
+        headers:
+          Subject: '[MODAX CRITICAL] {{ .GroupLabels.alertname }}'
+        send_resolved: true
+    # Uncomment for Slack integration
+    # slack_configs:
+    #   - api_url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL'
+    #     channel: '#modax-alerts'
+    #     title: 'MODAX Critical Alert'
+    #     text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+    # Uncomment for PagerDuty integration
+    # pagerduty_configs:
+    #   - service_key: 'YOUR_PAGERDUTY_KEY'
+    #     description: '{{ .GroupLabels.alertname }}'
+
+  # Safety team - highest priority
+  - name: 'safety-team'
+    email_configs:
+      - to: 'safety@example.com'
+        headers:
+          Subject: '[MODAX SAFETY ALERT] {{ .GroupLabels.alertname }}'
+        send_resolved: true
+    # webhook_configs:
+    #   - url: 'http://safety-system.example.com/webhook'
+
+  # Monitoring dashboard webhook
+  - name: 'monitoring-dashboard'
+    webhook_configs:
+      - url: 'http://dashboard.example.com/api/alerts'
+        send_resolved: true
