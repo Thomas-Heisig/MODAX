@@ -258,16 +258,16 @@ Complete documentation index for the MODAX industrial control system.
 ## Project Management
 
 ### Planning & Tracking
-- [TODO.md](../TODO.md) - Open tasks and roadmap
-- [ISSUES.md](../ISSUES.md) - Known issues and bugs
-- [DONE.md](../DONE.md) - Completed tasks
+- [TODO.md](../TODO.md) - Open tasks and roadmap (2 active items)
+- [ISSUES.md](../ISSUES.md) - Known issues and bugs (All resolved! 🎉)
+- [DONE.md](../DONE.md) - Completed tasks (123+ completed items)
 - [CHANGELOG.md](../CHANGELOG.md) - Version history
 
-### Recent Updates
-- [SESSION_SUMMARY_2025-12-09_PRIORITY_TASKS.md](../SESSION_SUMMARY_2025-12-09_PRIORITY_TASKS.md) - ⭐ **NEW** 20 Priority Tasks Completion (2025-12-09)
-- [REVIEW_SUMMARY_2025-12-07.md](REVIEW_SUMMARY_2025-12-07.md) - Comprehensive code and documentation review
-- [IMPROVEMENTS_SUMMARY.md](IMPROVEMENTS_SUMMARY.md) - Summary of improvements
-- [IMPROVEMENTS_2025-12-07.md](IMPROVEMENTS_2025-12-07.md) - Recent improvements
+### Documentation Archives
+- [archive/](../archive/README.md) - Historical implementation summaries and session notes
+- [docs/archive/](archive/README.md) - Historical documentation updates and reviews
+
+All completed session summaries, implementation reports, and historical documentation have been organized into archives for reference while keeping the main documentation focused and current.
 
 ## Documentation by Role
 
@@ -468,8 +468,9 @@ Each documentation file should include:
 - Case studies
 
 ---
-**Last Updated:** 2025-12-09  
-**Maintained By:** MODAX Documentation Team
+**Last Updated:** 2025-12-09 (Documentation Cleanup & Reorganization)  
+**Maintained By:** MODAX Documentation Team  
+**Recent Changes:** Archived completed session summaries and implementation reports to improve navigation and focus on current documentation.
 
 ## Quick Reference Card
 
@@ -496,6 +497,6 @@ Each documentation file should include:
 │ Troubleshooting:          TROUBLESHOOTING.md         │
 │ Best Practices:           BEST_PRACTICES.md          │
 │ Handbook Prep:            HANDBOOK_PREPARATION.md    │
-│ Latest Review:            REVIEW_SUMMARY_2025-12-07  │
+│ Archives:                 archive/README.md          │
 └──────────────────────────────────────────────────────┘
 ```

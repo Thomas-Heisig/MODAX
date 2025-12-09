@@ -379,11 +379,26 @@ Thomas Heisig
 - MQTT-Protokoll für zuverlässiges Messaging
 - Open-Source-Community
 
+## Projektdokumentation
+
+### Aktive Dokumentation
+- [docs/INDEX.md](docs/INDEX.md) - Vollständiger Dokumentations-Index
+- [TODO.md](TODO.md) - Offene Aufgaben (2 aktive Items)
+- [ISSUES.md](ISSUES.md) - Bekannte Probleme (Alle behoben! 🎉)
+- [DONE.md](DONE.md) - Erledigte Aufgaben (123+ Items)
+- [CHANGELOG.md](CHANGELOG.md) - Versionshistorie
+
+### Historische Dokumentation
+Abgeschlossene Session-Zusammenfassungen und Implementierungsberichte wurden für bessere Übersichtlichkeit archiviert:
+- [archive/](archive/README.md) - Implementierungs-Summaries, Session-Notes, Security Audits
+- [docs/archive/](docs/archive/README.md) - Historische Dokumentations-Updates
+
 ## Support
 
 Für Probleme und Fragen:
 - Öffnen Sie ein Issue auf GitHub
 - Überprüfen Sie die Dokumentation im `docs/` Verzeichnis
+- Konsultieren Sie den [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
 - Lesen Sie komponentenspezifische READMEs
 
 ---
