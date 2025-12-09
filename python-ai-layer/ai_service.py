@@ -15,6 +15,7 @@ from slowapi.errors import RateLimitExceeded
 from anomaly_detector import StatisticalAnomalyDetector
 from wear_predictor import SimpleWearPredictor
 from optimizer import OptimizationRecommender
+from onnx_predictor import get_rul_predictor, RULPrediction
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +59,7 @@ app.add_middleware(
 anomaly_detector = StatisticalAnomalyDetector(z_threshold=3.0)
 wear_predictor = SimpleWearPredictor()
 optimizer = OptimizationRecommender()
+rul_predictor = get_rul_predictor()
 
 
 class SensorDataInput(BaseModel):
@@ -97,6 +99,18 @@ class ErrorResponse(BaseModel):
     status_code: int
     timestamp: str
     details: Optional[Dict] = None
+
+
+class RULPredictionResponse(BaseModel):
+    """RUL prediction response"""
+    timestamp: int
+    device_id: str
+    predicted_rul_hours: float
+    health_status: str
+    confidence: float
+    contributing_factors: List[str]
+    model_version: str
+    recommendations: List[str]
 
 
 @app.exception_handler(Exception)
@@ -323,6 +337,8 @@ def reset_device_wear(request: Request, device_id: str):
 @limiter.limit(RATE_LIMIT_DEFAULT)
 def get_model_info(request: Request):
     """Get information about loaded models"""
+    onnx_info = rul_predictor.get_model_info()
+    
     return {
         "anomaly_detection": {
             "type": "Statistical Z-score",
@@ -334,14 +350,109 @@ def get_model_info(request: Request):
             "baseline_lifetime_hours": wear_predictor.nominal_lifetime,
             "description": "Predicts wear based on operating conditions and accumulated stress"
         },
+        "rul_prediction": {
+            "type": "ONNX Deep Learning Model",
+            "status": onnx_info.get("status", "unknown"),
+            "description": "Remaining Useful Life prediction using LSTM/TCN time-series model",
+            "details": onnx_info
+        },
         "optimization": {
             "type": "Rule-based expert system",
             "description": "Provides recommendations based on analysis results and best practices"
-        },
-        "future_enhancements": [
-            "ONNX runtime for ML models",
-            "Time-series forecasting",
-            "Predictive maintenance scheduling",
-            "Anomaly classification with neural networks"
-        ]
+        }
     }
+
+
+@app.post("/api/v1/predict-rul", response_model=RULPredictionResponse)
+@limiter.limit(RATE_LIMIT_DEFAULT)
+def predict_remaining_useful_life(request: Request, data: SensorDataInput):
+    """
+    Predict Remaining Useful Life (RUL) using ONNX deep learning model
+    
+    This endpoint uses time-series prediction (LSTM/TCN) to estimate
+    how many hours of operation remain before maintenance is required.
+    
+    The prediction is based on historical sensor patterns and learned
+    degradation trajectories from training data.
+    
+    Note: Predictions are advisory only. Always follow manufacturer
+    maintenance schedules and safety protocols.
+    """
+    try:
+        logger.info("RUL prediction request", extra={"device_id": data.device_id})
+        
+        # Convert to dict for processing
+        sensor_data = data.dict()
+        
+        # Get RUL prediction from ONNX model
+        rul_result = rul_predictor.predict_rul(sensor_data, data.device_id)
+        
+        # Generate recommendations based on RUL
+        recommendations = []
+        
+        if rul_result.health_status == "critical":
+            recommendations.append("URGENT: Schedule immediate maintenance")
+            recommendations.append("Consider stopping operation if safety allows")
+            recommendations.append("Inspect components for visible wear or damage")
+        elif rul_result.health_status == "warning":
+            recommendations.append("Schedule maintenance within the next week")
+            recommendations.append("Increase monitoring frequency")
+            recommendations.append("Prepare replacement parts")
+        else:
+            recommendations.append("Continue normal operations")
+            recommendations.append("Monitor for any changes in operating conditions")
+        
+        # Add factor-specific recommendations
+        for factor in rul_result.contributing_factors:
+            if "High current" in factor:
+                recommendations.append("Reduce load or cycle time if possible")
+            elif "vibration" in factor.lower():
+                recommendations.append("Check alignment and balance")
+            elif "temperature" in factor.lower():
+                recommendations.append("Improve cooling or reduce ambient temperature")
+        
+        response = RULPredictionResponse(
+            timestamp=int(time.time() * 1000),
+            device_id=data.device_id,
+            predicted_rul_hours=rul_result.predicted_rul_hours,
+            health_status=rul_result.health_status,
+            confidence=rul_result.confidence,
+            contributing_factors=rul_result.contributing_factors,
+            model_version=rul_result.model_version,
+            recommendations=recommendations[:5]  # Limit to top 5
+        )
+        
+        logger.info("RUL prediction complete", extra={
+            "device_id": data.device_id,
+            "predicted_rul": rul_result.predicted_rul_hours,
+            "health_status": rul_result.health_status
+        })
+        
+        return response
+        
+    except Exception as e:
+        logger.error("Error predicting RUL", extra={"error": str(e)}, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"RUL prediction failed: {str(e)}")
+
+
+@app.post("/api/v1/reset-rul-buffer/{device_id}")
+@limiter.limit("10/minute")
+def reset_rul_buffer(request: Request, device_id: str):
+    """
+    Reset RUL prediction buffer for a device
+    
+    This clears the time-series data buffer used for RUL prediction.
+    Use this after maintenance or when the device operating conditions
+    change significantly.
+    """
+    try:
+        rul_predictor.reset_buffer(device_id)
+        logger.info("RUL buffer reset", extra={"device_id": device_id})
+        return {
+            "status": "success",
+            "device_id": device_id,
+            "message": "RUL prediction buffer reset - new sequence will be built"
+        }
+    except Exception as e:
+        logger.error("Error resetting RUL buffer", extra={"error": str(e)})
+        raise HTTPException(status_code=500, detail=str(e))
