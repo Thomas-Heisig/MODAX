@@ -10,7 +10,7 @@ import logging
 import os
 from asyncua import Server, ua
 from asyncua.common.node import Node
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Optional, Any
 
 logger = logging.getLogger(__name__)
@@ -111,7 +111,7 @@ class MODAXOpcUaServer:
         # System status variables
         await self.system_folder.add_variable(self.namespace_idx, "Status", "Running")
         await self.system_folder.add_variable(self.namespace_idx, "ConnectedDevices", 0)
-        await self.system_folder.add_variable(self.namespace_idx, "Timestamp", datetime.utcnow())
+        await self.system_folder.add_variable(self.namespace_idx, "Timestamp", datetime.now(timezone.utc))
 
         logger.info("OPC UA object model created")
 
@@ -141,7 +141,7 @@ class MODAXOpcUaServer:
             "RPM": await device_node.add_variable(self.namespace_idx, "RPM", 0),
             "PowerKW": await device_node.add_variable(self.namespace_idx, "PowerKW", 0.0),
             "IsSafe": await device_node.add_variable(self.namespace_idx, "IsSafe", True),
-            "LastUpdate": await device_node.add_variable(self.namespace_idx, "LastUpdate", datetime.utcnow()),
+            "LastUpdate": await device_node.add_variable(self.namespace_idx, "LastUpdate", datetime.now(timezone.utc)),
         }
 
         # Make variables writable for server-side updates
@@ -206,7 +206,7 @@ class MODAXOpcUaServer:
                 await variables["Status"].write_value(str(data["status"]))
 
             # Update timestamp
-            await variables["LastUpdate"].write_value(datetime.utcnow())
+            await variables["LastUpdate"].write_value(datetime.now(timezone.utc))
         except Exception as e:
             logger.error(f"Error updating device {device_id} data: {e}")
 
@@ -255,7 +255,7 @@ class MODAXOpcUaServer:
 
             await status_node.write_value("Running")
             await devices_node.write_value(connected_devices)
-            await timestamp_node.write_value(datetime.utcnow())
+            await timestamp_node.write_value(datetime.now(timezone.utc))
         except Exception as e:
             logger.error(f"Error updating system status: {e}")
 
