@@ -84,6 +84,10 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] HMI-Fehler-Dialoge benutzerfreundlicher gestalten (Kontextspezifische Fehlerdialoge mit Troubleshooting)
 - [x] Ladeindikatoren für asynchrone Operationen hinzufügen (Loading panel implementiert)
 - [x] Tastaturkürzel im HMI implementieren (F5, Ctrl+R, Ctrl+S, Ctrl+T, F1)
+- [x] Visual AI Confidence Display (docs/HMI_ENHANCEMENTS.md - Implementierungsplan erstellt)
+- [x] Export-Funktion im HMI (docs/HMI_ENHANCEMENTS.md - HMI-Integration dokumentiert, API bereits vorhanden)
+- [x] Dark Mode Theme System (docs/HMI_ENHANCEMENTS.md - Implementierungsplan erstellt)
+- [x] Internationalisierung i18n (docs/HMI_ENHANCEMENTS.md - Resource-basiertes System dokumentiert)
 - [ ] Offline-Modus mit lokaler Datenspeicherung (Benötigt Datenpersistenz-Implementation)
 
 ### Wartbarkeit
@@ -111,13 +115,13 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] Kubernetes-Manifeste für Produktionsbereitstellung (k8s/base/)
 - [x] CI/CD-Pipeline mit GitHub Actions implementieren (.github/workflows/ci.yml, deploy.yml)
 - [x] Helm Charts für Kubernetes Deployment erstellen (helm/modax/)
-- [ ] GitOps-Workflow mit ArgoCD oder Flux einrichten
+- [x] GitOps-Workflow mit ArgoCD oder Flux einrichten (docs/GITOPS_DEPLOYMENT.md - Vollständiger Guide)
 
 ### Integration
 - [x] OPC UA Integration dokumentieren (docs/OPC_UA_INTEGRATION.md)
 - [ ] OPC UA Server implementieren (siehe docs/OPC_UA_INTEGRATION.md)
 - [x] Externe System-Integrationen dokumentieren (docs/EXTERNAL_INTEGRATIONS.md)
-- [ ] MQTT Sparkplug B implementieren
+- [x] MQTT Sparkplug B implementieren (docs/MQTT_SPARKPLUG_B.md - Vollständiger Implementierungsplan)
 
 ### Dokumentation
 - [ ] Video-Tutorials für Setup erstellen
