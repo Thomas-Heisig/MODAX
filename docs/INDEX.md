@@ -152,20 +152,65 @@ Complete documentation index for the MODAX industrial control system.
   - Security configuration
   - SCADA integration examples
 
-### External Systems (Coming Soon)
-- EXTERNAL_INTEGRATIONS.md - ERP/MES/SCADA integration
+### External Systems & Cloud
+- [EXTERNAL_INTEGRATIONS.md](EXTERNAL_INTEGRATIONS.md) - ERP/MES/SCADA integration
   - SAP integration
   - MES system connectivity
   - SCADA protocols (WinCC, Ignition)
   - Cloud platforms (Azure IoT, AWS SiteWise)
+- **[CLOUD_INTEGRATION.md](CLOUD_INTEGRATION.md)** ⭐ **NEW** - Multi-cloud deployment (AWS, Azure, GCP)
+  - Cloud architectures for each platform
+  - IoT Hub integration (AWS IoT Core, Azure IoT Hub, GCP IoT Core)
+  - Kubernetes on cloud (EKS, AKS, GKE)
+  - Managed databases and ML services
+  - Cost optimization and security best practices
 
-### Advanced Features (Coming Soon)
-- MACHINE_DATA_MODELS.md - Digital twins and machine models
-- ADVANCED_AI.md - Advanced AI features
-  - Federated learning
-  - Explainable AI (XAI)
-  - AutoML
-  - Advanced anomaly detection
+### Advanced Features - Phase 2 & 3
+- **[MOBILE_APP_ARCHITECTURE.md](MOBILE_APP_ARCHITECTURE.md)** ⭐ **NEW** - Mobile monitoring app design
+  - React Native/Flutter architecture
+  - Real-time monitoring and alerts
+  - Push notifications
+  - Offline support and multi-tenant access
+  - iOS and Android deployment
+- **[MULTI_TENANT_ARCHITECTURE.md](MULTI_TENANT_ARCHITECTURE.md)** ⭐ **NEW** - Multi-tenancy implementation
+  - Tenant isolation strategies
+  - Enhanced RBAC with role hierarchy
+  - Database schema with tenant partitioning
+  - Resource quotas and subscription tiers
+  - API endpoints for tenant management
+- **[ML_TRAINING_PIPELINE.md](ML_TRAINING_PIPELINE.md)** ⭐ **NEW** - ML model training infrastructure
+  - End-to-end training pipeline
+  - Data collection and feature engineering
+  - LSTM/TCN model training
+  - Model evaluation and ONNX conversion
+  - Continuous training and MLflow integration
+- **[ONNX_MODEL_DEPLOYMENT.md](ONNX_MODEL_DEPLOYMENT.md)** ⭐ **NEW** - ONNX model deployment guide
+  - RUL prediction with ONNX Runtime
+  - Model architecture and training
+  - Deployment workflow
+  - Performance optimization
+- **[FLEET_ANALYTICS.md](FLEET_ANALYTICS.md)** ⭐ **NEW** - Fleet-wide analytics
+  - Cross-location comparison
+  - Trend analysis and forecasting
+  - Benchmarking and best performers identification
+  - Executive dashboards
+- **[DIGITAL_TWIN_INTEGRATION.md](DIGITAL_TWIN_INTEGRATION.md)** ⭐ **NEW** - Digital twin technology
+  - Virtual device models
+  - Physics and wear simulation
+  - What-if scenario analysis
+  - Failure prediction and optimization
+  - 3D visualization
+- **[FEDERATED_LEARNING.md](FEDERATED_LEARNING.md)** ⭐ **NEW** - Federated learning framework
+  - Privacy-preserving collaborative training
+  - FedAvg aggregation strategy
+  - Differential privacy
+  - Secure aggregation with cryptography
+  - Multi-location model training
+- **[ADVANCED_FEATURES_ROADMAP.md](ADVANCED_FEATURES_ROADMAP.md)** ⭐ **NEW** - Additional advanced features
+  - MES/ERP Integration (SAP, Oracle, Dynamics)
+  - Blockchain audit trails for compliance
+  - Automated maintenance planning with AI
+  - Edge computing optimizations for ESP32
 
 ## Testing & Quality Assurance
 - [TESTING.md](TESTING.md) - Testing and code quality guide
