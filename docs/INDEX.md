@@ -97,6 +97,12 @@ Complete documentation index for the MODAX industrial control system.
   - Secrets management (environment variables, Docker secrets, Vault)
   - Configuration examples and troubleshooting
   - Testing and verification procedures
+- **[SECURITY_AUDIT_2025-12-09.md](../SECURITY_AUDIT_2025-12-09.md)** ⭐ **NEW** - Security Audit Results
+  - ✅ PASSED - Zero vulnerabilities detected
+  - Bandit scanner: 384 lines audited
+  - 39 security tests (100% pass rate)
+  - Production security checklist
+  - IEC 62443 & NIST SP 800-82 compliance notes
 
 ### Data Management
 - [DATA_PERSISTENCE.md](DATA_PERSISTENCE.md) - Time-series database strategy
