@@ -76,6 +76,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-push
     if: github.event.inputs.environment == 'staging' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
     environment:
       name: staging
       url: https://staging.modax.example.com
@@ -106,6 +108,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-push
     if: github.event_name == 'release' || github.event.inputs.environment == 'production'
+    permissions:
+      contents: read
     environment:
       name: production
       url: https://modax.example.com
@@ -142,6 +146,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [deploy-staging, deploy-production]
     if: always()
+    permissions: {}
     steps:
       - name: Notify deployment status
         run: |
