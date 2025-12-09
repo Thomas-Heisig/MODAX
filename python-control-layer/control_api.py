@@ -2,8 +2,9 @@
 from fastapi import FastAPI, HTTPException, Depends, WebSocket, WebSocketDisconnect, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict
+from enum import Enum
 import logging
 import os
 import time
@@ -62,7 +63,7 @@ API_AUTH_ENABLED = os.getenv("API_KEY_ENABLED", "false").lower() == "true"
 control_layer = None
 
 
-def set_control_layer(layer):
+def set_control_layer(layer: 'ControlLayer') -> None:
     """Set reference to control layer instance"""
     global control_layer
     control_layer = layer
@@ -173,15 +174,51 @@ class ControlCommandRequest(BaseModel):
     parameters: Optional[Dict[str, str]] = None
 
 
+class SpindleState(str, Enum):
+    """Valid spindle states"""
+    CW = "cw"
+    CCW = "ccw"
+    STOPPED = "stopped"
+
+
+class GCodeProgramRequest(BaseModel):
+    """G-code program load request"""
+    gcode: str = Field(..., min_length=1, description="G-code program content")
+    name: Optional[str] = Field(None, max_length=255, description="Optional program name")
+
+    @validator('gcode')
+    def validate_gcode(cls, v):
+        """Ensure G-code is not just whitespace"""
+        if not v or not v.strip():
+            raise ValueError("G-code cannot be empty or whitespace only")
+        return v.strip()
+
+
+class SpindleCommandRequest(BaseModel):
+    """Spindle control command"""
+    state: SpindleState = Field(..., description="Spindle state: cw, ccw, or stopped")
+    speed: Optional[float] = Field(None, ge=0, le=50000, description="Spindle speed in RPM (0-50000)")
+
+
+class OverrideRequest(BaseModel):
+    """Feed or spindle override request"""
+    percentage: float = Field(..., ge=0, le=200, description="Override percentage (0-200%)")
+
+
+class EmergencyStopRequest(BaseModel):
+    """Emergency stop activation/deactivation request"""
+    active: bool = Field(True, description="True to activate, False to deactivate")
+
+
 @app.get("/")
-def root():
+def root() -> Dict[str, str]:
     """API root"""
     return {"message": "MODAX Control Layer API", "version": "1.0.0", "api_prefix": "/api/v1"}
 
 
 @app.get("/health")
 @limiter.limit(config.control.rate_limit_default)
-def health_check(request: Request):
+def health_check(request: Request) -> Dict[str, str]:
     """Health check endpoint - returns 200 if service is running"""
     return {
         "status": "healthy",
@@ -227,7 +264,7 @@ def readiness_check(request: Request):
 
 
 @app.get("/metrics")
-def metrics():
+def metrics() -> Response:
     """Prometheus metrics endpoint"""
     return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
@@ -595,24 +632,19 @@ async def get_cnc_status(
 @limiter.limit("10/minute")
 async def load_cnc_program(
     request: Request,
-    program: Dict,
+    program: GCodeProgramRequest,
     api_key: str = Depends(require_control) if API_AUTH_ENABLED else None
 ):
     """
     Load G-code program
 
-    Request body:
-    {
-        "gcode": "G90 G54\\nG00 X10 Y20\\n...",
-        "name": "program_name" (optional)
-    }
+    Request body uses GCodeProgramRequest model with:
+    - gcode: G-code program string (required)
+    - name: program name (optional)
     """
     try:
-        gcode = program.get("gcode", "")
-        name = program.get("name", "")
-
-        if not gcode:
-            raise HTTPException(status_code=400, detail="No G-code provided")
+        gcode = program.gcode
+        name = program.name or ""
 
         success = cnc.load_program(gcode, name)
 
@@ -671,47 +703,40 @@ async def set_cnc_mode(
 @limiter.limit("30/minute")
 async def control_spindle(
     request: Request,
-    command: Dict,
+    command: SpindleCommandRequest,
     api_key: str = Depends(require_control) if API_AUTH_ENABLED else None
 ):
     """
     Control spindle
 
-    Request body:
-    {
-        "state": "cw" | "ccw" | "stopped",
-        "speed": 1000 (RPM, optional)
-    }
+    Request body uses SpindleCommandRequest model with:
+    - state: "cw", "ccw", or "stopped" (required)
+    - speed: RPM (optional)
     """
     try:
-        from cnc_controller import SpindleState
+        from cnc_controller import SpindleState as CNCSpindleState
 
+        # Map API SpindleState enum to CNC controller SpindleState
         state_map = {
-            "cw": SpindleState.CW,
-            "ccw": SpindleState.CCW,
-            "stopped": SpindleState.STOPPED
+            SpindleState.CW: CNCSpindleState.CW,
+            SpindleState.CCW: CNCSpindleState.CCW,
+            SpindleState.STOPPED: CNCSpindleState.STOPPED
         }
 
-        state_str = command.get("state", "").lower()
-        if state_str not in state_map:
-            raise HTTPException(
-                status_code=400,
-                detail="Invalid state. Use: cw, ccw, or stopped"
-            )
-
-        state = state_map[state_str]
-        speed = command.get("speed")
+        # Pydantic already validates that state is a valid enum value
+        state = state_map[command.state]
+        speed = command.speed
 
         success = cnc.controller.set_spindle(state, speed)
 
         if success:
             audit_logger.log_control_action(
                 "cnc_spindle_control",
-                {"state": state_str, "speed": speed}
+                {"state": command.state.value, "speed": speed}
             )
             return {
                 "status": "success",
-                "spindle_state": state_str,
+                "spindle_state": command.state.value,
                 "spindle_speed": cnc.controller.spindle_speed
             }
         else:
@@ -821,16 +846,16 @@ async def set_coordinate_system(
 @limiter.limit("30/minute")
 async def set_feed_override(
     request: Request,
-    override: Dict,
+    override: OverrideRequest,
     api_key: str = Depends(require_control) if API_AUTH_ENABLED else None
 ):
     """
     Set feed override percentage
 
-    Request body: {"percentage": 100}  (0-150)
+    Request body uses OverrideRequest model with percentage (0-150)
     """
     try:
-        percentage = override.get("percentage", 100)
+        percentage = override.percentage
         success = cnc.controller.set_feed_override(percentage)
 
         if success:
@@ -850,16 +875,16 @@ async def set_feed_override(
 @limiter.limit("30/minute")
 async def set_spindle_override(
     request: Request,
-    override: Dict,
+    override: OverrideRequest,
     api_key: str = Depends(require_control) if API_AUTH_ENABLED else None
 ):
     """
     Set spindle override percentage
 
-    Request body: {"percentage": 100}  (50-150)
+    Request body uses OverrideRequest model with percentage (50-150)
     """
     try:
-        percentage = override.get("percentage", 100)
+        percentage = override.percentage
         success = cnc.controller.set_spindle_override(percentage)
 
         if success:
@@ -879,16 +904,16 @@ async def set_spindle_override(
 @limiter.limit("100/minute")  # Higher limit for safety
 async def emergency_stop(
     request: Request,
-    command: Dict,
+    command: EmergencyStopRequest,
     api_key: str = Depends(require_control) if API_AUTH_ENABLED else None
 ):
     """
     Activate or deactivate emergency stop
 
-    Request body: {"active": true/false}
+    Request body uses EmergencyStopRequest model with active boolean
     """
     try:
-        active = command.get("active", True)
+        active = command.active
         cnc.controller.set_emergency_stop(active)
 
         audit_logger.log_security_event(

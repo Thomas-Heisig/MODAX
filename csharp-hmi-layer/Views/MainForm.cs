@@ -13,12 +13,19 @@ namespace MODAX.HMI.Views
     /// </summary>
     public partial class MainForm : Form
     {
+        // Configuration constants
+        private const int DEFAULT_UPDATE_INTERVAL_MS = 2000;
+        private const int MIN_UPDATE_INTERVAL_MS = 500;
+        private const int MAX_UPDATE_INTERVAL_MS = 30000;
+
         private readonly ControlLayerClient _controlClient;
         private System.Windows.Forms.Timer? _updateTimer;
         private string? _selectedDeviceId;
 
         // UI Controls
         private ComboBox? _deviceComboBox;
+        private TextBox? _deviceFilterTextBox;
+        private System.Collections.Generic.List<string> _allDevices = new();
         private Label? _systemStatusLabel;
         private Label? _safetyStatusLabel;
         private Panel? _safetyPanel;
@@ -123,18 +130,36 @@ namespace MODAX.HMI.Views
             };
             panel.Controls.Add(_systemStatusLabel);
 
+            // Device filter
+            var filterLabel = new Label
+            {
+                Text = "Filter:",
+                Location = new Point(400, 20),
+                AutoSize = true
+            };
+            panel.Controls.Add(filterLabel);
+
+            _deviceFilterTextBox = new TextBox
+            {
+                Location = new Point(450, 18),
+                Width = 150,
+                PlaceholderText = "Type to filter..."
+            };
+            _deviceFilterTextBox.TextChanged += OnDeviceFilterChanged;
+            panel.Controls.Add(_deviceFilterTextBox);
+
             // Device selector
             var deviceLabel = new Label
             {
                 Text = "Device:",
-                Location = new Point(400, 20),
+                Location = new Point(610, 20),
                 AutoSize = true
             };
             panel.Controls.Add(deviceLabel);
 
             _deviceComboBox = new ComboBox
             {
-                Location = new Point(460, 18),
+                Location = new Point(670, 18),
                 Width = 200,
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
@@ -145,7 +170,7 @@ namespace MODAX.HMI.Views
             _refreshButton = new Button
             {
                 Text = "Refresh",
-                Location = new Point(670, 17),
+                Location = new Point(880, 17),
                 Width = 80
             };
             _refreshButton.Click += async (s, e) => await RefreshDevicesAsync();
@@ -304,9 +329,21 @@ namespace MODAX.HMI.Views
 
         private void InitializeTimer()
         {
+            // Read update interval from environment variable or use default
+            int updateInterval = DEFAULT_UPDATE_INTERVAL_MS;
+            string? intervalEnv = Environment.GetEnvironmentVariable("HMI_UPDATE_INTERVAL_MS");
+            if (!string.IsNullOrEmpty(intervalEnv) && int.TryParse(intervalEnv, out int parsedInterval))
+            {
+                // Validate interval within acceptable range
+                if (parsedInterval >= MIN_UPDATE_INTERVAL_MS && parsedInterval <= MAX_UPDATE_INTERVAL_MS)
+                {
+                    updateInterval = parsedInterval;
+                }
+            }
+
             _updateTimer = new System.Windows.Forms.Timer
             {
-                Interval = 2000 // Update every 2 seconds
+                Interval = updateInterval
             };
             _updateTimer.Tick += async (s, e) => await UpdateDataAsync();
             _updateTimer.Start();
@@ -321,6 +358,46 @@ namespace MODAX.HMI.Views
             }
         }
 
+        private void OnDeviceFilterChanged(object? sender, EventArgs e)
+        {
+            if (_deviceFilterTextBox == null || _deviceComboBox == null) return;
+
+            string filter = _deviceFilterTextBox.Text.Trim().ToLower();
+            string? currentSelection = _deviceComboBox.SelectedItem as string;
+
+            _deviceComboBox.Items.Clear();
+
+            if (string.IsNullOrEmpty(filter))
+            {
+                // Show all devices when filter is empty
+                foreach (var device in _allDevices)
+                {
+                    _deviceComboBox.Items.Add(device);
+                }
+            }
+            else
+            {
+                // Show only filtered devices
+                foreach (var device in _allDevices)
+                {
+                    if (device.ToLower().Contains(filter))
+                    {
+                        _deviceComboBox.Items.Add(device);
+                    }
+                }
+            }
+
+            // Try to restore previous selection if it's still in the filtered list
+            if (currentSelection != null && _deviceComboBox.Items.Contains(currentSelection))
+            {
+                _deviceComboBox.SelectedItem = currentSelection;
+            }
+            else if (_deviceComboBox.Items.Count > 0)
+            {
+                _deviceComboBox.SelectedIndex = 0;
+            }
+        }
+
         private async Task RefreshDevicesAsync()
         {
             if (_isLoading) return; // Prevent concurrent refresh operations
@@ -331,11 +408,22 @@ namespace MODAX.HMI.Views
                 var devices = await _controlClient.GetDevicesAsync();
                 if (devices != null && _deviceComboBox != null)
                 {
+                    // Store all devices
+                    _allDevices.Clear();
+                    _allDevices.AddRange(devices);
+
+                    // Apply current filter
                     _deviceComboBox.Items.Clear();
-                    foreach (var device in devices)
+                    string filter = _deviceFilterTextBox?.Text.Trim().ToLower() ?? "";
+                    
+                    foreach (var device in _allDevices)
                     {
-                        _deviceComboBox.Items.Add(device);
+                        if (string.IsNullOrEmpty(filter) || device.ToLower().Contains(filter))
+                        {
+                            _deviceComboBox.Items.Add(device);
+                        }
                     }
+
                     if (_deviceComboBox.Items.Count > 0)
                     {
                         _deviceComboBox.SelectedIndex = 0;

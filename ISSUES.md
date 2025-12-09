@@ -2,8 +2,9 @@
 
 Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Probleme werden nach `DONE.md` verschoben.
 
-**Letzte Aktualisierung:** 2025-12-07  
-**Anzahl offener Issues:** 14 (2 kritisch, 5 wichtig, 7 kleinere Probleme)
+**Letzte Aktualisierung:** 2025-12-09  
+**Anzahl offener Issues:** 9 (2 kritisch, 3 wichtig, 4 kleinere Probleme)  
+**Behobene Issues in dieser Session:** 5 (#027, #008 teilweise, #010, #013, #014)
 
 ## Kritische Probleme
 
@@ -144,21 +145,29 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
 
 ### Wartung & Dokumentation
 
-#### #027: Datum-Inkonsistenzen in Dokumentation
+#### ~~#027: Datum-Inkonsistenzen in Dokumentation~~ ✅ BEHOBEN
 **Beschreibung:** Einige Dokumentationsdateien verwenden noch das Jahr 2024 statt 2025.
 - **Betroffene Komponenten:** Diverse .md Dateien in docs/
 - **Auswirkung:** Verwirrung über Aktualität der Dokumentation
 - **Priorität:** Niedrig
-- **Vorgeschlagene Lösung:** Systematische Aktualisierung aller Datums-Referenzen auf 2025
+- **Status:** ✅ Behoben in Commit 682ba3a
+- **Lösung:** Alle Datums-Referenzen auf 2025 aktualisiert
+  - IMPROVEMENTS_2024-12-06.md → IMPROVEMENTS_2025-12-06.md
+  - SESSION_SUMMARY_2024-12-07.md → SESSION_SUMMARY_2025-12-07.md
+  - Datumsinhalte in den Dateien aktualisiert
 
 ### Code-Qualität
 
-#### #008: Einige Python-Module haben keine Type Hints
+#### ~~#008: Einige Python-Module haben keine Type Hints~~ ✅ TEILWEISE BEHOBEN
 **Beschreibung:** Nicht alle Funktionen haben vollständige Type-Annotations.
 - **Betroffene Komponenten:** Python Control Layer, Python AI Layer
 - **Auswirkung:** Schlechtere IDE-Unterstützung, schwerer zu wartender Code
 - **Priorität:** Niedrig
-- **Vorgeschlagene Lösung:** Schrittweise Type Hints hinzufügen, mypy für Type-Checking nutzen
+- **Status:** ✅ Teilweise behoben in Commit 8cf2e2b
+- **Lösung:** Type Hints zu allen API-Endpunkt-Funktionen hinzugefügt
+  - control_api.py: root(), health_check(), readiness_check(), metrics(), set_control_layer()
+  - ai_service.py: root(), health_check(), metrics()
+  - Weitere Module können bei Bedarf ergänzt werden
 
 #### ~~#009: Magic Numbers in Code~~ ✅ BEHOBEN
 **Beschreibung:** Einige Threshold-Werte sind direkt im Code als Zahlen geschrieben (z.B. Temperatur-Limits, Strom-Schwellenwerte).
@@ -172,12 +181,18 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
   - optimizer.py: 18 Konstanten für Optimierungs-Empfehlungen
   - Alle Konstanten mit beschreibenden Namen und Kommentaren
 
-#### #010: Fehlende Eingabevalidierung in einigen API-Endpunkten
+#### ~~#010: Fehlende Eingabevalidierung in einigen API-Endpunkten~~ ✅ BEHOBEN
 **Beschreibung:** Nicht alle API-Endpunkte validieren Eingabeparameter vollständig.
 - **Betroffene Komponenten:** Python Control Layer (control_api.py)
 - **Auswirkung:** Potenzielle Sicherheitsprobleme, unklare Fehlermeldungen
 - **Priorität:** Mittel
-- **Vorgeschlagene Lösung:** Pydantic-Modelle für alle Request-Bodies verwenden
+- **Status:** ✅ Behoben in Commit 8cf2e2b
+- **Lösung:** Pydantic-Modelle für alle CNC-Endpunkte erstellt
+  - GCodeProgramRequest für CNC-Programm-Laden
+  - SpindleCommandRequest für Spindle-Steuerung
+  - OverrideRequest für Feed/Spindle-Override
+  - EmergencyStopRequest für Notaus
+  - Alle Endpunkte verwenden nun typisierte Modelle statt Dict
 
 ### Performance
 
@@ -197,19 +212,28 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
 
 ### Benutzeroberfläche
 
-#### #013: HMI-Update-Intervall fest codiert
+#### ~~#013: HMI-Update-Intervall fest codiert~~ ✅ BEHOBEN
 **Beschreibung:** Das 2-Sekunden-Update-Intervall im HMI ist nicht konfigurierbar.
 - **Betroffene Komponenten:** C# HMI Layer (MainForm.cs)
 - **Auswirkung:** Keine Flexibilität für verschiedene Nutzungsszenarien
 - **Priorität:** Niedrig
-- **Vorgeschlagene Lösung:** Update-Intervall in Einstellungen konfigurierbar machen
+- **Status:** ✅ Behoben in Commit 57503db
+- **Lösung:** Update-Intervall über Umgebungsvariable konfigurierbar
+  - HMI_UPDATE_INTERVAL_MS: Intervall in Millisekunden (Standard: 2000)
+  - Validierung: 500ms - 30000ms (0.5s - 30s)
+  - Fehlerhafte Werte werden ignoriert und Standard verwendet
 
-#### #014: Fehlende Sortier- und Filterfunktionen im HMI
+#### ~~#014: Fehlende Sortier- und Filterfunktionen im HMI~~ ✅ BEHOBEN
 **Beschreibung:** Bei vielen verbundenen Geräten gibt es keine Möglichkeit, die Liste zu filtern oder zu sortieren.
 - **Betroffene Komponenten:** C# HMI Layer (MainForm.cs)
 - **Auswirkung:** Unübersichtlich bei großer Anzahl von Geräten
 - **Priorität:** Niedrig
-- **Vorgeschlagene Lösung:** Such- und Filterfunktion für Geräteliste hinzufügen
+- **Status:** ✅ Behoben in Commit 57503db
+- **Lösung:** Echtzeit-Filterfunktion implementiert
+  - TextBox mit PlaceholderText "Type to filter..."
+  - Filterung erfolgt bei jeder Texteingabe (case-insensitive)
+  - Erhaltung der Auswahl beim Filtern wenn möglich
+  - Speicherung aller Geräte für schnelle Filterung
 
 ## Verbesserungsvorschläge (Enhancements)
 
