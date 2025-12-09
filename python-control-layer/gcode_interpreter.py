@@ -10,6 +10,12 @@ class InterpreterState:
     """Maintains interpreter execution state"""
 
     def __init__(self):
+        """
+        Initialize interpreter state
+        
+        Sets up execution state including current line, call stack, variables,
+        labels, and execution counter for loop prevention.
+        """
         self.current_line: int = 0
         self.call_stack: List[int] = []  # For GOSUB/RETURN
         self.variables: Dict[str, float] = {}  # Macro variables
@@ -30,6 +36,11 @@ class GCodeInterpreter:
     """Interprets and executes G-code programs with control flow"""
 
     def __init__(self):
+        """
+        Initialize G-code interpreter
+        
+        Creates parser, interpreter state, program storage, and execution log.
+        """
         self.parser = GCodeParser()
         self.state = InterpreterState()
         self.program: List[GCodeCommand] = []

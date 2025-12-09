@@ -52,6 +52,15 @@ class ToolManager:
     COMP_RIGHT = "G42"
 
     def __init__(self, magazine_capacity: int = 24):
+        """
+        Initialize tool manager
+        
+        Args:
+            magazine_capacity: Maximum number of tools in magazine (default: 24)
+            
+        Sets up tool storage, current state, radius compensation, length compensation,
+        tool measurement, and wear tracking.
+        """
         self.magazine_capacity = magazine_capacity
         self.tools: Dict[int, Tool] = {}
 

@@ -94,6 +94,18 @@ async def get_api_key(api_key: str = Security(api_key_header_scheme)) -> str:
 async def require_permission(permission: str):
     """Dependency factory to require specific permission"""
     async def check_permission(api_key: str = Security(get_api_key)) -> str:
+        """
+        Check if the API key has the required permission
+        
+        Args:
+            api_key: The API key to check
+            
+        Returns:
+            The validated API key
+            
+        Raises:
+            HTTPException: If the API key doesn't have the required permission
+        """
         if not api_key_manager.has_permission(api_key, permission):
             key_info = api_key_manager.validate_key(api_key)
             logger.warning(

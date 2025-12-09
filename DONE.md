@@ -12,6 +12,81 @@ Jeder Eintrag sollte folgende Informationen enthalten:
 
 ---
 
+## 2025-12-09 (Session 3 - Status Update)
+
+### Dokumentation bestehender Implementierungen aktualisiert
+- **Datum:** 2025-12-09
+- **Typ:** Documentation Update
+- **Beschreibung:** Status-Update für bereits implementierte Features in ISSUES.md
+- **Autor:** GitHub Copilot Agent
+- **Details:**
+
+#### #024: TimescaleDB Integration - Als implementiert markiert ✅
+- **Status:** Bereits vollständig implementiert, nun als behoben markiert
+- **Implementierte Dateien:**
+  - `python-control-layer/db_connection.py`: DatabaseConnectionPool mit ThreadedConnectionPool
+  - `python-control-layer/data_writer.py`: Sensor-Daten Persistierung
+  - `python-control-layer/data_reader.py`: Historische Daten-Abfrage
+  - `docker-compose.prod.yml`: TimescaleDB Container (timescale/timescaledb:2.13.0-pg15)
+- **Features:**
+  - Connection Pooling für Performance
+  - Secrets Management für DB-Credentials
+  - Konfigurierbare Pool-Größe
+  - Graceful Shutdown
+  - Dokumentation in docs/DATA_PERSISTENCE.md
+
+#### #025: Prometheus Metrics Export - Als implementiert markiert ✅
+- **Status:** Bereits vollständig implementiert, nun als behoben markiert
+- **Control Layer Metrics:**
+  - control_api_requests_total (Counter by method, endpoint, status)
+  - control_api_request_duration_seconds (Histogram)
+  - control_devices_online (Gauge)
+  - control_system_safe (Gauge)
+  - control_cache_hits_total, control_cache_misses_total (Counter)
+- **AI Layer Metrics:**
+  - ai_analysis_requests_total (Counter by status)
+  - ai_analysis_duration_seconds (Histogram)
+  - ai_anomalies_detected_total (Counter by type)
+- **Features:**
+  - /metrics Endpunkte auf beiden Layern
+  - config/prometheus.yml: Vollständige Scraping-Konfiguration
+  - Grafana-Dashboards in config/grafana/dashboards/
+  - Dokumentation in docs/MONITORING.md und IMPROVEMENTS.md
+
+#### #026: WebSocket-Support - Als implementiert markiert ✅
+- **Status:** Bereits vollständig implementiert, nun als behoben markiert
+- **Implementierte Dateien:**
+  - `python-control-layer/websocket_manager.py`: WebSocketManager-Klasse
+  - `python-control-layer/control_api.py`: WebSocket Endpoints
+- **Features:**
+  - /ws: All-device updates (Broadcast)
+  - /ws/{device_id}: Device-specific updates
+  - Connection Management (connect, disconnect)
+  - Device-spezifische Subscriptions
+  - Async/Thread-safe Implementierung
+  - Automatische Push-Updates bei Datenänderungen
+  - Ping/Pong für Connection Keep-Alive
+  - Fehlerbehandlung und Reconnection-Support
+  - Dokumentation in docs/IMPROVEMENTS.md
+
+#### #030: Health-Check-Endpunkte - Als implementiert markiert ✅
+- **Status:** Bereits vollständig implementiert, nun als behoben markiert
+- **Control Layer Endpunkte:**
+  - GET /health: Basis Health-Check (Service läuft)
+  - GET /ready: Readiness-Check (Control Layer initialisiert, Devices online, Safety Status)
+- **AI Layer Endpunkte:**
+  - GET /health: Basis Health-Check (Service läuft)
+  - GET /ready: Readiness-Check (AI-Modelle geladen, Service bereit)
+- **Docker Integration:**
+  - Health-Checks in allen Dockerfiles
+  - docker-compose.yml: Health-Check-Konfiguration für alle Services
+  - Kubernetes Health-Probes in k8s/base/
+- **Dokumentation:**
+  - docs/IMPROVEMENTS.md: Vollständige Health-Check-Dokumentation
+  - docs/CONTAINERIZATION.md: Docker Health-Check Integration
+
+---
+
 ## 2025-12-09 (Session 2)
 
 ### Abarbeitung der nächsten 20 Punkte aus TODO.md und ISSUES.md
