@@ -205,12 +205,21 @@ Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Pr
 
 ### Performance
 
-#### #011: Keine Caching-Strategie für häufig abgerufene Daten
+#### ~~#011: Keine Caching-Strategie für häufig abgerufene Daten~~ ✅ BEHOBEN
 **Beschreibung:** Jeder API-Aufruf generiert neue Berechnungen, auch wenn sich Daten nicht geändert haben.
 - **Betroffene Komponenten:** Python Control Layer (control_api.py)
 - **Auswirkung:** Unnötige CPU-Last bei vielen Clients
 - **Priorität:** Niedrig
-- **Vorgeschlagene Lösung:** Redis-Cache oder In-Memory-Cache für häufige Abfragen
+- **Status:** ✅ Behoben - TTL-basiertes In-Memory-Caching implementiert
+- **Lösung:** CacheManager mit cachetools implementiert
+  - cache_manager.py: Thread-safe TTL-basiertes Caching
+  - Separate Caches für verschiedene Datentypen (Device List, Device Data, AI Analysis, System Status)
+  - Konfigurierbare TTL-Werte (1-10 Sekunden je nach Datentyp)
+  - Cache-Statistik-Endpunkt (/api/v1/cache/stats)
+  - Prometheus Metrics für Cache-Performance (control_cache_hits_total, control_cache_misses_total, control_cache_size)
+  - 10 Unit-Tests mit 100% Erfolgsrate
+  - Cache-Invalidierung für einzelne Geräte
+  - Thread-sicher mit Locks für concurrent access
 
 #### #012: Große MQTT-Nachrichten bei hoher Sensor-Frequenz
 **Beschreibung:** Bei 10Hz Sensor-Sampling werden viele kleine MQTT-Nachrichten gesendet.

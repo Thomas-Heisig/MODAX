@@ -19,12 +19,14 @@ from websocket_manager import get_websocket_manager
 from data_export import get_data_exporter
 from config import config
 from cnc_integration import get_cnc_integration
+from cache_manager import get_cache_manager
 
 logger = logging.getLogger(__name__)
 audit_logger = get_security_audit_logger()
 ws_manager = get_websocket_manager()
 data_exporter = get_data_exporter()
 cnc = get_cnc_integration()
+cache = get_cache_manager()
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address, enabled=config.control.rate_limit_enabled)
@@ -34,6 +36,9 @@ REQUEST_COUNT = Counter('control_api_requests_total', 'Total API requests', ['me
 REQUEST_DURATION = Histogram('control_api_request_duration_seconds', 'API request duration', ['method', 'endpoint'])
 DEVICES_ONLINE = Gauge('control_devices_online', 'Number of devices online')
 SYSTEM_SAFE = Gauge('control_system_safe', 'System safety status (1=safe, 0=unsafe)')
+CACHE_HITS = Counter('control_cache_hits_total', 'Total cache hits')
+CACHE_MISSES = Counter('control_cache_misses_total', 'Total cache misses')
+CACHE_SIZE = Gauge('control_cache_size', 'Cache size', ['cache_type'])
 
 app = FastAPI(
     title="MODAX Control Layer API",
@@ -266,7 +271,24 @@ def readiness_check(request: Request):
 @app.get("/metrics")
 def metrics() -> Response:
     """Prometheus metrics endpoint"""
+    # Update cache metrics before exporting
+    stats = cache.get_statistics()
+    CACHE_HITS._value.set(stats['hits'])
+    CACHE_MISSES._value.set(stats['misses'])
+    for cache_type, size in stats['cache_sizes'].items():
+        CACHE_SIZE.labels(cache_type=cache_type).set(size)
+    
     return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+
+@app.get("/api/v1/cache/stats")
+@limiter.limit(config.control.rate_limit_default)
+async def get_cache_stats(
+    request: Request,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
+    """Get cache statistics for monitoring and debugging"""
+    return cache.get_statistics()
 
 
 @app.get("/api/v1/status", response_model=SystemStatus)
@@ -275,16 +297,24 @@ async def get_system_status(
     request: Request,
     api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
 ):
-    """Get overall system status"""
+    """Get overall system status (cached for performance)"""
     if not control_layer:
         raise HTTPException(status_code=503, detail="Control layer not initialized")
 
-    return SystemStatus(
+    # Try to get from cache first
+    cached_status = cache.get_system_status()
+    if cached_status:
+        return SystemStatus(**cached_status)
+
+    # Cache miss - compute and cache
+    status = SystemStatus(
         is_safe=control_layer.aggregator.is_system_safe(),
         devices_online=control_layer.aggregator.get_device_ids(),
         ai_enabled=control_layer.config.control.ai_layer_enabled,
         last_update=control_layer.get_last_update_time()
     )
+    cache.set_system_status(status.dict())
+    return status
 
 
 @app.get("/api/v1/devices", response_model=List[str])
@@ -293,11 +323,19 @@ async def get_devices(
     request: Request,
     api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
 ):
-    """Get list of connected devices"""
+    """Get list of connected devices (cached for performance)"""
     if not control_layer:
         raise HTTPException(status_code=503, detail="Control layer not initialized")
 
-    return control_layer.aggregator.get_device_ids()
+    # Try to get from cache first
+    cached_devices = cache.get_device_list()
+    if cached_devices is not None:
+        return cached_devices
+
+    # Cache miss - compute and cache
+    devices = control_layer.aggregator.get_device_ids()
+    cache.set_device_list(devices)
+    return devices
 
 
 @app.get("/api/v1/devices/{device_id}/data", response_model=DeviceData)
@@ -375,14 +413,21 @@ async def get_ai_analysis(
     device_id: str,
     api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
 ):
-    """Get latest AI analysis for a device"""
+    """Get latest AI analysis for a device (cached for performance)"""
     if not control_layer:
         raise HTTPException(status_code=503, detail="Control layer not initialized")
 
+    # Try to get from cache first (AI analysis is expensive)
+    cached_analysis = cache.get_ai_analysis(device_id)
+    if cached_analysis:
+        return AIAnalysisResponse(**cached_analysis)
+
+    # Cache miss - compute and cache
     analysis = control_layer.get_latest_ai_analysis(device_id)
     if not analysis:
         raise HTTPException(status_code=404, detail=f"No AI analysis for device {device_id}")
 
+    cache.set_ai_analysis(device_id, analysis)
     return AIAnalysisResponse(**analysis)
 
 
