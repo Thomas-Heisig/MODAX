@@ -55,9 +55,16 @@ namespace MODAX.HMI.Views
         // Chart panel
         private ChartPanel? _chartPanel;
 
+        // Offline mode indicator
+        private Label? _offlineModeLabel;
+
         public MainForm()
         {
             _controlClient = new ControlLayerClient();
+            
+            // Subscribe to online/offline status changes
+            _controlClient.OnlineStatusChanged += OnOnlineStatusChanged;
+            
             InitializeComponents();
             InitializeTimer();
             InitializeKeyboardShortcuts();
@@ -138,6 +145,18 @@ namespace MODAX.HMI.Views
                 AutoSize = true
             };
             panel.Controls.Add(_systemStatusLabel);
+
+            // Offline mode indicator
+            _offlineModeLabel = new Label
+            {
+                Text = "",
+                Font = new Font("Arial", 10, FontStyle.Bold),
+                Location = new Point(300, 45),
+                AutoSize = true,
+                ForeColor = Color.OrangeRed,
+                Visible = false
+            };
+            panel.Controls.Add(_offlineModeLabel);
 
             // Device filter
             var filterLabel = new Label
@@ -866,6 +885,47 @@ Note: Control commands require a device to be selected first.";
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information
             );
+        }
+
+        /// <summary>
+        /// Handle online/offline status changes
+        /// </summary>
+        private void OnOnlineStatusChanged(object? sender, bool isOnline)
+        {
+            // Update UI on UI thread
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => OnOnlineStatusChanged(sender, isOnline)));
+                return;
+            }
+
+            if (_offlineModeLabel != null)
+            {
+                if (isOnline)
+                {
+                    _offlineModeLabel.Text = "";
+                    _offlineModeLabel.Visible = false;
+                    
+                    // Show reconnection notification
+                    if (_systemStatusLabel != null)
+                    {
+                        _systemStatusLabel.Text = "Status: ✓ Reconnected - Synchronizing...";
+                        _systemStatusLabel.ForeColor = Color.DarkGreen;
+                    }
+                }
+                else
+                {
+                    _offlineModeLabel.Text = "⚠ OFFLINE MODE - Using cached data";
+                    _offlineModeLabel.Visible = true;
+                    
+                    var stats = _controlClient.GetCacheStats();
+                    var tooltip = $"Cached: {stats.sensorCount} sensor readings, {stats.aiCount} AI analyses\n" +
+                                 $"Pending commands: {stats.pendingCommands}";
+                    
+                    // Create tooltip (simplified, could use ToolTip control)
+                    _offlineModeLabel.Text = $"⚠ OFFLINE MODE - {stats.sensorCount} cached readings";
+                }
+            }
         }
     }
 }
