@@ -52,9 +52,19 @@ namespace MODAX.HMI.Views
         private Label? _loadingLabel;
         private bool _isLoading = false;
 
+        // Chart panel
+        private ChartPanel? _chartPanel;
+
+        // Offline mode indicator
+        private Label? _offlineModeLabel;
+
         public MainForm()
         {
             _controlClient = new ControlLayerClient();
+            
+            // Subscribe to online/offline status changes
+            _controlClient.OnlineStatusChanged += OnOnlineStatusChanged;
+            
             InitializeComponents();
             InitializeTimer();
             InitializeKeyboardShortcuts();
@@ -64,20 +74,21 @@ namespace MODAX.HMI.Views
         {
             // Form setup
             Text = "MODAX - Industrial Control HMI";
-            Size = new Size(1200, 800);
+            Size = new Size(1600, 900);  // Increased width for charts
             StartPosition = FormStartPosition.CenterScreen;
             KeyPreview = true; // Enable keyboard shortcuts
 
-            // Main layout
+            // Main layout - 3 columns to accommodate charts
             var mainPanel = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
-                ColumnCount = 2,
+                ColumnCount = 3,
                 RowCount = 3,
                 Padding = new Padding(10)
             };
-            mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60F));
-            mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
+            mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 35F));  // Left: Controls
+            mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));  // Middle: Status
+            mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));  // Right: Charts
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 80F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 60F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
@@ -85,7 +96,7 @@ namespace MODAX.HMI.Views
             // Header section
             var headerPanel = CreateHeaderPanel();
             mainPanel.Controls.Add(headerPanel, 0, 0);
-            mainPanel.SetColumnSpan(headerPanel, 2);
+            mainPanel.SetColumnSpan(headerPanel, 3);
 
             // Sensor data section
             var sensorPanel = CreateSensorPanel();
@@ -94,6 +105,11 @@ namespace MODAX.HMI.Views
             // Safety section
             var safetySection = CreateSafetyPanel();
             mainPanel.Controls.Add(safetySection, 1, 1);
+
+            // Chart panel section (NEW)
+            _chartPanel = new ChartPanel();
+            mainPanel.Controls.Add(_chartPanel, 2, 1);
+            mainPanel.SetRowSpan(_chartPanel, 2);  // Span 2 rows for more chart space
 
             // AI analysis section
             var aiSection = CreateAIPanel();
@@ -129,6 +145,18 @@ namespace MODAX.HMI.Views
                 AutoSize = true
             };
             panel.Controls.Add(_systemStatusLabel);
+
+            // Offline mode indicator
+            _offlineModeLabel = new Label
+            {
+                Text = "",
+                Font = new Font("Arial", 10, FontStyle.Bold),
+                Location = new Point(300, 45),
+                AutoSize = true,
+                ForeColor = Color.OrangeRed,
+                Visible = false
+            };
+            panel.Controls.Add(_offlineModeLabel);
 
             // Device filter
             var filterLabel = new Label
@@ -354,6 +382,10 @@ namespace MODAX.HMI.Views
             if (_deviceComboBox?.SelectedItem is string deviceId)
             {
                 _selectedDeviceId = deviceId;
+                
+                // Clear charts when switching devices
+                _chartPanel?.ClearCharts();
+                
                 await UpdateDataAsync();
             }
         }
@@ -650,6 +682,9 @@ namespace MODAX.HMI.Views
                 if (_startButton != null) _startButton.Enabled = isSafe;
                 if (_stopButton != null) _stopButton.Enabled = true;
             }
+
+            // Update charts with sensor data
+            _chartPanel?.UpdateSensorData(data);
         }
 
         private async Task UpdateAIAnalysisAsync(string deviceId)
@@ -694,6 +729,9 @@ namespace MODAX.HMI.Views
                 _recommendationsTextBox.Text = string.Join(Environment.NewLine + Environment.NewLine, 
                                                           analysis.Recommendations);
             }
+
+            // Update charts with AI analysis data
+            _chartPanel?.UpdateAIAnalysis(analysis);
         }
 
         private async Task SendCommandAsync(string commandType)
@@ -847,6 +885,47 @@ Note: Control commands require a device to be selected first.";
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information
             );
+        }
+
+        /// <summary>
+        /// Handle online/offline status changes
+        /// </summary>
+        private void OnOnlineStatusChanged(object? sender, bool isOnline)
+        {
+            // Update UI on UI thread
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => OnOnlineStatusChanged(sender, isOnline)));
+                return;
+            }
+
+            if (_offlineModeLabel != null)
+            {
+                if (isOnline)
+                {
+                    _offlineModeLabel.Text = "";
+                    _offlineModeLabel.Visible = false;
+                    
+                    // Show reconnection notification
+                    if (_systemStatusLabel != null)
+                    {
+                        _systemStatusLabel.Text = "Status: ✓ Reconnected - Synchronizing...";
+                        _systemStatusLabel.ForeColor = Color.DarkGreen;
+                    }
+                }
+                else
+                {
+                    _offlineModeLabel.Text = "⚠ OFFLINE MODE - Using cached data";
+                    _offlineModeLabel.Visible = true;
+                    
+                    var stats = _controlClient.GetCacheStats();
+                    var tooltip = $"Cached: {stats.sensorCount} sensor readings, {stats.aiCount} AI analyses\n" +
+                                 $"Pending commands: {stats.pendingCommands}";
+                    
+                    // Create tooltip (simplified, could use ToolTip control)
+                    _offlineModeLabel.Text = $"⚠ OFFLINE MODE - {stats.sensorCount} cached readings";
+                }
+            }
         }
     }
 }

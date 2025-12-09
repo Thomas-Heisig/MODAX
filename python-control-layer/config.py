@@ -83,16 +83,36 @@ class ControlConfig:
 
 
 @dataclass
+class OpcUaConfig:
+    """OPC UA Server configuration"""
+    enabled: bool = os.getenv("OPCUA_ENABLED", "false").lower() == "true"
+    endpoint: str = os.getenv("OPCUA_ENDPOINT", "opc.tcp://0.0.0.0:4840")
+    enable_security: bool = os.getenv("OPCUA_ENABLE_SECURITY", "false").lower() == "true"
+    cert_dir: str = os.getenv("OPCUA_CERT_DIR", "certs")
+
+    def validate(self) -> List[str]:
+        """Validate OPC UA configuration"""
+        errors = []
+        if self.enabled:
+            # Parse endpoint to validate
+            if not self.endpoint.startswith("opc.tcp://"):
+                errors.append(f"Invalid OPCUA_ENDPOINT: {self.endpoint} (must start with opc.tcp://)")
+        return errors
+
+
+@dataclass
 class Config:
     """Master configuration"""
     mqtt: MQTTConfig = field(default_factory=MQTTConfig)
     control: ControlConfig = field(default_factory=ControlConfig)
+    opcua: OpcUaConfig = field(default_factory=OpcUaConfig)
 
     def validate(self) -> bool:
         """Validate all configuration and exit if invalid"""
         all_errors = []
         all_errors.extend(self.mqtt.validate())
         all_errors.extend(self.control.validate())
+        all_errors.extend(self.opcua.validate())
 
         if all_errors:
             logger.error("Configuration validation failed:")
