@@ -137,7 +137,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 
 @app.get("/")
-def root():
+def root() -> Dict[str, any]:
     """API root"""
     return {
         "service": "MODAX AI Layer",
@@ -154,7 +154,7 @@ def root():
 
 @app.get("/health")
 @limiter.limit(RATE_LIMIT_DEFAULT)
-def health_check(request: Request):
+def health_check(request: Request) -> Dict[str, str]:
     """Health check endpoint - returns 200 if service is running"""
     return {
         "status": "healthy",
@@ -177,7 +177,7 @@ def readiness_check(request: Request):
 
 
 @app.get("/metrics")
-def metrics():
+def metrics() -> Response:
     """Prometheus metrics endpoint"""
     return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
