@@ -30,9 +30,10 @@ def calculate_p95(times: List[float]) -> float:
         # Not enough data for reliable percentile, return max
         return max(times)
     
-    # Using quantiles with n=100 gives us percentiles directly
-    # Index 94 gives us the 95th percentile (0-indexed)
-    # quantiles returns n-1 cut points dividing data into n equal groups
+    # Using quantiles with n=100 returns 99 cut points (indices 0-98)
+    # that divide the data into 100 equal-sized groups.
+    # Index 94 represents the cut point where 95% of the data is below
+    # and 5% is above, which is the 95th percentile.
     return statistics.quantiles(times, n=100)[94]
 
 

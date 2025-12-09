@@ -398,7 +398,7 @@ Include:
 ### Security Issues
 
 **Do not** create public issues for security vulnerabilities.
-Contact the maintainers privately at [security email].
+Contact the maintainers privately via GitHub's private vulnerability reporting feature or by opening a private security advisory.
 
 ## Priority Levels
 
