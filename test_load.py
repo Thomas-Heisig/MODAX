@@ -18,6 +18,25 @@ from anomaly_detector import StatisticalAnomalyDetector
 from wear_predictor import SimpleWearPredictor
 
 
+def calculate_p95(times):
+    """
+    Calculate the 95th percentile of a list of times.
+    
+    Args:
+        times: List of time measurements
+        
+    Returns:
+        95th percentile value, or max value if insufficient data
+    """
+    if not times:
+        return 0
+    if len(times) < 20:
+        return max(times)
+    # Using quantiles with n=100 gives us percentiles directly
+    # Index 94 gives us the 95th percentile (0-indexed)
+    return statistics.quantiles(times, n=100)[94]
+
+
 @dataclass
 class LoadTestResult:
     """Results from a load test"""
@@ -197,7 +216,7 @@ class TestMultiDeviceLoad(unittest.TestCase):
         
         # Calculate statistics
         avg_latency = statistics.mean(latencies) if latencies else 0
-        p95_latency = statistics.quantiles(latencies, n=20)[18] if len(latencies) > 20 else max(latencies) if latencies else 0
+        p95_latency = calculate_p95(latencies)
         ops_per_second = successful / total_time if total_time > 0 else 0
         
         print(f"\nResults:")

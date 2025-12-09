@@ -17,6 +17,23 @@ from wear_predictor import SimpleWearPredictor
 from optimizer import OptimizationRecommender
 
 
+def calculate_p95(times):
+    """
+    Calculate the 95th percentile of a list of times.
+    
+    Args:
+        times: List of time measurements
+        
+    Returns:
+        95th percentile value, or max value if insufficient data
+    """
+    if len(times) < 20:
+        return max(times) if times else 0
+    # Using quantiles with n=100 gives us percentiles directly
+    # Index 94 gives us the 95th percentile (0-indexed)
+    return statistics.quantiles(times, n=100)[94]
+
+
 class TestAPIPerformance(unittest.TestCase):
     """Performance tests for API operations"""
     
@@ -55,7 +72,7 @@ class TestAPIPerformance(unittest.TestCase):
         avg_time = statistics.mean(times)
         max_time = max(times)
         min_time = min(times)
-        p95_time = statistics.quantiles(times, n=20)[18]  # 95th percentile
+        p95_time = calculate_p95(times)
         
         print(f"\nData Aggregation Performance:")
         print(f"  Average: {avg_time:.2f}ms")
@@ -90,7 +107,7 @@ class TestAPIPerformance(unittest.TestCase):
             times.append((end_time - start_time) * 1000)
         
         avg_time = statistics.mean(times)
-        p95_time = statistics.quantiles(times, n=20)[18]
+        p95_time = calculate_p95(times)
         
         print(f"\nAnomaly Detection Performance:")
         print(f"  Average: {avg_time:.2f}ms")
@@ -127,7 +144,7 @@ class TestAPIPerformance(unittest.TestCase):
             self.assertIsNotNone(wear_prediction)
         
         avg_time = statistics.mean(times)
-        p95_time = statistics.quantiles(times, n=20)[18]
+        p95_time = calculate_p95(times)
         
         print(f"\nWear Prediction Performance:")
         print(f"  Average: {avg_time:.2f}ms")
@@ -162,7 +179,7 @@ class TestAPIPerformance(unittest.TestCase):
             self.assertIsNotNone(recommendations)
         
         avg_time = statistics.mean(times)
-        p95_time = statistics.quantiles(times, n=20)[18]
+        p95_time = calculate_p95(times)
         
         print(f"\nOptimization Recommendation Performance:")
         print(f"  Average: {avg_time:.2f}ms")
@@ -216,7 +233,7 @@ class TestAPIPerformance(unittest.TestCase):
             times.append((end_time - start_time) * 1000)
         
         avg_time = statistics.mean(times)
-        p95_time = statistics.quantiles(times, n=20)[18]
+        p95_time = calculate_p95(times)
         
         print(f"\nComplete AI Pipeline Performance:")
         print(f"  Average: {avg_time:.2f}ms")

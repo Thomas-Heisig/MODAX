@@ -5,7 +5,6 @@ import os
 from unittest.mock import Mock, patch, MagicMock
 import json
 import time
-import asyncio
 
 # Add paths to system path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'python-control-layer'))
