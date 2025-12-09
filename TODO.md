@@ -55,7 +55,7 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] WebSocket-Unterstützung für Echtzeit-Updates im HMI
 - [x] Zeitreihen-Datenbank-Integration dokumentieren (docs/DATA_PERSISTENCE.md)
 - [x] TimescaleDB implementieren (siehe docs/DATA_PERSISTENCE.md)
-- [ ] Erweiterte Visualisierungen mit Diagrammen im HMI
+- [x] Erweiterte Visualisierungen mit Diagrammen im HMI (LiveCharts integration - #55)
 - [x] Daten-Export-Funktion (CSV, JSON)
 
 ### Code-Qualität
@@ -91,7 +91,7 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] Export-Funktion im HMI (docs/HMI_ENHANCEMENTS.md - HMI-Integration dokumentiert, API bereits vorhanden)
 - [x] Dark Mode Theme System (docs/HMI_ENHANCEMENTS.md - Implementierungsplan erstellt)
 - [x] Internationalisierung i18n (docs/HMI_ENHANCEMENTS.md - Resource-basiertes System dokumentiert)
-- [ ] Offline-Modus mit lokaler Datenspeicherung (Benötigt Datenpersistenz-Implementation)
+- [x] Offline-Modus mit lokaler Datenspeicherung (SQLite cache implementiert - #91)
 
 ### Wartbarkeit
 - [x] Abhängigkeiten auf neueste stabile Versionen aktualisieren (Bereits aktuell)
@@ -122,7 +122,7 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 
 ### Integration
 - [x] OPC UA Integration dokumentieren (docs/OPC_UA_INTEGRATION.md)
-- [ ] OPC UA Server implementieren (siehe docs/OPC_UA_INTEGRATION.md)
+- [x] OPC UA Server implementieren (asyncua-based implementation - #122)
 - [x] Externe System-Integrationen dokumentieren (docs/EXTERNAL_INTEGRATIONS.md)
 - [x] MQTT Sparkplug B implementieren (docs/MQTT_SPARKPLUG_B.md - Vollständiger Implementierungsplan)
 
