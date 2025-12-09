@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: modax
+
+resources:
+  - namespace.yaml
+  - mqtt-deployment.yaml
+  - control-layer-deployment.yaml
+  - ai-layer-deployment.yaml
+  - timescaledb-deployment.yaml
+  - ingress.yaml
+
+commonLabels:
+  app.kubernetes.io/name: modax
+  app.kubernetes.io/version: "0.2.0"
