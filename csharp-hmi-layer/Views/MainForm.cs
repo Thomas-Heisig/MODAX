@@ -13,6 +13,11 @@ namespace MODAX.HMI.Views
     /// </summary>
     public partial class MainForm : Form
     {
+        // Configuration constants
+        private const int DEFAULT_UPDATE_INTERVAL_MS = 2000;
+        private const int MIN_UPDATE_INTERVAL_MS = 500;
+        private const int MAX_UPDATE_INTERVAL_MS = 30000;
+
         private readonly ControlLayerClient _controlClient;
         private System.Windows.Forms.Timer? _updateTimer;
         private string? _selectedDeviceId;
@@ -324,13 +329,13 @@ namespace MODAX.HMI.Views
 
         private void InitializeTimer()
         {
-            // Read update interval from environment variable or use default (2000ms = 2 seconds)
-            int updateInterval = 2000;
+            // Read update interval from environment variable or use default
+            int updateInterval = DEFAULT_UPDATE_INTERVAL_MS;
             string? intervalEnv = Environment.GetEnvironmentVariable("HMI_UPDATE_INTERVAL_MS");
             if (!string.IsNullOrEmpty(intervalEnv) && int.TryParse(intervalEnv, out int parsedInterval))
             {
-                // Validate interval: minimum 500ms, maximum 30000ms (30 seconds)
-                if (parsedInterval >= 500 && parsedInterval <= 30000)
+                // Validate interval within acceptable range
+                if (parsedInterval >= MIN_UPDATE_INTERVAL_MS && parsedInterval <= MAX_UPDATE_INTERVAL_MS)
                 {
                     updateInterval = parsedInterval;
                 }

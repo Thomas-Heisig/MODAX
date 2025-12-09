@@ -2,8 +2,9 @@
 from fastapi import FastAPI, HTTPException, Depends, WebSocket, WebSocketDisconnect, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict
+from enum import Enum
 import logging
 import os
 import time
@@ -173,26 +174,40 @@ class ControlCommandRequest(BaseModel):
     parameters: Optional[Dict[str, str]] = None
 
 
+class SpindleState(str, Enum):
+    """Valid spindle states"""
+    CW = "cw"
+    CCW = "ccw"
+    STOPPED = "stopped"
+
+
 class GCodeProgramRequest(BaseModel):
     """G-code program load request"""
-    gcode: str
-    name: Optional[str] = None
+    gcode: str = Field(..., min_length=1, description="G-code program content")
+    name: Optional[str] = Field(None, max_length=255, description="Optional program name")
+
+    @validator('gcode')
+    def validate_gcode(cls, v):
+        """Ensure G-code is not just whitespace"""
+        if not v or not v.strip():
+            raise ValueError("G-code cannot be empty or whitespace only")
+        return v.strip()
 
 
 class SpindleCommandRequest(BaseModel):
     """Spindle control command"""
-    state: str  # "cw", "ccw", or "stopped"
-    speed: Optional[float] = None  # RPM, optional
+    state: SpindleState = Field(..., description="Spindle state: cw, ccw, or stopped")
+    speed: Optional[float] = Field(None, ge=0, le=50000, description="Spindle speed in RPM (0-50000)")
 
 
 class OverrideRequest(BaseModel):
     """Feed or spindle override request"""
-    percentage: float  # Override percentage (e.g., 100 = 100%, 150 = 150%)
+    percentage: float = Field(..., ge=0, le=200, description="Override percentage (0-200%)")
 
 
 class EmergencyStopRequest(BaseModel):
     """Emergency stop activation/deactivation request"""
-    active: bool = True  # True to activate, False to deactivate
+    active: bool = Field(True, description="True to activate, False to deactivate")
 
 
 @app.get("/")
@@ -699,22 +714,17 @@ async def control_spindle(
     - speed: RPM (optional)
     """
     try:
-        from cnc_controller import SpindleState
+        from cnc_controller import SpindleState as CNCSpindleState
 
+        # Map API SpindleState enum to CNC controller SpindleState
         state_map = {
-            "cw": SpindleState.CW,
-            "ccw": SpindleState.CCW,
-            "stopped": SpindleState.STOPPED
+            SpindleState.CW: CNCSpindleState.CW,
+            SpindleState.CCW: CNCSpindleState.CCW,
+            SpindleState.STOPPED: CNCSpindleState.STOPPED
         }
 
-        state_str = command.state.lower()
-        if state_str not in state_map:
-            raise HTTPException(
-                status_code=400,
-                detail="Invalid state. Use: cw, ccw, or stopped"
-            )
-
-        state = state_map[state_str]
+        # Pydantic already validates that state is a valid enum value
+        state = state_map[command.state]
         speed = command.speed
 
         success = cnc.controller.set_spindle(state, speed)
@@ -722,11 +732,11 @@ async def control_spindle(
         if success:
             audit_logger.log_control_action(
                 "cnc_spindle_control",
-                {"state": state_str, "speed": speed}
+                {"state": command.state.value, "speed": speed}
             )
             return {
                 "status": "success",
-                "spindle_state": state_str,
+                "spindle_state": command.state.value,
                 "spindle_speed": cnc.controller.spindle_speed
             }
         else:
