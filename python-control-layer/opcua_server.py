@@ -248,16 +248,26 @@ class MODAXOpcUaServer:
             return
 
         try:
-            # Get system status node
-            status_node = await self.system_folder.get_child([f"{self.namespace_idx}:Status"])
-            devices_node = await self.system_folder.get_child([f"{self.namespace_idx}:ConnectedDevices"])
-            timestamp_node = await self.system_folder.get_child([f"{self.namespace_idx}:Timestamp"])
+            # Get system status nodes with specific error handling
+            try:
+                status_node = await self.system_folder.get_child([f"{self.namespace_idx}:Status"])
+                await status_node.write_value("Running")
+            except Exception as e:
+                logger.error(f"Error updating Status node: {e}")
 
-            await status_node.write_value("Running")
-            await devices_node.write_value(connected_devices)
-            await timestamp_node.write_value(datetime.now(timezone.utc))
+            try:
+                devices_node = await self.system_folder.get_child([f"{self.namespace_idx}:ConnectedDevices"])
+                await devices_node.write_value(connected_devices)
+            except Exception as e:
+                logger.error(f"Error updating ConnectedDevices node: {e}")
+
+            try:
+                timestamp_node = await self.system_folder.get_child([f"{self.namespace_idx}:Timestamp"])
+                await timestamp_node.write_value(datetime.now(timezone.utc))
+            except Exception as e:
+                logger.error(f"Error updating Timestamp node: {e}")
         except Exception as e:
-            logger.error(f"Error updating system status: {e}")
+            logger.error(f"Error updating system status (folder access): {e}")
 
     async def start(self):
         """Start OPC UA server"""

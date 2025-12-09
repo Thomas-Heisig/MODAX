@@ -16,7 +16,8 @@ namespace MODAX.HMI.Views
     /// </summary>
     public class ChartPanel : Panel
     {
-        private const int MAX_DATA_POINTS = 50;
+        private const int DEFAULT_MAX_DATA_POINTS = 50;
+        private readonly int _maxDataPoints;
         
         private CartesianChart? _currentChart;
         private CartesianChart? _temperatureChart;
@@ -32,8 +33,9 @@ namespace MODAX.HMI.Views
         
         private int _dataPointCounter = 0;
 
-        public ChartPanel()
+        public ChartPanel(int maxDataPoints = DEFAULT_MAX_DATA_POINTS)
         {
+            _maxDataPoints = maxDataPoints;
             InitializeCharts();
         }
 
@@ -353,7 +355,7 @@ namespace MODAX.HMI.Views
             values.Add(new ObservablePoint(_dataPointCounter, yValue));
 
             // Remove old points if exceeded max
-            if (values.Count > MAX_DATA_POINTS)
+            if (values.Count > _maxDataPoints)
             {
                 values.RemoveAt(0);
             }

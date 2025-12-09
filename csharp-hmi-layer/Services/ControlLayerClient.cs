@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MODAX.HMI.Models;
-using Newtonsoft.Json;
 
 namespace MODAX.HMI.Services
 {
@@ -113,10 +113,11 @@ namespace MODAX.HMI.Services
                 response.EnsureSuccessStatusCode();
                 
                 var json = await response.Content.ReadAsStringAsync();
-                var data = JsonConvert.DeserializeObject<SensorData>(json, new JsonSerializerSettings
+                var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
-                });
+                };
+                var data = JsonSerializer.Deserialize<SensorData>(json, options);
                 
                 // Cache the data for offline use
                 if (data != null)
@@ -148,7 +149,7 @@ namespace MODAX.HMI.Services
                 response.EnsureSuccessStatusCode();
                 
                 var json = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<DeviceHistoryResponse>(json);
+                var result = JsonSerializer.Deserialize<DeviceHistoryResponse>(json);
                 
                 return result?.Readings;
             }
@@ -171,10 +172,11 @@ namespace MODAX.HMI.Services
                 response.EnsureSuccessStatusCode();
                 
                 var json = await response.Content.ReadAsStringAsync();
-                var analysis = JsonConvert.DeserializeObject<AIAnalysis>(json, new JsonSerializerSettings
+                var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
-                });
+                };
+                var analysis = JsonSerializer.Deserialize<AIAnalysis>(json, options);
                 
                 // Cache the analysis for offline use
                 if (analysis != null)
@@ -258,7 +260,7 @@ namespace MODAX.HMI.Services
             {
                 try
                 {
-                    var parameters = JsonConvert.DeserializeObject<Dictionary<string, string>>(commandJson);
+                    var parameters = JsonSerializer.Deserialize<Dictionary<string, string>>(commandJson);
                     var success = await SendControlCommandAsync(commandType, parameters);
                     
                     if (success)
