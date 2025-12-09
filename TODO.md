@@ -32,10 +32,10 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] Unit-Tests für CNC-Module hinzufügen (25+ Tests)
 - [x] Integrationstests für MQTT-Kommunikation erstellen
 - [x] Test-Coverage-Reporting einrichten (test_with_coverage.sh)
-- [ ] End-to-End-Tests für komplette Datenflusskette erweitern
+- [x] End-to-End-Tests für komplette Datenflusskette erweitern (11 Tests gesamt)
 - [ ] ESP32 Hardware-in-the-Loop Tests
-- [ ] Performance-Tests für API-Endpunkte
-- [ ] Load-Tests für Multi-Device-Szenarien
+- [x] Performance-Tests für API-Endpunkte (test_performance.py mit 8 Test-Suites)
+- [x] Load-Tests für Multi-Device-Szenarien (test_load.py mit 7 Test-Suites)
 
 ### Sicherheit
 - [x] Sicherheitskonzept dokumentieren (docs/SECURITY.md)
