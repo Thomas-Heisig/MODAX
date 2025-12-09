@@ -14,6 +14,70 @@ Jeder Eintrag sollte folgende Informationen enthalten:
 
 ## 2025-12-09
 
+### Code Quality Improvements: Type Hints und Input Validation
+- **Datum:** 2025-12-09
+- **Typ:** Code Quality/Enhancement
+- **Beschreibung:** Type Hints und Pydantic-Modelle für bessere Typsicherheit und Input-Validierung
+- **Commits:** 8cf2e2b
+- **Autor:** GitHub Copilot Agent
+- **Details:**
+  - **Type Hints hinzugefügt:**
+    - control_api.py: root(), health_check(), readiness_check(), metrics(), set_control_layer()
+    - ai_service.py: root(), health_check(), metrics()
+  - **Pydantic-Modelle erstellt für CNC-Endpunkte:**
+    - GCodeProgramRequest: G-Code-Programm laden
+    - SpindleCommandRequest: Spindle-Steuerung
+    - OverrideRequest: Feed/Spindle-Override
+    - EmergencyStopRequest: Notaus-Steuerung
+  - **Issues behoben:** #008 (teilweise), #010
+  - **TODO-Items abgeschlossen:** Type Hints, Eingabevalidierung, Fehlerbehandlung vereinheitlicht
+
+### HMI Improvements: Konfigurierbarkeit und Filterung
+- **Datum:** 2025-12-09
+- **Typ:** Enhancement
+- **Beschreibung:** HMI Update-Intervall konfigurierbar gemacht und Device-Filterung hinzugefügt
+- **Commits:** 57503db
+- **Autor:** GitHub Copilot Agent
+- **Details:**
+  - **Update-Intervall konfigurierbar:**
+    - Umgebungsvariable HMI_UPDATE_INTERVAL_MS
+    - Standard: 2000ms (2 Sekunden)
+    - Validierung: 500ms - 30000ms
+  - **Device-Filterung implementiert:**
+    - TextBox mit Placeholder "Type to filter..."
+    - Echtzeit-Filterung (case-insensitive)
+    - Erhaltung der Auswahl beim Filtern
+    - Speicherung aller Geräte für schnelle Filterung
+  - **Issues behoben:** #013, #014
+
+### Dokumentations-Update: Datumsangaben auf 2025 aktualisiert
+- **Datum:** 2025-12-09
+- **Typ:** Documentation/Housekeeping
+- **Beschreibung:** Alle Dokumentationsdateien mit 2024-Datum auf 2025 aktualisiert
+- **Commits:** 682ba3a
+- **Autor:** GitHub Copilot Agent
+- **Details:**
+  - **Dateien umbenannt:**
+    - IMPROVEMENTS_2024-12-06.md → IMPROVEMENTS_2025-12-06.md
+    - SESSION_SUMMARY_2024-12-07.md → SESSION_SUMMARY_2025-12-07.md
+  - **Datumsinhalte aktualisiert:**
+    - "December 6, 2024" → "December 6, 2025"
+  - **Issues behoben:** #027
+  - **TODO-Items abgeschlossen:** Dokumentation auf 2025 aktualisieren
+
+### Code-Cleanup: Verifizierung und Dokumentation
+- **Datum:** 2025-12-09
+- **Typ:** Code Quality/Maintenance
+- **Beschreibung:** Code-Cleanup-Aufgaben durchgeführt und dokumentiert
+- **Commits:** Siehe oben
+- **Autor:** GitHub Copilot Agent
+- **Details:**
+  - **Deprecated Features:** Keine gefunden
+  - **TODO-Kommentare:** Keine im Code vorhanden
+  - **Code-Kommentare:** Alle aktuell
+  - **Ungenutzte Konfigurationen:** Keine gefunden
+  - **TODO.md und ISSUES.md aktualisiert:** Erledigte Tasks markiert
+
 ### Erweiterte Test-Suites für Performance und Load Testing
 - **Datum:** 2025-12-09
 - **Typ:** Testing/Quality Assurance

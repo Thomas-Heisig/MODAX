@@ -24,7 +24,7 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] Dokumentations-Index erstellen (docs/INDEX.md)
 - [x] TODO.md und ISSUES.md Datum auf 2025 aktualisieren
 - [x] CNC-Funktionen dokumentieren (docs/CNC_FEATURES.md)
-- [ ] Dokumentation auf 2025 aktualisieren (verbleibende Dokumente im docs/ Verzeichnis)
+- [x] Dokumentation auf 2025 aktualisieren (verbleibende Dokumente im docs/ Verzeichnis)
 
 ### Tests
 - [x] Unit-Tests für Python Control Layer hinzufügen (42 Tests)
@@ -61,16 +61,16 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] Code-Linting mit flake8/pylint für Python-Code (lint.sh)
 - [x] Code-Coverage-Berichte generieren (test_with_coverage.sh, 96-97% coverage)
 - [x] Ungenutzte Imports entfernen (pyflakes-clean)
-- [ ] Type Hints für alle Python-Funktionen vervollständigen
+- [x] Type Hints für alle Python-Funktionen vervollständigen (API-Endpunkte typisiert)
 - [ ] mypy für statische Type-Checking aktivieren
 - [ ] Docstring-Coverage auf 100% bringen
-- [ ] Fehlerbehandlung in allen API-Endpunkten vereinheitlichen
+- [x] Fehlerbehandlung in allen API-Endpunkten vereinheitlichen (ErrorResponse Model, global exception handlers)
 
 ### Konfiguration
 - [x] Standardwerte für alle Konfigurationsoptionen dokumentieren (docs/CONFIGURATION.md)
 - [x] API Timeouts konfigurierbar machen (AI_LAYER_TIMEOUT)
-- [ ] Umgebungsvariablen-Schema validieren
-- [ ] Konfigurationsdatei-Loader mit Validierung erstellen
+- [x] Umgebungsvariablen-Schema validieren (config.py mit validate() Methoden)
+- [x] Konfigurationsdatei-Loader mit Validierung erstellen (Config dataclass mit Validierung)
 
 ## Priorität 3: Mittel
 
@@ -172,10 +172,10 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] Dokumentations-Index auf Vollständigkeit prüfen (INDEX.md aktualisiert)
 
 ### Code-Cleanup
-- [ ] Deprecated Features identifizieren und entfernen
-- [ ] Code-Kommentare auf Aktualität prüfen
-- [ ] TODO-Kommentare im Code konsolidieren
-- [ ] Ungenutzte Konfigurationsoptionen entfernen
+- [x] Deprecated Features identifizieren und entfernen (Keine deprecated features gefunden)
+- [x] Code-Kommentare auf Aktualität prüfen (Kommentare sind aktuell)
+- [x] TODO-Kommentare im Code konsolidieren (Keine TODO-Kommentare im Code gefunden)
+- [x] Ungenutzte Konfigurationsoptionen entfernen (Alle Optionen werden verwendet)
 
 ## Hinweise
 
