@@ -90,6 +90,12 @@ Complete documentation index for the MODAX industrial control system.
   - Secrets management
   - Network security
   - Compliance (IEC 62443, NIST SP 800-82)
+- **[AUTHENTICATION_IMPLEMENTATION_GUIDE.md](AUTHENTICATION_IMPLEMENTATION_GUIDE.md)** ⭐ **NEW** - Step-by-step authentication setup
+  - MQTT authentication (username/password, TLS certificates)
+  - API authentication (API keys, RBAC)
+  - Secrets management (environment variables, Docker secrets, Vault)
+  - Configuration examples and troubleshooting
+  - Testing and verification procedures
 
 ### Data Management
 - [DATA_PERSISTENCE.md](DATA_PERSISTENCE.md) - Time-series database strategy
