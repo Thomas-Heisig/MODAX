@@ -7,6 +7,77 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Hinzugefügt - Umfassende Entwicklerdokumentation (2025-12-09)
+- **📚 CONTRIBUTING.md** - Vollständige Contribution Guidelines
+  - Code of Conduct und Entwicklungsworkflow
+  - Coding Standards für Python, C# und C++
+  - Type Hints und Docstring-Konventionen
+  - Testing-Anforderungen (95% Coverage-Minimum)
+  - Pull Request Checkliste
+  - Branching-Strategie (feature/, fix/, docs/, refactor/, test/)
+  - Sicherheitsrichtlinien für Safety-Critical Code
+  
+- **📚 docs/TROUBLESHOOTING.md** - Umfassender Troubleshooting-Guide
+  - Quick Diagnostics mit System Health Check
+  - Detaillierte Problemlösung für alle Komponenten:
+    - Connection Issues (HMI, Control Layer, AI Layer)
+    - MQTT Problems (Broker, Authentication, Connection Drops)
+    - API Issues (500 Errors, Timeouts, Authentication)
+    - HMI Problems (No Data, Crashes, Chart Updates)
+    - ESP32 Field Layer (WiFi, Sensors, Memory)
+    - Performance Issues (CPU, Memory, Database)
+    - Data Issues (Missing Data, Incorrect Analysis)
+    - Security Issues (Unauthorized Access, TLS)
+    - Docker/Deployment Issues (Container, Network)
+  - Diagnose-Befehle und Lösungsstrategien
+  - Emergency Support Guidelines
+  
+- **📚 docs/BEST_PRACTICES.md** - Development Best Practices
+  - Architecture & Design:
+    - Separation of Concerns (Safety-Critical vs. AI)
+    - Layered Communication Pattern
+    - Scalability Considerations
+  - Code Quality Standards:
+    - Type Hints und Docstring Examples
+    - Error Handling Patterns
+    - Logging Standards (DEBUG/INFO/WARNING/ERROR/CRITICAL)
+    - Configuration Management
+  - Security Best Practices:
+    - Authentication & Authorization
+    - TLS/SSL Encryption
+    - Secrets Management (Vault)
+    - Input Validation mit Pydantic
+  - Performance Optimization:
+    - Data Aggregation mit Numpy
+    - Asynchronous Operations
+    - Caching Strategies
+    - Database Optimization
+  - Testing Strategies:
+    - Unit Testing Examples
+    - Integration Testing
+    - Load Testing mit Locust
+  - Deployment & Operations:
+    - Container Best Practices
+    - Docker Compose Setup
+    - Environment-Specific Configuration
+    - Graceful Shutdown Handling
+  - Monitoring & Observability:
+    - Prometheus Metrics Collection
+    - Health Checks (/health, /ready)
+    - Structured Logging
+  - Data Management:
+    - Data Retention Policies
+    - Archival Strategies
+    - Backup Procedures
+
+### Geändert
+- **docs/INDEX.md** aktualisiert mit neuen Dokumenten
+  - Developer Resources Section hinzugefügt
+  - CONTRIBUTING.md, TROUBLESHOOTING.md, BEST_PRACTICES.md verlinkt
+  - Quick Reference Card erweitert
+  - "For Developers" Section aktualisiert
+  - Last Updated auf 2025-12-09
+
 ## [0.4.0] - 2025-12-07
 
 ### Hinzugefügt - Extended G-Code Support & Interpreter

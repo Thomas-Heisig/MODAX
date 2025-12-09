@@ -12,6 +12,57 @@ Jeder Eintrag sollte folgende Informationen enthalten:
 
 ---
 
+## 2025-12-09
+
+### Umfassende Entwicklerdokumentation erstellt
+- **Datum:** 2025-12-09
+- **Typ:** Documentation/Enhancement
+- **Beschreibung:** Drei umfassende Dokumentationsdateien für Entwickler und Betreiber erstellt
+- **Commit:** 12ce285
+- **Autor:** GitHub Copilot Agent
+- **Details:**
+  - **CONTRIBUTING.md (9.8KB):**
+    - Code of Conduct und Entwicklungsrichtlinien
+    - Coding Standards für Python, C# und C++
+    - Type Hints und Docstring-Konventionen
+    - Testing-Anforderungen und Checklisten
+    - Pull Request Template und Review-Prozess
+    - Branching-Strategie und Commit-Konventionen
+    - Sicherheitsrichtlinien für Safety-Critical Code
+  - **docs/TROUBLESHOOTING.md (19KB):**
+    - Quick Diagnostics und System Health Checks
+    - Umfassende Problemlösung für alle Komponenten:
+      - Connection Issues (HMI, Control, AI Layer)
+      - MQTT Problems (Broker, Auth, Reconnects)
+      - API Issues (500 Errors, Timeouts)
+      - HMI Problems (No Data, Crashes)
+      - ESP32 Issues (WiFi, Sensors, Memory)
+      - Performance Issues (CPU, Memory, DB)
+      - Security Issues (TLS, Auth)
+      - Docker/Deployment Issues
+    - Diagnose-Befehle und konkrete Lösungen
+    - Emergency Support Guidelines
+  - **docs/BEST_PRACTICES.md (24.7KB):**
+    - Architecture & Design Patterns
+    - Code Quality Standards mit Beispielen
+    - Security Best Practices (Auth, TLS, Secrets)
+    - Performance Optimization Strategies
+    - Testing Strategies (Unit, Integration, Load)
+    - Deployment & Operations Guidelines
+    - Monitoring & Observability Patterns
+    - Data Management Best Practices
+    - Comprehensive Code Examples
+  - **docs/INDEX.md aktualisiert:**
+    - Developer Resources Section hinzugefügt
+    - Neue Dokumente verlinkt
+    - Quick Reference Card erweitert
+    - Last Updated auf 2025-12-09
+  - **CHANGELOG.md aktualisiert:**
+    - Unreleased Section mit neuen Dokumenten
+  - **TODO.md aktualisiert:**
+    - Items 124, 125, 126 als erledigt markiert
+    - Housekeeping Tasks als abgeschlossen markiert
+
 ## 2025-12-07
 
 ### Security und Feature-Erweiterungen implementiert

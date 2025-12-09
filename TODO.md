@@ -121,9 +121,9 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 
 ### Dokumentation
 - [ ] Video-Tutorials für Setup erstellen
-- [ ] Troubleshooting-Guide erweitern
-- [ ] Best-Practices-Dokument schreiben
-- [ ] Beitragsrichtlinien (CONTRIBUTING.md) erstellen
+- [x] Troubleshooting-Guide erweitern (docs/TROUBLESHOOTING.md)
+- [x] Best-Practices-Dokument schreiben (docs/BEST_PRACTICES.md)
+- [x] Beitragsrichtlinien (CONTRIBUTING.md) erstellen
 
 ## Zukünftige Ideen (Backlog)
 
@@ -167,9 +167,9 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] TODO.md Datum auf 2025 korrigieren
 - [x] ISSUES.md Datum auf 2025 korrigieren
 - [x] DONE.md mit erledigten Aufgaben von 2025-12-07 aktualisieren
-- [ ] Alle Dokumentationsdateien auf Datum 2025 prüfen
-- [ ] CHANGELOG.md für Version 0.2.0 vorbereiten
-- [ ] Dokumentations-Index auf Vollständigkeit prüfen
+- [x] Alle Dokumentationsdateien auf Datum 2025 prüfen
+- [x] CHANGELOG.md für Version 0.2.0 vorbereiten (bereits vorhanden)
+- [x] Dokumentations-Index auf Vollständigkeit prüfen (INDEX.md aktualisiert)
 
 ### Code-Cleanup
 - [ ] Deprecated Features identifizieren und entfernen

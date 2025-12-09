@@ -217,15 +217,18 @@ Complete documentation index for the MODAX industrial control system.
 1. [ARCHITECTURE](ARCHITECTURE.md) - Understand the system
 2. [SETUP](SETUP.md) - Get environment running
 3. [API](API.md) - Learn the APIs
-4. [FUNCTION_REFERENCE](FUNCTION_REFERENCE.md) - Detailed function documentation
-5. [GLOSSARY](GLOSSARY.md) - Technical terms and definitions
-6. [TESTING](TESTING.md) - Testing and code quality
-7. [CI_CD](CI_CD.md) - Development workflow
+4. [CONTRIBUTING](../CONTRIBUTING.md) - Contribution guidelines
+5. [FUNCTION_REFERENCE](FUNCTION_REFERENCE.md) - Detailed function documentation
+6. [GLOSSARY](GLOSSARY.md) - Technical terms and definitions
+7. [TESTING](TESTING.md) - Testing and code quality
+8. [CI_CD](CI_CD.md) - Development workflow
 
 **Advanced Topics:**
+- [BEST_PRACTICES](BEST_PRACTICES.md) - Development best practices
 - [OPC_UA_INTEGRATION](OPC_UA_INTEGRATION.md) - Protocol integration
 - [ERROR_HANDLING](ERROR_HANDLING.md) - Error patterns
 - [LOGGING_STANDARDS](LOGGING_STANDARDS.md) - Logging practices
+- [TROUBLESHOOTING](TROUBLESHOOTING.md) - Problem solving guide
 
 ### For DevOps Engineers
 **Essential Reading:**
@@ -280,6 +283,32 @@ Complete documentation index for the MODAX industrial control system.
 **Planning Documents:**
 - [TODO](../TODO.md) - Roadmap
 - TECHNOLOGY_ROADMAP.md (Coming soon) - Future plans
+
+### Developer Resources
+- **[CONTRIBUTING.md](../CONTRIBUTING.md)** ⭐ **NEW** - Contribution guidelines
+  - Code of conduct
+  - Development workflow
+  - Coding standards (Python, C#, C++)
+  - Testing requirements
+  - Pull request process
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** ⭐ **NEW** - Comprehensive troubleshooting guide
+  - Connection issues
+  - MQTT problems
+  - API issues
+  - HMI problems
+  - ESP32 field layer issues
+  - Performance issues
+  - Security issues
+  - Docker/deployment issues
+- **[BEST_PRACTICES.md](BEST_PRACTICES.md)** ⭐ **NEW** - Development best practices
+  - Architecture & design patterns
+  - Code quality standards
+  - Security best practices
+  - Performance optimization
+  - Testing strategies
+  - Deployment & operations
+  - Monitoring & observability
+  - Documentation standards
 
 ## Documentation Standards
 
@@ -337,11 +366,13 @@ Each documentation file should include:
 - **Component READMEs** - Specific implementation details
 
 ### Common Questions
-- **Setup problems?** → See [SETUP.md](SETUP.md)
+- **Setup problems?** → See [SETUP.md](SETUP.md) or [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 - **API questions?** → See [API.md](API.md)
 - **Security concerns?** → See [SECURITY.md](SECURITY.md)
 - **Deployment issues?** → See [CONTAINERIZATION.md](CONTAINERIZATION.md)
 - **Integration needs?** → See [OPC_UA_INTEGRATION.md](OPC_UA_INTEGRATION.md)
+- **Want to contribute?** → See [CONTRIBUTING.md](../CONTRIBUTING.md)
+- **Development guidelines?** → See [BEST_PRACTICES.md](BEST_PRACTICES.md)
 
 ## Documentation Status
 
@@ -378,31 +409,34 @@ Each documentation file should include:
 - Case studies
 
 ---
-**Last Updated:** 2025-12-07  
+**Last Updated:** 2025-12-09  
 **Maintained By:** MODAX Documentation Team
 
 ## Quick Reference Card
 
 ```
-┌─────────────────────────────────────────────────────┐
-│ MODAX Quick Documentation Reference                 │
-├─────────────────────────────────────────────────────┤
-│ Getting Started:          SETUP.md                  │
-│ System Overview:          ARCHITECTURE.md           │
-│ API Reference:            API.md                    │
-│ Function Reference:       FUNCTION_REFERENCE.md     │
-│ Glossary:                 GLOSSARY.md               │
-│ Testing & Quality:        TESTING.md                │
-│ Configuration:            CONFIGURATION.md          │
-│ Security:                 SECURITY.md               │
-│ Deployment:               CONTAINERIZATION.md       │
-│ Operations:               MONITORING.md             │
-│ Integration:              OPC_UA_INTEGRATION.md     │
-│ High Availability:        HIGH_AVAILABILITY.md      │
-│ Backup/Recovery:          BACKUP_RECOVERY.md        │
-│ Network Security:         NETWORK_ARCHITECTURE.md   │
-│ CI/CD:                    CI_CD.md                  │
-│ Handbook Prep:            HANDBOOK_PREPARATION.md   │
-│ Latest Review:            REVIEW_SUMMARY_2025-12-07 │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│ MODAX Quick Documentation Reference                  │
+├──────────────────────────────────────────────────────┤
+│ Getting Started:          SETUP.md                   │
+│ System Overview:          ARCHITECTURE.md            │
+│ API Reference:            API.md                     │
+│ Function Reference:       FUNCTION_REFERENCE.md      │
+│ Glossary:                 GLOSSARY.md                │
+│ Testing & Quality:        TESTING.md                 │
+│ Configuration:            CONFIGURATION.md           │
+│ Security:                 SECURITY.md                │
+│ Deployment:               CONTAINERIZATION.md        │
+│ Operations:               MONITORING.md              │
+│ Integration:              OPC_UA_INTEGRATION.md      │
+│ High Availability:        HIGH_AVAILABILITY.md       │
+│ Backup/Recovery:          BACKUP_RECOVERY.md         │
+│ Network Security:         NETWORK_ARCHITECTURE.md    │
+│ CI/CD:                    CI_CD.md                   │
+│ Contributing:             CONTRIBUTING.md            │
+│ Troubleshooting:          TROUBLESHOOTING.md         │
+│ Best Practices:           BEST_PRACTICES.md          │
+│ Handbook Prep:            HANDBOOK_PREPARATION.md    │
+│ Latest Review:            REVIEW_SUMMARY_2025-12-07  │
+└──────────────────────────────────────────────────────┘
 ```
