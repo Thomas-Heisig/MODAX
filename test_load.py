@@ -16,25 +16,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'python-ai-layer'))
 from data_aggregator import DataAggregator, SensorReading
 from anomaly_detector import StatisticalAnomalyDetector
 from wear_predictor import SimpleWearPredictor
-
-
-def calculate_p95(times):
-    """
-    Calculate the 95th percentile of a list of times.
-    
-    Args:
-        times: List of time measurements
-        
-    Returns:
-        95th percentile value, or max value if insufficient data
-    """
-    if not times:
-        return 0
-    if len(times) < 20:
-        return max(times)
-    # Using quantiles with n=100 gives us percentiles directly
-    # Index 94 gives us the 95th percentile (0-indexed)
-    return statistics.quantiles(times, n=100)[94]
+from test_utils import calculate_p95
 
 
 @dataclass
@@ -278,8 +260,9 @@ class TestMultiDeviceLoad(unittest.TestCase):
         
         # Performance assertions
         total_readings_per_burst = burst_size * num_devices
-        self.assertLess(avg_burst_time, 5, 
-                       f"Should handle {total_readings_per_burst} readings in < 5s")
+        # Tighter threshold: 2000 readings should be handled in < 3 seconds
+        self.assertLess(avg_burst_time, 3, 
+                       f"Should handle {total_readings_per_burst} readings in < 3s")
     
     def test_gradual_device_scaling(self):
         """Test system behavior as device count gradually increases"""

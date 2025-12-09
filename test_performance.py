@@ -4,7 +4,6 @@ import sys
 import os
 import time
 import statistics
-from unittest.mock import Mock, patch
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Add paths to system path
@@ -15,23 +14,7 @@ from data_aggregator import DataAggregator, SensorReading
 from anomaly_detector import StatisticalAnomalyDetector
 from wear_predictor import SimpleWearPredictor
 from optimizer import OptimizationRecommender
-
-
-def calculate_p95(times):
-    """
-    Calculate the 95th percentile of a list of times.
-    
-    Args:
-        times: List of time measurements
-        
-    Returns:
-        95th percentile value, or max value if insufficient data
-    """
-    if len(times) < 20:
-        return max(times) if times else 0
-    # Using quantiles with n=100 gives us percentiles directly
-    # Index 94 gives us the 95th percentile (0-indexed)
-    return statistics.quantiles(times, n=100)[94]
+from test_utils import calculate_p95
 
 
 class TestAPIPerformance(unittest.TestCase):

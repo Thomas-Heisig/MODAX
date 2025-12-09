@@ -13,7 +13,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'python-ai-layer'))
 from data_aggregator import DataAggregator, SensorReading, SafetyStatus
 from anomaly_detector import StatisticalAnomalyDetector
 from wear_predictor import SimpleWearPredictor
-from optimizer import OptimizationRecommender
 
 
 class TestEndToEndDataFlow(unittest.TestCase):
@@ -267,6 +266,9 @@ class TestEndToEndDataFlow(unittest.TestCase):
 
     def test_complete_ai_pipeline(self):
         """Test complete AI pipeline with anomaly detection, wear prediction, and optimization"""
+        # Import OptimizationRecommender only when needed
+        from optimizer import OptimizationRecommender
+        
         # Step 1: Simulate extended operation period
         for i in range(50):
             reading = SensorReading(
