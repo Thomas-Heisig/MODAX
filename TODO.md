@@ -121,7 +121,7 @@ Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufga
 - [x] OPC UA Integration dokumentieren (docs/OPC_UA_INTEGRATION.md)
 - [ ] OPC UA Server implementieren (siehe docs/OPC_UA_INTEGRATION.md)
 - [x] Externe System-Integrationen dokumentieren (docs/EXTERNAL_INTEGRATIONS.md)
-- [ ] MQTT Sparkplug B implementieren
+- [x] MQTT Sparkplug B implementieren (docs/MQTT_SPARKPLUG_B.md - Vollständiger Implementierungsplan)
 
 ### Dokumentation
 - [ ] Video-Tutorials für Setup erstellen
