@@ -18,6 +18,7 @@ import logging
 import sys
 import os
 import signal
+import time
 import uvicorn
 from pythonjsonlogger import jsonlogger
 from ai_service import app
@@ -74,24 +75,47 @@ def signal_handler(signum, frame):
 
 
 def main():
-    """Main entry point"""
+    """Main entry point - Fault tolerant startup"""
     logger.info("MODAX AI Layer Starting", extra={"component": "main"})
 
-    # Validate configuration
-    validate_config()
+    # Validate configuration with error handling
+    try:
+        validate_config()
+    except Exception as e:
+        logger.error("Configuration validation failed", extra={"error": str(e)}, exc_info=True)
+        logger.warning("Using default configuration values")
 
     # Register signal handlers for graceful shutdown
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
-    # Start API server
-    logger.info("Starting API server", extra={"host": AI_HOST, "port": AI_PORT})
-    uvicorn.run(
-        app,
-        host=AI_HOST,
-        port=AI_PORT,
-        log_level="info"
-    )
+    # Start API server with retry logic
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            logger.info(
+                f"Starting API server (attempt {attempt + 1}/{max_retries})",
+                extra={"host": AI_HOST, "port": AI_PORT})
+            uvicorn.run(
+                app,
+                host=AI_HOST,
+                port=AI_PORT,
+                log_level="info"
+            )
+            # If we reach here, server exited normally
+            logger.info("API server stopped normally")
+            sys.exit(0)
+        except Exception as e:
+            logger.error(
+                f"Failed to start API server (attempt {attempt + 1}/{max_retries})",
+                extra={"error": str(e)}, exc_info=True)
+            if attempt < max_retries - 1:
+                logger.info("Retrying in 2 seconds...")
+                # Blocking sleep is acceptable during startup retry
+                time.sleep(2)
+            else:
+                logger.error("Failed to start API server after all retries")
+                sys.exit(1)
 
 
 if __name__ == "__main__":
