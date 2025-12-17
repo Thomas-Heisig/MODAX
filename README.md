@@ -11,10 +11,13 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
 
 **Kernkonzept:** Sichere Automatisierung mit beratender KI - Die KI-Ebene liefert Empfehlungen und Analysen, während die Steuerungsebene alle sicherheitskritischen Entscheidungen trifft. Das System kombiniert Echtzeit-Reaktionsfähigkeit mit intelligenter Langzeit-Analyse.
 
-**Aktuelle Version:** 0.4.1 (Device Communication Protocols & Integration)
-- 161+ Unit-Tests, 96-97% Code Coverage
+**Aktuelle Version:** 0.5.0 (MDI Interface & Network Scanner)
+- 172+ Unit-Tests, 96-97% Code Coverage
+- **NEU:** MDI (Multiple Document Interface) mit Dashboard und Tabs
+- **NEU:** Network Scanner & Port Scanner mit automatischer Geräteerkennung
+- **NEU:** Erweiterte Dashboard-Funktionen (Overview, Devices, Analytics, Logs)
 - Vollständige CNC-Maschinen-Funktionalität
-- **NEU:** RS485/Modbus, MIDI, Pendant, Slave Board Support
+- RS485/Modbus, MIDI, Pendant, Slave Board Support
 - Industrielle Kommunikationsprotokolle
 - Produktionsreife Dokumentation
 - Docker-ready Architektur
@@ -50,11 +53,15 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
    - **Entry Point:** `python-ai-layer/main.py`
 
 4. **HMI-Ebene (C#)** - Mensch-Maschine-Schnittstelle
+   - **NEU:** MDI (Multiple Document Interface) mit Tabs und Fenstern
+   - **NEU:** Erweitertes Dashboard (Overview, Devices, Analytics, Logs)
+   - **NEU:** Network Scanner & Port Scanner Integration
    - Echtzeit-Überwachung (2s Update-Intervall)
    - Sicherheitsstatus-Anzeige mit Farbcodierung
    - KI-Empfehlungen mit Confidence-Level
    - Steuerungsbefehle mit Verbindungsstatus-Prüfung
    - Fehlerbehandlung mit Troubleshooting-Hinweisen
+   - Umfangreiche Keyboard-Shortcuts (F1, Ctrl+D, Ctrl+N, etc.)
    - **Entry Point:** `csharp-hmi-layer/Program.cs`
 
 ## Hauptmerkmale
@@ -113,6 +120,17 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
 - **Digital Twin:** Virtual machine simulation and optimization
 - **Next-Gen HMI:** Cloud-native interfaces, AR guidance, voice control
 - Siehe [ADVANCED_CNC_INDUSTRY_4_0.md](docs/ADVANCED_CNC_INDUSTRY_4_0.md) für vollständige Roadmap
+
+### 💻 MDI Interface & Network Scanner (NEU in v0.5.0)
+- **MDI (Multiple Document Interface):** Moderne Tab-basierte Benutzeroberfläche
+- **Erweitertes Dashboard:** Overview, Devices, Analytics, Logs-Tabs
+- **Network Scanner:** Automatische Netzwerk-Geräteerkennung (CIDR-Notation)
+- **Port Scanner:** Service-Erkennung mit Common Ports und Custom Ranges
+- **Device Type Detection:** Automatische Identifikation (Modbus, OPC UA, MODAX, Web, SSH)
+- **Keyboard Shortcuts:** Umfangreiche Tastaturkürzel (F1, Ctrl+D, Ctrl+N, etc.)
+- **Window Management:** Cascade, Tile Horizontal/Vertical, Arrange Icons
+- **Rate Limiting:** Schutz vor Missbrauch mit API-Ratenbegrenzung
+- Siehe [MDI_INTERFACE.md](docs/MDI_INTERFACE.md) für vollständige Dokumentation
 
 ### 🔌 Industrielle Kommunikation (NEU in v0.4.1)
 - **RS485/Modbus RTU:** Direkte VFD-Steuerung (ABB, Siemens, Schneider, etc.)

@@ -20,6 +20,7 @@ from data_export import get_data_exporter
 from config import config
 from cnc_integration import get_cnc_integration
 from cache_manager import get_cache_manager
+from network_scanner import NetworkScanner, PortScanner
 
 logger = logging.getLogger(__name__)
 audit_logger = get_security_audit_logger()
@@ -1012,4 +1013,235 @@ async def parse_gcode(
 
     except Exception as e:
         logger.error(f"Error parsing G-code: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Network Scanner Endpoints
+@app.post("/api/v1/network/scan")
+@limiter.limit("5/minute")  # Rate limit to prevent abuse
+async def scan_network(
+    request: Request,
+    network: Optional[str] = None,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
+    """
+    Scan network for devices
+    
+    Parameters:
+    - network: CIDR notation (e.g., "192.168.1.0/24"). If not provided, scans local subnet.
+    
+    Returns list of discovered devices with IP, hostname, and open ports.
+    """
+    try:
+        scanner = NetworkScanner(timeout=1.0)
+        
+        if network:
+            devices = await scanner.scan_network_range(network)
+        else:
+            devices = await scanner.scan_subnet()
+        
+        audit_logger.log_access_event(
+            "network_scan",
+            {"network": network or "local_subnet", "devices_found": len(devices)}
+        )
+        
+        return {
+            "status": "success",
+            "scan_time": datetime.now().isoformat(),
+            "network": network or "local_subnet",
+            "devices_found": len(devices),
+            "devices": [device.to_dict() for device in devices]
+        }
+        
+    except Exception as e:
+        logger.error(f"Error scanning network: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/network/scan/quick")
+@limiter.limit("10/minute")
+async def quick_scan(
+    request: Request,
+    hosts: List[str],
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
+    """
+    Quick scan of specific hosts
+    
+    Parameters:
+    - hosts: List of IP addresses or hostnames to scan
+    
+    Returns list of active devices from the provided hosts.
+    """
+    try:
+        if len(hosts) > 100:
+            raise HTTPException(
+                status_code=400,
+                detail="Maximum 100 hosts per quick scan"
+            )
+        
+        scanner = NetworkScanner(timeout=1.0)
+        devices = await scanner.quick_scan(hosts)
+        
+        audit_logger.log_access_event(
+            "network_quick_scan",
+            {"hosts_scanned": len(hosts), "devices_found": len(devices)}
+        )
+        
+        return {
+            "status": "success",
+            "scan_time": datetime.now().isoformat(),
+            "hosts_scanned": len(hosts),
+            "devices_found": len(devices),
+            "devices": [device.to_dict() for device in devices]
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in quick scan: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/port/scan")
+@limiter.limit("10/minute")
+async def scan_ports(
+    request: Request,
+    host: str,
+    ports: Optional[List[int]] = None,
+    common_ports: bool = True,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
+    """
+    Scan ports on a specific host
+    
+    Parameters:
+    - host: IP address or hostname to scan
+    - ports: List of specific ports to scan (optional)
+    - common_ports: If True and ports not specified, scans common ports
+    
+    Returns dictionary of port numbers and their status.
+    """
+    try:
+        scanner = PortScanner(timeout=1.0)
+        
+        if ports:
+            if len(ports) > 1000:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Maximum 1000 ports per scan"
+                )
+            port_status = await scanner.scan_ports(host, ports)
+            results = [
+                {
+                    "port": port,
+                    "open": is_open,
+                    "service": scanner.get_service_info(port) if is_open else None
+                }
+                for port, is_open in port_status.items()
+            ]
+        elif common_ports:
+            services = await scanner.scan_common_ports(host)
+            results = [
+                {
+                    "port": port,
+                    "open": is_open,
+                    "service": service_name
+                }
+                for port, (is_open, service_name) in services.items()
+            ]
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Either 'ports' or 'common_ports' must be specified"
+            )
+        
+        open_ports = [r for r in results if r["open"]]
+        
+        audit_logger.log_access_event(
+            "port_scan",
+            {
+                "host": host,
+                "ports_scanned": len(results),
+                "open_ports": len(open_ports)
+            }
+        )
+        
+        return {
+            "status": "success",
+            "scan_time": datetime.now().isoformat(),
+            "host": host,
+            "ports_scanned": len(results),
+            "open_ports": len(open_ports),
+            "results": results
+        }
+        
+    except Exception as e:
+        logger.error(f"Error scanning ports: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/port/scan/range")
+@limiter.limit("5/minute")
+async def scan_port_range(
+    request: Request,
+    host: str,
+    start_port: int,
+    end_port: int,
+    api_key: str = Depends(get_api_key) if API_AUTH_ENABLED else None
+):
+    """
+    Scan a range of ports on a host
+    
+    Parameters:
+    - host: IP address or hostname to scan
+    - start_port: Starting port number
+    - end_port: Ending port number
+    
+    Returns list of open ports in the range.
+    """
+    try:
+        # Validate port range
+        if start_port < 1 or end_port > 65535 or start_port > end_port:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid port range. Ports must be 1-65535 and start_port <= end_port"
+            )
+        
+        if (end_port - start_port) > 1000:
+            raise HTTPException(
+                status_code=400,
+                detail="Port range too large. Maximum 1000 ports per scan"
+            )
+        
+        scanner = PortScanner(timeout=0.5)  # Faster timeout for range scans
+        open_ports = await scanner.scan_range(host, start_port, end_port)
+        
+        results = [
+            {
+                "port": port,
+                "service": scanner.get_service_info(port)
+            }
+            for port in open_ports
+        ]
+        
+        audit_logger.log_access_event(
+            "port_range_scan",
+            {
+                "host": host,
+                "port_range": f"{start_port}-{end_port}",
+                "open_ports": len(open_ports)
+            }
+        )
+        
+        return {
+            "status": "success",
+            "scan_time": datetime.now().isoformat(),
+            "host": host,
+            "port_range": f"{start_port}-{end_port}",
+            "ports_scanned": end_port - start_port + 1,
+            "open_ports": len(open_ports),
+            "results": results
+        }
+        
+    except Exception as e:
+        logger.error(f"Error scanning port range: {e}")
         raise HTTPException(status_code=500, detail=str(e))

@@ -767,16 +767,161 @@ Different API keys have different permission levels:
 
 ---
 
+## Network Scanner Endpoints
+
+### POST /api/v1/network/scan
+Scan network for active devices.
+
+**Query Parameters:**
+- `network` (string, optional): CIDR notation (e.g., "192.168.1.0/24"). If not provided, scans local subnet.
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "scan_time": "2025-12-17T10:20:00.000Z",
+  "network": "192.168.1.0/24",
+  "devices_found": 5,
+  "devices": [
+    {
+      "ip": "192.168.1.1",
+      "hostname": "router.local",
+      "mac": null,
+      "open_ports": [80, 443],
+      "device_type": "Web Server",
+      "vendor": null,
+      "discovered_at": "2025-12-17T10:20:00.000Z"
+    }
+  ]
+}
+```
+
+**Rate Limit:** 5 requests/minute
+
+### POST /api/v1/network/scan/quick
+Quick scan of specific hosts.
+
+**Request Body:**
+```json
+{
+  "hosts": ["192.168.1.1", "192.168.1.2", "192.168.1.100"]
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "scan_time": "2025-12-17T10:20:00.000Z",
+  "hosts_scanned": 3,
+  "devices_found": 2,
+  "devices": [...]
+}
+```
+
+**Rate Limit:** 10 requests/minute  
+**Maximum:** 100 hosts per request
+
+### POST /api/v1/port/scan
+Scan ports on a specific host.
+
+**Query Parameters:**
+- `host` (string, required): IP address or hostname
+- `common_ports` (boolean, default: true): Scan common ports (22, 80, 443, 502, 8000, 8001, etc.)
+- `ports` (array, optional): List of specific ports to scan
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "scan_time": "2025-12-17T10:20:00.000Z",
+  "host": "192.168.1.100",
+  "ports_scanned": 24,
+  "open_ports": 3,
+  "results": [
+    {
+      "port": 22,
+      "open": true,
+      "service": "SSH"
+    },
+    {
+      "port": 80,
+      "open": true,
+      "service": "HTTP"
+    },
+    {
+      "port": 8000,
+      "open": true,
+      "service": "HTTP Alt (Control Layer)"
+    }
+  ]
+}
+```
+
+**Rate Limit:** 10 requests/minute  
+**Maximum:** 1000 ports per request
+
+### POST /api/v1/port/scan/range
+Scan a range of ports on a host.
+
+**Query Parameters:**
+- `host` (string, required): IP address or hostname
+- `start_port` (integer, required): Starting port number (1-65535)
+- `end_port` (integer, required): Ending port number (1-65535)
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "scan_time": "2025-12-17T10:20:00.000Z",
+  "host": "192.168.1.100",
+  "port_range": "8000-8100",
+  "ports_scanned": 101,
+  "open_ports": 2,
+  "results": [
+    {
+      "port": 8000,
+      "service": "HTTP Alt (Control Layer)"
+    },
+    {
+      "port": 8001,
+      "service": "HTTP Alt (AI Layer)"
+    }
+  ]
+}
+```
+
+**Rate Limit:** 5 requests/minute  
+**Maximum:** 1000 ports per scan
+
+### Device Type Detection
+
+The network scanner automatically identifies device types based on open ports:
+
+| Device Type | Detected Ports |
+|------------|----------------|
+| Modbus Device | 502 |
+| OPC UA Device | 44818, 4840 |
+| MODAX Control System | 8000 and 8001 |
+| MODAX Control Layer | 8000 |
+| MODAX AI Layer | 8001 |
+| Web Server | 80, 443 |
+| SSH Device | 22 |
+| Telnet Device | 23 |
+
+---
+
 ## Support
 
 For API issues or questions:
 - Check this documentation
 - Review [ARCHITECTURE.md](ARCHITECTURE.md) for system design
+- Review [MDI_INTERFACE.md](MDI_INTERFACE.md) for HMI interface
 - Review [SECURITY_IMPLEMENTATION.md](SECURITY_IMPLEMENTATION.md) for security setup
 - See [ISSUES.md](../ISSUES.md) for known problems
 - Check application logs for detailed error messages
 
 ---
 
-**Last Updated:** 2025-12-07  
-**Documentation Version:** 1.1
+**Last Updated:** 2025-12-17  
+**Documentation Version:** 1.2

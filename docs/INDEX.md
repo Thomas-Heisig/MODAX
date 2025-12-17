@@ -4,10 +4,11 @@
 Complete documentation index for the MODAX industrial control system.
 
 **System Status:**
-- **Version:** 0.4.0 (Extended G-Code Support & Industry 4.0 Roadmap)
-- **Test Coverage:** 96-97% (126+ Unit Tests)
-- **NEW:** Vollständige CNC-Maschinen-Funktionalität
-- **✅ Features Verifiziert:** WebSocket, TimescaleDB, Prometheus, Health Checks
+- **Version:** 0.5.0 (MDI Interface & Network Scanner)
+- **Test Coverage:** 96-97% (172+ Unit Tests)
+- **NEW:** MDI Interface mit Dashboard und Network Scanner
+- **NEW:** Automatische Netzwerk-Geräteerkennung und Port-Scanning
+- **✅ Features Verifiziert:** WebSocket, TimescaleDB, Prometheus, Health Checks, Network Scanner
 - **Main Entry Points:** 
   - Field Layer: `esp32-field-layer/src/main.cpp`
   - Control Layer: `python-control-layer/main.py` (Port 8000)
@@ -45,6 +46,7 @@ Complete documentation index for the MODAX industrial control system.
 - [API.md](API.md) - REST API reference for Control and AI layers
 - [CONFIGURATION.md](CONFIGURATION.md) - Configuration options and environment variables
 - [NETWORK_ARCHITECTURE.md](NETWORK_ARCHITECTURE.md) - Network design, OT/IT separation, Purdue Model
+- **[MDI_INTERFACE.md](MDI_INTERFACE.md)** ⭐ **NEW** - MDI Interface, Dashboard, Network Scanner documentation
 - **[GLOSSARY.md](GLOSSARY.md)** ⭐ **NEW** - Comprehensive glossary of all technical terms (250+ entries)
 - **[FUNCTION_REFERENCE.md](FUNCTION_REFERENCE.md)** ⭐ **NEW** - Detailed function documentation for all modules
 - **[HANDBOOK_PREPARATION.md](HANDBOOK_PREPARATION.md)** ⭐ **NEW** - Structure and preparation for complete user handbook

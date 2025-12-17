@@ -23,9 +23,20 @@ namespace MODAX.HMI
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.SetHighDpiMode(HighDpiMode.SystemAware);
                 
+                // Check if MDI mode should be used (default: yes)
+                string? mdiMode = Environment.GetEnvironmentVariable("MODAX_MDI_MODE");
+                bool useMdi = string.IsNullOrEmpty(mdiMode) || mdiMode.ToLower() != "false";
+                
                 // Application must always start, even if backend is unavailable
                 // The MainForm handles connection errors gracefully
-                Application.Run(new MainForm());
+                if (useMdi)
+                {
+                    Application.Run(new MainFormMdi());
+                }
+                else
+                {
+                    Application.Run(new MainForm());
+                }
             }
             catch (Exception ex)
             {
