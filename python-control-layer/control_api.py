@@ -1130,12 +1130,14 @@ async def scan_ports(
                     detail="Maximum 1000 ports per scan"
                 )
             port_status = await scanner.scan_ports(host, ports)
-            results = {
-                "port": port,
-                "open": is_open,
-                "service": scanner.get_service_info(port) if is_open else None
-            } for port, is_open in port_status.items()
-            results = list(results)
+            results = [
+                {
+                    "port": port,
+                    "open": is_open,
+                    "service": scanner.get_service_info(port) if is_open else None
+                }
+                for port, is_open in port_status.items()
+            ]
         elif common_ports:
             services = await scanner.scan_common_ports(host)
             results = [
