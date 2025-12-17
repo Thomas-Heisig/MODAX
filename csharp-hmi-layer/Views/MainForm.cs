@@ -204,6 +204,17 @@ namespace MODAX.HMI.Views
             _refreshButton.Click += async (s, e) => await RefreshDevicesAsync();
             panel.Controls.Add(_refreshButton);
 
+            // Help button (NEW)
+            var helpButton = new Button
+            {
+                Text = "Help (F1)",
+                Location = new Point(970, 17),
+                Width = 90,
+                BackColor = Color.FromArgb(230, 240, 255)
+            };
+            helpButton.Click += (s, e) => ShowHelpDocumentation();
+            panel.Controls.Add(helpButton);
+
             return panel;
         }
 
@@ -856,13 +867,44 @@ namespace MODAX.HMI.Views
                     e.Handled = true;
                     _ = SendCommandAsync("stop_motor");
                 }
-                // Help shortcut
+                // Help shortcut - Open comprehensive help documentation
                 else if (e.KeyCode == Keys.F1)
+                {
+                    e.Handled = true;
+                    ShowHelpDocumentation();
+                }
+                // Quick keyboard shortcuts help
+                else if (e.Control && e.KeyCode == Keys.H)
                 {
                     e.Handled = true;
                     ShowKeyboardShortcutsHelp();
                 }
             };
+        }
+
+        /// <summary>
+        /// Display comprehensive help documentation
+        /// </summary>
+        private void ShowHelpDocumentation()
+        {
+            try
+            {
+                var helpForm = new HelpForm();
+                helpForm.Show(this);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error opening help documentation:\n\n{ex.Message}\n\n" +
+                    "Please ensure documentation files are available in the docs folder.",
+                    "MODAX HMI - Help Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+
+                // Fallback to keyboard shortcuts
+                ShowKeyboardShortcutsHelp();
+            }
         }
 
         /// <summary>
@@ -875,9 +917,12 @@ namespace MODAX.HMI.Views
 F5 or Ctrl+R     - Refresh device list
 Ctrl+S           - Start motor (requires device selection)
 Ctrl+T           - Stop motor (requires device selection)
-F1               - Show this help
+F1               - Open comprehensive help documentation
+Ctrl+H           - Show keyboard shortcuts (this dialog)
 
-Note: Control commands require a device to be selected first.";
+Note: Control commands require a device to be selected first.
+
+For full documentation, press F1 or click the Help button.";
 
             MessageBox.Show(
                 helpText,
