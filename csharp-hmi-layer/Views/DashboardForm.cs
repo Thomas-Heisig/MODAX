@@ -11,6 +11,10 @@ namespace MODAX.HMI.Views
     /// </summary>
     public partial class DashboardForm : MdiChildForm
     {
+        // Configuration constants
+        private const int MAX_LOG_LINES = 1000;
+        private const int LOG_TRIM_SIZE = 500;
+        
         private readonly ControlLayerClient _controlClient;
         private TabControl? _tabControl;
         private System.Windows.Forms.Timer? _updateTimer;
@@ -357,11 +361,11 @@ namespace MODAX.HMI.Views
                 _logsTextBox.ScrollToCaret();
                 
                 // Limit log size to prevent memory issues
-                if (_logsTextBox.Lines.Length > 1000)
+                if (_logsTextBox.Lines.Length > MAX_LOG_LINES)
                 {
                     var lines = _logsTextBox.Lines;
-                    var newLines = new string[500];
-                    Array.Copy(lines, lines.Length - 500, newLines, 0, 500);
+                    var newLines = new string[LOG_TRIM_SIZE];
+                    Array.Copy(lines, lines.Length - LOG_TRIM_SIZE, newLines, 0, LOG_TRIM_SIZE);
                     _logsTextBox.Lines = newLines;
                 }
             }

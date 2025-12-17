@@ -3,7 +3,6 @@ Network Scanner Module for MODAX
 Provides network discovery and device detection capabilities
 """
 import socket
-import struct
 import ipaddress
 from typing import List, Dict, Optional, Tuple
 import asyncio
@@ -104,22 +103,21 @@ class NetworkScanner:
     async def _scan_host(self, ip: str) -> Optional[NetworkDevice]:
         """Scan a single host"""
         try:
-            # Quick connectivity check
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(self.timeout)
-            
             # Try common ports to detect if host is alive
             ports_to_check = [80, 443, 22, 23, 8000, 8001, 502, 44818]  # Include Modbus and OPC UA
             is_alive = False
             open_ports = []
             
             for port in ports_to_check:
+                # Create a new socket for each port check
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(self.timeout)
                 result = sock.connect_ex((ip, port))
+                sock.close()
+                
                 if result == 0:
                     is_alive = True
                     open_ports.append(port)
-            
-            sock.close()
             
             if not is_alive:
                 return None

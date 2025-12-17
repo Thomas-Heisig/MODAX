@@ -376,7 +376,7 @@ Alt+F4            - Exit Application";
         {
             var about = @"MODAX - Modular Industrial Control System
 
-Version: 0.4.1
+Version: 0.5.0
 MDI Interface Edition
 
 © 2024 Thomas Heisig
