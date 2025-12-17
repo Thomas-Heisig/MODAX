@@ -70,44 +70,76 @@ def signal_handler(signum, frame):
 async def start_opcua_background():
     """Start OPC UA server in background"""
     if config.opcua.enabled:
-        logger.info("Starting OPC UA server...")
-        await init_opcua_server(
-            enable=True,
-            endpoint=config.opcua.endpoint,
-            enable_security=config.opcua.enable_security
-        )
-        logger.info("OPC UA server started")
+        try:
+            logger.info("Starting OPC UA server...")
+            await init_opcua_server(
+                enable=True,
+                endpoint=config.opcua.endpoint,
+                enable_security=config.opcua.enable_security
+            )
+            logger.info("OPC UA server started")
+        except Exception as e:
+            logger.error("Failed to start OPC UA server", extra={"error": str(e)}, exc_info=True)
+            logger.warning("Continuing without OPC UA server")
 
 
 def main():
-    """Main entry point"""
+    """Main entry point - Fault tolerant startup"""
     global control_layer_instance, opcua_server_task
 
     logger.info("MODAX Control Layer Starting", extra={"component": "main"})
 
     # Validate configuration before starting
-    logger.info("Validating configuration...")
-    config.validate()
+    try:
+        logger.info("Validating configuration...")
+        config.validate()
+    except Exception as e:
+        logger.error("Configuration validation failed", extra={"error": str(e)}, exc_info=True)
+        logger.warning("Using default configuration values where possible")
 
     # Register signal handlers
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
-    # Create and start control layer
-    control_layer_instance = ControlLayer(config)
-    control_api.set_control_layer(control_layer_instance)
-
+    # Create and start control layer with fault tolerance
     try:
-        # Start control layer
-        control_layer_instance.start()
+        control_layer_instance = ControlLayer(config)
+        control_api.set_control_layer(control_layer_instance)
+    except Exception as e:
+        logger.error("Failed to create control layer instance", extra={"error": str(e)}, exc_info=True)
+        logger.error("Cannot continue without control layer. Exiting.")
+        sys.exit(1)
 
-        # Start OPC UA server if enabled
-        if config.opcua.enabled:
+    # Start control layer with retry logic
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            logger.info(f"Starting control layer (attempt {attempt + 1}/{max_retries})...")
+            control_layer_instance.start()
+            logger.info("Control layer started successfully")
+            break
+        except Exception as e:
+            logger.error(f"Failed to start control layer (attempt {attempt + 1}/{max_retries})", 
+                        extra={"error": str(e)}, exc_info=True)
+            if attempt < max_retries - 1:
+                logger.info("Retrying in 2 seconds...")
+                import time
+                time.sleep(2)
+            else:
+                logger.warning("Control layer failed to start, continuing with API only")
+
+    # Start OPC UA server if enabled (non-critical)
+    if config.opcua.enabled:
+        try:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             loop.run_until_complete(start_opcua_background())
+        except Exception as e:
+            logger.error("Failed to initialize OPC UA", extra={"error": str(e)}, exc_info=True)
+            logger.warning("Continuing without OPC UA server")
 
-        # Start API server in main thread
+    # Start API server in main thread - This MUST succeed for the service to be useful
+    try:
         logger.info("Starting API server", extra={
             "host": config.control.api_host,
             "port": config.control.api_port
@@ -118,17 +150,25 @@ def main():
             port=config.control.api_port,
             log_level="info"
         )
-
     except Exception as e:
-        logger.error("Error in control layer", extra={"error": str(e)}, exc_info=True)
+        logger.error("Failed to start API server", extra={"error": str(e)}, exc_info=True)
+        logger.error("API server is critical. Shutting down.")
+        
+        # Cleanup
         if control_layer_instance:
-            control_layer_instance.stop()
+            try:
+                control_layer_instance.stop()
+            except Exception as cleanup_error:
+                logger.error("Error during cleanup", extra={"error": str(cleanup_error)})
         
         # Stop OPC UA server
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(stop_opcua_server())
-        loop.close()
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(stop_opcua_server())
+            loop.close()
+        except Exception as cleanup_error:
+            logger.error("Error stopping OPC UA", extra={"error": str(cleanup_error)})
         
         sys.exit(1)
 
