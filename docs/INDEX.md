@@ -152,6 +152,12 @@ Complete documentation index for the MODAX industrial control system.
   - Information model
   - Security configuration
   - SCADA integration examples
+- **[DEVICE_COMMUNICATION_PROTOCOLS.md](DEVICE_COMMUNICATION_PROTOCOLS.md)** ⭐ **NEW** - Industrial communication protocols
+  - RS485/Modbus RTU for frequency converters
+  - MIDI audio feedback for CNC events
+  - Pendant/handwheel device support
+  - I2C slave board expansion
+  - Live wire ESP32/Arduino communication
 
 ### External Systems & Cloud
 - [EXTERNAL_INTEGRATIONS.md](EXTERNAL_INTEGRATIONS.md) - ERP/MES/SCADA integration

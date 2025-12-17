@@ -11,9 +11,11 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
 
 **Kernkonzept:** Sichere Automatisierung mit beratender KI - Die KI-Ebene liefert Empfehlungen und Analysen, während die Steuerungsebene alle sicherheitskritischen Entscheidungen trifft. Das System kombiniert Echtzeit-Reaktionsfähigkeit mit intelligenter Langzeit-Analyse.
 
-**Aktuelle Version:** 0.3.0 (mit Industry 4.0 Roadmap)
-- 123+ Unit-Tests, 96-97% Code Coverage
+**Aktuelle Version:** 0.4.1 (Device Communication Protocols & Integration)
+- 161+ Unit-Tests, 96-97% Code Coverage
 - Vollständige CNC-Maschinen-Funktionalität
+- **NEU:** RS485/Modbus, MIDI, Pendant, Slave Board Support
+- Industrielle Kommunikationsprotokolle
 - Produktionsreife Dokumentation
 - Docker-ready Architektur
 - MQTT-basierte IoT-Kommunikation
@@ -111,6 +113,13 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
 - **Digital Twin:** Virtual machine simulation and optimization
 - **Next-Gen HMI:** Cloud-native interfaces, AR guidance, voice control
 - Siehe [ADVANCED_CNC_INDUSTRY_4_0.md](docs/ADVANCED_CNC_INDUSTRY_4_0.md) für vollständige Roadmap
+
+### 🔌 Industrielle Kommunikation (NEU in v0.4.1)
+- **RS485/Modbus RTU:** Direkte VFD-Steuerung (ABB, Siemens, Schneider, etc.)
+- **MIDI Audio Feedback:** Betriebsgeräusche für CNC-Events
+- **Pendant Device Support:** USB HID Handwheel/MPG für manuelle Steuerung
+- **Slave Board I2C:** Verteilte I/O-Erweiterung (Digital, Analog, PWM)
+- Graceful Degradation mit Stub-Implementierungen
 
 ### 🔧 Modular & Skalierbar
 - Mehrere Feldgeräte unterstützt

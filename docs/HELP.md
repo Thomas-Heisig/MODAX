@@ -38,6 +38,7 @@ Integrate MODAX with your systems:
 
 - **[API](API.md)** - REST API reference for Control and AI layers
 - **[DEVICE_INTEGRATION](DEVICE_INTEGRATION.md)** - Integrating devices (ESP32, PLCs, sensors)
+- **[DEVICE_COMMUNICATION_PROTOCOLS](DEVICE_COMMUNICATION_PROTOCOLS.md)** - **NEW** RS485/Modbus, MIDI, Pendant, I2C protocols
 - **[OPC_UA_INTEGRATION](OPC_UA_INTEGRATION.md)** - OPC UA server integration
 - **[MQTT_SPARKPLUG_B](MQTT_SPARKPLUG_B.md)** - Sparkplug B MQTT integration
 - **[EXTERNAL_INTEGRATIONS](EXTERNAL_INTEGRATIONS.md)** - Third-party system integrations
