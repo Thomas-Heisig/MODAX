@@ -5,6 +5,28 @@ Alle bemerkenswerten Änderungen an diesem Projekt werden in dieser Datei dokume
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [0.4.1] - 2025-12-17
+
+### Hinzugefügt - Device Communication Protocols
+- **RS485/Modbus RTU Driver** - Frequency converter (VFD) control
+  - Direkte VFD-Steuerung (Start/Stop, Frequenz, Status-Monitoring)
+  - Unterstützung für ABB, Siemens, Schneider, Danfoss, Delta VFDs
+  - Modbus RTU mit automatischer Wiederholung und Fehlerbehandlung
+- **MIDI Controller** - Audio-Feedback für CNC-Events
+  - Maschinen-, Werkzeug-, Programm- und Alarm-Events
+  - Konfigurierbare MIDI-Noten mit Intensität
+- **Pendant Device Support** - Manuelle Steuergeräte
+  - USB HID Handrad/MPG-Unterstützung
+  - Button-Handler für Maschinensteuerung
+  - Manuelle Achsbewegung (kontinuierlich, Schritt, MPG)
+  - Vorschub- und Spindel-Override
+- **Slave Board I2C** - Verteilte I/O-Erweiterung
+  - Digital I/O, Analog Input, PWM Output
+  - Auto-Discovery und Hot-Plugging
+- **DEVICE_COMMUNICATION_PROTOCOLS.md** - 12.5KB umfassende Dokumentation
+- **38 neue Unit-Tests** (19 MIDI, 19 RS485) - Gesamt: 161 Tests
+- Neue optionale Abhängigkeiten in requirements.txt
+
 ## [Unreleased]
 
 ### Hinzugefügt - Installation & Fehlertoleranz (2025-12-17)
