@@ -82,6 +82,16 @@ class SlaveStatus:
     uptime: Optional[float] = None
 
 
+# I2C Protocol Command Codes
+class I2CCommand:
+    """I2C protocol command codes for slave board communication"""
+    CMD_READ_DIGITAL = 0x01   # Read digital input
+    CMD_WRITE_DIGITAL = 0x02  # Write digital output
+    CMD_READ_ANALOG = 0x03    # Read analog input
+    CMD_WRITE_PWM = 0x04      # Write PWM output
+    CMD_GET_INFO = 0x10       # Get board information
+
+
 class SlaveBoardI2C:
     """
     I2C-based slave board driver
@@ -152,8 +162,12 @@ class SlaveBoardI2C:
 
         discovered = []
 
-        # Scan common I2C slave addresses (0x08-0x77)
-        for addr in range(0x08, 0x78):
+        # Scan I2C address range (0x08-0x77)
+        # 0x00-0x07 are reserved addresses
+        # 0x78-0x7F are reserved for special purposes
+        I2C_MIN_ADDR = 0x08
+        I2C_MAX_ADDR = 0x78  # Exclusive upper bound
+        for addr in range(I2C_MIN_ADDR, I2C_MAX_ADDR):
             try:
                 # Try to read from device
                 self._bus.read_byte(addr)
@@ -215,7 +229,7 @@ class SlaveBoardI2C:
             # Protocol: CMD_READ_DIGITAL (0x01), PIN
             data = self._bus.read_i2c_block_data(
                 config.address,
-                0x01,  # CMD_READ_DIGITAL
+                I2CCommand.CMD_READ_DIGITAL,
                 1
             )
 
@@ -260,7 +274,7 @@ class SlaveBoardI2C:
             # Protocol: CMD_WRITE_DIGITAL (0x02), PIN, VALUE
             self._bus.write_i2c_block_data(
                 config.address,
-                0x02,  # CMD_WRITE_DIGITAL
+                I2CCommand.CMD_WRITE_DIGITAL,
                 [pin, 1 if value else 0]
             )
 
@@ -299,7 +313,7 @@ class SlaveBoardI2C:
             # Protocol: CMD_READ_ANALOG (0x03), CHANNEL
             data = self._bus.read_i2c_block_data(
                 config.address,
-                0x03,  # CMD_READ_ANALOG
+                I2CCommand.CMD_READ_ANALOG,
                 2  # 16-bit value
             )
 
@@ -355,7 +369,7 @@ class SlaveBoardI2C:
 
             self._bus.write_i2c_block_data(
                 config.address,
-                0x04,  # CMD_WRITE_PWM
+                I2CCommand.CMD_WRITE_PWM,
                 [channel, value_high, value_low]
             )
 
@@ -394,7 +408,7 @@ class SlaveBoardI2C:
             # Protocol: CMD_GET_INFO (0x10)
             data = self._bus.read_i2c_block_data(
                 config.address,
-                0x10,  # CMD_GET_INFO
+                I2CCommand.CMD_GET_INFO,
                 8
             )
 

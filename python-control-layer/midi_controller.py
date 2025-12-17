@@ -82,7 +82,6 @@ class MidiController:
         Args:
             port_name: MIDI output port name (None = auto-detect)
             channel: MIDI channel (0-15)
-            channel: MIDI channel (0-15)
             velocity: Note velocity (0-127)
             duration: Note duration in seconds
         """
