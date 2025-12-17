@@ -17,6 +17,7 @@ import signal
 import sys
 import os
 import asyncio
+import time
 import uvicorn
 from pythonjsonlogger import jsonlogger
 from config import config
@@ -124,7 +125,6 @@ def main():
                 extra={"error": str(e)}, exc_info=True)
             if attempt < max_retries - 1:
                 logger.info("Retrying in 2 seconds...")
-                import time
                 time.sleep(2)
             else:
                 logger.warning("Control layer failed to start, continuing with API only")

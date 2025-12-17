@@ -18,6 +18,7 @@ import logging
 import sys
 import os
 import signal
+import time
 import uvicorn
 from pythonjsonlogger import jsonlogger
 from ai_service import app
@@ -110,7 +111,6 @@ def main():
                 extra={"error": str(e)}, exc_info=True)
             if attempt < max_retries - 1:
                 logger.info("Retrying in 2 seconds...")
-                import time
                 time.sleep(2)
             else:
                 logger.error("Failed to start API server after all retries")
