@@ -7,6 +7,72 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Hinzugefügt - Installation & Fehlertoleranz (2025-12-17)
+
+- **🔧 Automatisches Installationsskript (`install.sh`)**
+  - Erkennt Betriebssystem (Linux, macOS, Windows)
+  - Prüft alle Voraussetzungen (Python, .NET, MQTT)
+  - Erstellt virtuelle Python-Umgebungen für beide Layer
+  - Installiert alle Abhängigkeiten automatisch
+  - Generiert Konfigurationsdateien (.env)
+  - Erstellt Start-/Stop-Skripte (start-all.sh, stop-all.sh)
+  - Führt Validierungstests durch
+  
+- **🛡️ Fehlertoleranz-Verbesserungen**
+  - **Control Layer**: 3-fache Wiederholungslogik beim Start
+  - **AI Layer**: 3-fache Wiederholungslogik beim Start
+  - **HMI Layer**: Globale Exception Handler, startet immer
+  - Graceful Degradation bei Komponentenausfällen
+  - OPC UA Server startet optional, blockiert nicht das System
+  - Umfassende Fehlerprotokollierung auf allen Ebenen
+  
+- **📊 Progressive Strict Mode**
+  - Aktualisiertes `lint.sh` mit `--strict` Flag
+  - Progressive MyPy-Konfiguration
+  - Strengere Flake8-Regeln im Strict-Mode
+  - Pylint schlägt bei Fehlern im Strict-Mode fehl
+  - Normale Ausführung bleibt rückwärtskompatibel
+  
+- **📚 Dokumentation**
+  - Neues INSTALL_GUIDE.md mit vollständiger Installationsanleitung
+  - README.md mit automatischer Installation aktualisiert
+  - Fehlertoleranz-Features dokumentiert
+  - Linting-Dokumentation mit Strict-Mode
+
+### Geändert - Installation & Fehlertoleranz (2025-12-17)
+
+- **Python Control Layer (main.py)**
+  - Retry-Logik für Startup hinzugefügt
+  - Konfigurationsvalidierung mit Error-Handling
+  - OPC UA Start mit Try-Catch umschlossen
+  - Detaillierte Fehlerprotokollierung
+  
+- **Python AI Layer (main.py)**
+  - Retry-Logik für Startup hinzugefügt
+  - Konfigurationsvalidierung mit Error-Handling
+  - Graceful Exit bei wiederholten Fehlern
+  
+- **C# HMI Layer (Program.cs)**
+  - Globale Exception Handler hinzugefügt
+  - Application.ThreadException Handler
+  - AppDomain.UnhandledException Handler
+  - Benutzerfreundliche Fehlermeldungen
+  
+- **mypy.ini**
+  - Progressive Strict-Mode-Konfiguration
+  - Duplizierte Einträge entfernt
+  - Konsistente Typprüfungs-Einstellungen
+
+### Behoben - Installation & Fehlertoleranz (2025-12-17)
+
+- Import-Statements in main.py an den Anfang verschoben (PEP 8)
+- Duplizierte mypy-Konfiguration entfernt
+- Code-Formatierung für Flake8-Compliance korrigiert
+
+**Security**: 0 Sicherheitslücken (CodeQL verifiziert)
+
+---
+
 ### Geändert - Dokumentations-Reorganisation (2025-12-09)
 
 - **📁 Archive-Struktur erstellt** für historische Dokumentation
