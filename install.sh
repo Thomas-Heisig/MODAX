@@ -272,8 +272,7 @@ log_info "=== Creating startup scripts ==="
 cat > start-all.sh << 'EOF'
 #!/bin/bash
 # Start all MODAX services
-
-set -e
+# Services are fault-tolerant and will attempt to start independently
 
 echo "Starting MODAX services..."
 

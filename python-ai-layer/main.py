@@ -111,6 +111,7 @@ def main():
                 extra={"error": str(e)}, exc_info=True)
             if attempt < max_retries - 1:
                 logger.info("Retrying in 2 seconds...")
+                # Blocking sleep is acceptable during startup retry
                 time.sleep(2)
             else:
                 logger.error("Failed to start API server after all retries")
