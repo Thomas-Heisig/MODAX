@@ -15,6 +15,7 @@ Complete documentation index for the MODAX industrial control system.
   - HMI Layer: `csharp-hmi-layer/Program.cs`
 
 ## Quick Start
+- **[HELP](HELP.md)** ⭐ **NEW** - Main help entry point with full navigation (accessible via F1 in HMI)
 - [README](../README.md) - Project overview and quick start guide
 - [SETUP](SETUP.md) - Detailed setup instructions
 - [ARCHITECTURE](ARCHITECTURE.md) - System architecture overview
@@ -223,6 +224,14 @@ Complete documentation index for the MODAX industrial control system.
   - Hardware-in-the-loop (HIL) testing
   - Performance testing
   - Security testing
+
+## User Interface & Help
+- **[HELP_SYSTEM_INTEGRATION.md](HELP_SYSTEM_INTEGRATION.md)** ⭐ **NEW** - Integrated help system documentation
+  - Comprehensive documentation browser in HMI
+  - Accessible via F1 or Help button
+  - Full-text search across all documentation
+  - Organized navigation (10 categories, 50+ documents)
+  - Implementation details and usage guide
 
 ## Operational Guides (Coming Soon)
 - RUNBOOKS.md - Standard operational procedures
