@@ -57,6 +57,15 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
 
 ## Hauptmerkmale
 
+### 🛡️ Fehlertoleranz & Robustheit (NEU in v0.4.1)
+- **Automatische Wiederholungslogik:** Services starten mit bis zu 3 Versuchen bei Fehlern
+- **Graceful Degradation:** System läuft weiter, auch wenn einzelne Komponenten ausfallen
+- **Globale Exception Handler:** Umfassende Fehlerbehandlung auf allen Ebenen
+- **Startup Resilience:** API-Server startet garantiert, unabhängig von anderen Services
+- **HMI Offline-Modus:** HMI startet immer, auch wenn Backend nicht verfügbar ist
+- **Konfigurationsvalidierung:** Automatische Fallback auf Standardwerte bei Fehlern
+- **Comprehensive Logging:** Detaillierte Fehlerprotokolle für schnelle Problemanalyse
+
 ### ✅ Sicherheit zuerst
 - Alle sicherheitskritischen Funktionen bleiben KI-frei
 - Hardware-Sicherheitsverriegelungen auf ESP32
@@ -113,11 +122,42 @@ MODAX ist ein industrielles Steuerungssystem mit 4 Ebenen, das maschinelles Lern
 
 ### Voraussetzungen
 - Python 3.8+
-- .NET 8.0 SDK
-- MQTT Broker (Mosquitto)
+- .NET 8.0 SDK (optional, für HMI)
+- MQTT Broker (Mosquitto oder Docker)
 - PlatformIO (für ESP32)
 
-### Installation
+### Automatische Installation (Empfohlen)
+
+**Schnellinstallation aller Ebenen:**
+```bash
+git clone https://github.com/Thomas-Heisig/MODAX.git
+cd MODAX
+./install.sh
+```
+
+Das Installationsskript:
+- ✅ Prüft und validiert alle Voraussetzungen
+- ✅ Erstellt virtuelle Python-Umgebungen für beide Ebenen
+- ✅ Installiert alle Python-Abhängigkeiten
+- ✅ Konfiguriert .NET HMI (falls SDK verfügbar)
+- ✅ Erstellt Konfigurationsdateien (.env)
+- ✅ Generiert Start-/Stop-Skripte
+- ✅ Validiert die Installation
+
+**Services starten:**
+```bash
+./start-all.sh
+```
+
+**Services stoppen:**
+```bash
+./stop-all.sh
+```
+
+### Manuelle Installation
+
+<details>
+<summary>Klicken Sie hier für manuelle Installationsschritte</summary>
 
 1. **Repository klonen**
 ```bash
@@ -137,6 +177,8 @@ docker run -d -p 1883:1883 eclipse-mosquitto
 3. **Steuerungsebene starten**
 ```bash
 cd python-control-layer
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 python main.py
 ```
@@ -144,6 +186,8 @@ python main.py
 4. **KI-Ebene starten**
 ```bash
 cd python-ai-layer
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 python main.py
 ```
@@ -151,6 +195,7 @@ python main.py
 5. **HMI starten** (Windows)
 ```bash
 cd csharp-hmi-layer
+dotnet restore
 dotnet run
 ```
 
@@ -160,6 +205,8 @@ cd esp32-field-layer
 # Edit src/main.cpp with WiFi credentials
 pio run --target upload
 ```
+
+</details>
 
 Ausführliche Anweisungen finden Sie unter [docs/SETUP.md](docs/SETUP.md)
 
@@ -332,11 +379,12 @@ Das Projekt verfügt über umfassende Tests und Code-Qualitätstools:
 
 - **98 Unit-Tests** (42 Control Layer, 56 AI Layer)
 - **96-97% Code Coverage**
-- **Flake8 und Pylint** für Code-Qualitätsprüfungen
+- **Flake8, Pylint und MyPy** für Code-Qualitätsprüfungen
+- **Strict Mode** verfügbar für erhöhte Code-Qualität
 
 ### Tests ausführen
 ```bash
-# Alle Tests
+# Alle Tests mit Coverage
 ./test_with_coverage.sh
 
 # Nur Control Layer
@@ -348,8 +396,17 @@ cd python-ai-layer && python -m unittest discover -v
 
 ### Code-Linting
 ```bash
+# Standard-Linting (informativ)
 ./lint.sh
+
+# Strict Mode (erzwingt alle Prüfungen)
+./lint.sh --strict
 ```
+
+**Linting-Tools:**
+- **Flake8:** PEP 8 Compliance, Code-Komplexität
+- **Pylint:** Erweiterte Code-Analyse, Best Practices
+- **MyPy:** Statische Typprüfung
 
 Siehe [docs/TESTING.md](docs/TESTING.md) für weitere Details.
 

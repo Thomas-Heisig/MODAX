@@ -92,8 +92,9 @@ def main():
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            logger.info(f"Starting API server (attempt {attempt + 1}/{max_retries})", 
-                       extra={"host": AI_HOST, "port": AI_PORT})
+            logger.info(
+                f"Starting API server (attempt {attempt + 1}/{max_retries})",
+                extra={"host": AI_HOST, "port": AI_PORT})
             uvicorn.run(
                 app,
                 host=AI_HOST,
@@ -104,8 +105,9 @@ def main():
             logger.info("API server stopped normally")
             sys.exit(0)
         except Exception as e:
-            logger.error(f"Failed to start API server (attempt {attempt + 1}/{max_retries})", 
-                        extra={"error": str(e)}, exc_info=True)
+            logger.error(
+                f"Failed to start API server (attempt {attempt + 1}/{max_retries})",
+                extra={"error": str(e)}, exc_info=True)
             if attempt < max_retries - 1:
                 logger.info("Retrying in 2 seconds...")
                 import time
