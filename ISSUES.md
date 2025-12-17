@@ -2,7 +2,7 @@
 
 Dieses Dokument verfolgt bekannte Probleme und Bugs im MODAX-System. Behobene Probleme werden nach `DONE.md` verschoben.
 
-**Letzte Aktualisierung:** 2025-12-09  
+**Letzte Aktualisierung:** 2025-12-17  
 **Anzahl offener Issues:** 0 🎉  
 **Status:** Alle bekannten Issues wurden behoben oder dokumentiert
 

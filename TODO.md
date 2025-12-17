@@ -2,9 +2,9 @@
 
 Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufgaben werden nach `DONE.md` verschoben.
 
-**Letzte Aktualisierung:** 2025-12-09  
+**Letzte Aktualisierung:** 2025-12-17  
 **Aktuelle Version:** 0.4.0  
-**Status:** Produktionsreif mit vollständiger Dokumentation, CNC-Funktionen, Test-Coverage (96-97%), CI/CD und Kubernetes-Support
+**Status:** Produktionsreif mit vollständiger Dokumentation, integriertem Help-System, CNC-Funktionen, Test-Coverage (96-97%), CI/CD und Kubernetes-Support
 
 ## Offene Aufgaben
 
@@ -51,9 +51,11 @@ Für eine vollständige Liste der abgeschlossenen Aufgaben siehe [DONE.md](DONE.
 Kürzlich abgeschlossene Highlights:
 - ✅ 123+ abgeschlossene TODO-Items (Stand: 2025-12-09)
 - ✅ Vollständige Dokumentation (50+ Dokumente)
+- ✅ **Integriertes Help-System** (Stand: 2025-12-17) - Voller Dokumentationszugriff über F1 im HMI
 - ✅ CNC-Funktionalität implementiert und getestet
 - ✅ Security-Features implementiert (MQTT TLS, API Auth, Audit Logging)
 - ✅ Monitoring-Stack (Prometheus, Grafana, Loki)
 - ✅ CI/CD Pipeline mit GitHub Actions
 - ✅ Kubernetes-Support mit Helm Charts
 - ✅ 96-97% Test-Coverage
+- ✅ Alle Code-Quality Warnungen behoben
