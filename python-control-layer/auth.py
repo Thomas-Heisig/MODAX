@@ -96,7 +96,7 @@ class APIKeyManager:
             max_devices=100,
             enabled=True
         )
-        
+
         # Load additional tenants from environment
         # Format: TENANT_<ID>=name:max_devices:device1,device2
         for key, value in os.environ.items():
@@ -114,7 +114,7 @@ class APIKeyManager:
                         max_devices=max_devices,
                         enabled=True
                     )
-        
+
         logger.info(f"Loaded {len(self.tenants)} tenants")
 
     def _load_api_keys(self):
@@ -167,25 +167,25 @@ class APIKeyManager:
         if not user_context:
             return False
         return permission in user_context.permissions
-    
+
     def get_tenant(self, tenant_id: str) -> Optional[Tenant]:
         """Get tenant by ID"""
         return self.tenants.get(tenant_id)
-    
+
     def validate_device_access(self, user_context: UserContext, device_id: str) -> bool:
         """Check if a user has access to a specific device based on tenant"""
         tenant = self.get_tenant(user_context.tenant_id)
         if not tenant or not tenant.enabled:
             return False
-        
+
         # Admin can access all devices
         if user_context.role == Role.ADMIN:
             return True
-        
+
         # Check if device is in tenant's allowed devices
         if "*" in tenant.devices:  # Wildcard access
             return True
-        
+
         return device_id in tenant.devices
 
 
@@ -199,14 +199,14 @@ async def get_user_context(
 ) -> UserContext:
     """
     Dependency to validate API key and get user context with tenant information
-    
+
     Args:
         api_key: API key from X-API-Key header
         tenant_id: Optional tenant ID from X-Tenant-ID header
-        
+
     Returns:
         UserContext with user and tenant information
-        
+
     Raises:
         HTTPException: If authentication fails
     """
@@ -225,7 +225,7 @@ async def get_user_context(
             detail="Invalid API key",
             headers={"WWW-Authenticate": "ApiKey"},
         )
-    
+
     # Override tenant if provided and user is admin
     if tenant_id and user_context.role == Role.ADMIN:
         tenant = api_key_manager.get_tenant(tenant_id)
@@ -247,13 +247,13 @@ async def get_user_context(
 async def get_api_key(api_key: str = Security(api_key_header_scheme)) -> str:
     """
     Dependency to validate API key (backwards compatible)
-    
+
     Args:
         api_key: API key from X-API-Key header
-        
+
     Returns:
         The validated API key string
-        
+
     Raises:
         HTTPException: If authentication fails
     """
@@ -263,16 +263,18 @@ async def get_api_key(api_key: str = Security(api_key_header_scheme)) -> str:
 
 async def require_permission(permission: Permission):
     """Dependency factory to require specific permission"""
-    async def check_permission(user_context: UserContext = Security(get_user_context)) -> UserContext:
+    async def check_permission(
+            user_context: UserContext = Security(get_user_context)
+    ) -> UserContext:
         """
         Check if the user has the required permission
-        
+
         Args:
             user_context: The user context to check
-            
+
         Returns:
             The validated user context
-            
+
         Raises:
             HTTPException: If the user doesn't have the required permission
         """
@@ -291,16 +293,18 @@ async def require_permission(permission: Permission):
 
 async def require_device_access(device_id: str):
     """Dependency factory to require device access based on tenant"""
-    async def check_device_access(user_context: UserContext = Security(get_user_context)) -> UserContext:
+    async def check_device_access(
+            user_context: UserContext = Security(get_user_context)
+    ) -> UserContext:
         """
         Check if the user has access to a specific device
-        
+
         Args:
             user_context: The user context to check
-            
+
         Returns:
             The validated user context
-            
+
         Raises:
             HTTPException: If the user doesn't have access to the device
         """
@@ -311,7 +315,8 @@ async def require_device_access(device_id: str):
             )
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Access denied: Device '{device_id}' not accessible to tenant '{user_context.tenant_id}'"
+                detail=(f"Access denied: Device '{device_id}' not accessible "
+                        f"to tenant '{user_context.tenant_id}'")
             )
         return user_context
     return check_device_access

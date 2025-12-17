@@ -43,7 +43,7 @@ class SimpleWearPredictor:
     def __init__(self):
         """
         Initialize wear predictor
-        
+
         Sets up wear accumulation factors and nominal lifetime thresholds
         for component wear tracking and prediction.
         """
