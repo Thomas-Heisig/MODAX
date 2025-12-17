@@ -3,13 +3,15 @@
 Dieses Dokument verfolgt offene Aufgaben für das MODAX-Projekt. Erledigte Aufgaben werden nach `DONE.md` verschoben.
 
 **Letzte Aktualisierung:** 2025-12-17  
-**Aktuelle Version:** 0.4.0  
-**Status:** Produktionsreif mit vollständiger Dokumentation, integriertem Help-System, CNC-Funktionen, Test-Coverage (96-97%), CI/CD und Kubernetes-Support
+**Aktuelle Version:** 0.4.1  
+**Status:** Produktionsreif mit vollständiger Dokumentation, integriertem Help-System, CNC-Funktionen, RS485/Modbus, MIDI-Feedback, Pendant-Support, Slave-Boards, Test-Coverage (96-97%), CI/CD und Kubernetes-Support
 
 ## Offene Aufgaben
 
 ### Tests
 - [ ] ESP32 Hardware-in-the-Loop Tests
+- [ ] RS485/Modbus integration tests
+- [ ] Pendant device integration tests
 
 ### Dokumentation
 - [ ] Video-Tutorials für Setup erstellen
