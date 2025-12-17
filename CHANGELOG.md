@@ -5,6 +5,90 @@ Alle bemerkenswerten Änderungen an diesem Projekt werden in dieser Datei dokume
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [0.5.0] - 2025-12-17
+
+### Hinzugefügt - MDI Interface & Network Scanner
+
+- **💻 MDI (Multiple Document Interface)**
+  - MDI Parent Window mit Menu Bar, Toolbar und Status Bar
+  - Child Windows: Dashboard, Network Scanner, Classic View
+  - Window Management: Cascade, Tile Horizontal/Vertical, Arrange Icons
+  - Umfangreiche Keyboard Shortcuts (F1, Ctrl+D, Ctrl+N, Ctrl+W, etc.)
+  - Environment Variable `MODAX_MDI_MODE` für Classic/MDI Toggle
+  - Real-time Connection Status in Status Bar
+  - About Dialog mit Versionsinformationen
+
+- **📊 Erweitertes Dashboard mit Tabs**
+  - **Overview Tab**: System Status, Devices Online, AI Status, Uptime
+  - **Devices Tab**: Device Grid mit Refresh-Funktion, Real-time Updates
+  - **Analytics Tab**: Placeholder für Charts und Statistiken
+  - **Logs Tab**: Real-time Activity Log mit Auto-scrolling, Clear-Funktion, 1000-Zeilen Limit
+
+- **🔍 Network Scanner & Port Scanner**
+  - **Network Scanner Tab**: 
+    - Full Network Scan (CIDR notation: 192.168.1.0/24)
+    - Local Subnet Scan (One-click)
+    - Device Discovery mit Hostname Resolution
+    - Device Type Detection (Modbus, OPC UA, MODAX, Web, SSH, etc.)
+    - Open Ports Detection
+  - **Port Scanner Tab**:
+    - Common Ports Preset (20+ Ports)
+    - Custom Port List Support
+    - Service Identification
+    - Color-coded Results (Green=Open, Gray=Closed)
+  - Results in DataGridView mit Sortierung und Filterung
+
+- **🌐 Backend Network Scanner Module**
+  - `network_scanner.py`: NetworkScanner und PortScanner Klassen
+  - Asynchrone Scanning mit asyncio
+  - Automatic Device Type Identification
+  - Concurrent Scanning für bessere Performance
+  - 11 neue Unit Tests (100% Pass Rate)
+
+- **🔌 Neue API Endpoints**
+  - `POST /api/v1/network/scan` - Network Range Scanning (Rate Limit: 5/min)
+  - `POST /api/v1/network/scan/quick` - Quick Host Scan (Rate Limit: 10/min, Max: 100 hosts)
+  - `POST /api/v1/port/scan` - Port Scanning (Rate Limit: 10/min, Max: 1000 ports)
+  - `POST /api/v1/port/scan/range` - Port Range Scanning (Rate Limit: 5/min, Max: 1000 ports)
+  - Audit Logging für alle Scan-Aktivitäten
+
+- **📚 Dokumentation**
+  - `docs/MDI_INTERFACE.md` - Vollständige MDI Interface Dokumentation
+  - `docs/WHATS_NEW_v0.5.0.md` - Release Notes und Feature Guide
+  - Aktualisierte `docs/API.md` mit Network Scanner Endpoints
+  - Aktualisierte `docs/INDEX.md` und `README.md` für v0.5.0
+
+### Geändert
+
+- **C# HMI Layer**
+  - `Program.cs`: MDI Mode Support mit Environment Variable
+  - MainForm jetzt optional, MDI als Standard
+  - Version auf 0.5.0 aktualisiert im About Dialog
+  
+- **Python Control Layer**
+  - `control_api.py`: 4 neue Endpoints für Network/Port Scanning
+  - Import von `network_scanner` Modulen
+
+### Verbessert
+
+- **Code Quality**
+  - Entfernt: Unused imports (struct)
+  - Behoben: Socket Reuse-Problem (neuer Socket pro Port Check)
+  - Aktualisiert: asyncio.get_event_loop() → asyncio.run() (Python 3.10+)
+  - Hinzugefügt: Named Constants für Magic Numbers (MAX_LOG_LINES, LOG_TRIM_SIZE)
+
+- **Testing**
+  - 172+ Unit Tests (war 161+)
+  - 0 Security Vulnerabilities (CodeQL verified)
+  - Alle Tests bestehen mit 100% Pass Rate
+
+### Sicherheit
+
+- Rate Limiting für alle Network Scanner Endpoints
+- Audit Logging für Scan-Aktivitäten
+- Maximum Limits für Scan-Größen (100 hosts, 1000 ports)
+- Keine neuen Sicherheitslücken (CodeQL checked)
+
 ## [0.4.1] - 2025-12-17
 
 ### Hinzugefügt - Device Communication Protocols
