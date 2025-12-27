@@ -155,24 +155,13 @@ Then create a Pull Request on GitHub with:
 
 ## Coding Standards
 
-⚠️ **WICHTIG:** Bitte lesen Sie die **[GitHub Copilot Instructions](.github/copilot-instructions.md)** für strikte Code-Qualitäts- und Sicherheitsregeln.
-
-**Kernprinzipien:**
-- **Payload Strict:** Type hints, Docstrings, Tests sind verpflichtend
-- **Immer dokumentieren:** Jede öffentliche Funktion/Klasse muss dokumentiert sein
-- **Gleiche Codebase:** Konsistente Patterns und Namenskonventionen
-- **Safety First:** KI niemals in sicherheitskritischen Funktionen
-- **Ebenentr ennung:** Strikte Trennung der 4 Ebenen einhalten
-
 ### Python (Control Layer & AI Layer)
 
 #### Style Guide
-- Follow PEP 8 (verpflichtend)
+- Follow PEP 8
 - Use 4 spaces for indentation
 - Maximum line length: 100 characters
 - Use descriptive variable names
-- **Type hints sind verpflichtend** (siehe Copilot Instructions)
-- **Docstrings sind verpflichtend** (Google-Style)
 
 #### Type Hints
 ```python
